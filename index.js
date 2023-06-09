@@ -59,13 +59,13 @@ const roles = require('./middleware/checkAdmin');
 //Ruta home para logearse o crear usuario/admin:
 app.use('/', homeRoutes);
 //Rutas del dashboard para ir hacia lado usuario o lado administrador:
-app.use('/dashboard', check.isAuth, roles.isAdmin, dashboardRoutes);
+app.use('/dashboard', roles.isAdmin, dashboardRoutes);
 //Rutas para usuario:
-app.use('/search', check.isAuth, searchRoutes);
+app.use('/search', searchRoutes);
 //Rutas para administrador:
-app.use('/movies', check.isAuth, adminRoutes);
+app.use('/movies', adminRoutes);
 //Rutas para ver las peliculas favoritas de un usuario:
-app.use('/favmovies', check.isAuth, roles.isAdmin, favMoviesRoutes);
+app.use('/favmovies', favMoviesRoutes);
 
 app.listen(port, () => {
     console.log(`server running on http://localhost:${port}`)

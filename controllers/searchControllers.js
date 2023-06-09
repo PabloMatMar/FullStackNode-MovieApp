@@ -36,14 +36,14 @@ const getSearch = (req, res) => {
 const startScraping = async (title) => {
     try {
         const movies = await scraper.scrap("https://www.filmaffinity.com/en/search.php?stype=title&stext=" + title);
-        return movies 
-    } catch (error) {
-        console.log("Error Scraping")
-    }
+        return movies;
+    } catch (err) {
+        res.status(500).send({ err });
+    };
 
 }
 /**
- * Description: This function gets all the movies in the database.
+ * Description: This function searches first in mongo, if it does not find the movie there it redirects the search to the api
  * @memberof searchControllers
  * @method getSearchForTitleInMongo 
  * @async 
@@ -57,34 +57,22 @@ const getSearchForTitleInMongo = async (req, res) => {
 
     try {
         const title = req.params.title;
-        let param = await Movies.find({ title }, { _id: 0, __v: 0 });
-        param = param[0];
-        console.log(param);
-        if (param !== undefined) {
+        let param = await Movies.find({ title }, { _id: 0, __v: 0 })[0];
+        if (param != undefined) {
+            console.log("SEARCH MONGO");
             const critics = await startScraping(title);
-            console.log("ENTRE EN SEARCH SEARCH MONGO");
-            console.log(critics);
-            let userData = req.oidc.user;
-            let userId = userData.sub;
-            if (userId.startsWith('auth0|')) {
-                console.log(userId.slice(userId.indexOf('|') + 1));
-                userId = userId.slice(userId.indexOf('|') + 1).trim();
-
-            }
-
-            res.status(200).render("searchInMongoForTitle", { param, critics: critics, userId });
+            res.status(200).render("searchInMongoForTitle", { param, critics: critics, /*userId*/ });
 
         } else {
-            const title = "/search/" + req.params.title;
-            res.redirect(title);
+            res.redirect("/search/" + req.params.title);
         }
     } catch (error) {
-        res.status(500).send({ error: "An error occurred while searching in MongoDB: " + error.message });
+        res.status(500).send({ error: error.message });
     }
 };
 
 /**
- * Description: This function gets all the movies in the database.
+ * Description: This function looks for the movie in the api, if it doesn't find it, it renders a movie view not found
  * @memberof searchControllers
  * @method getSearchForTitle
  * @async 
@@ -97,33 +85,22 @@ const getSearchForTitle = async (req, res) => {
     try {
         const resp = await fetch(`http://www.omdbapi.com/?t=${req.params.title}&apikey=` + API_KEY);
         let param = await resp.json();
-        console.log(param);
-        const title = req.params.title;
-        if (param.Response !== 'False') {
-            const critics = await startScraping(title);
-            console.log("ENTRE EN SEARCH SEARCH TITLE");
-            console.log(critics);
-            let userData = req.oidc.user;
-            let userId = userData.sub;
-            if (userId.startsWith('auth0|')) {
-                console.log(userId.slice(userId.indexOf('|') + 1));
-                userId = userId.slice(userId.indexOf('|') + 1).trim();
-
-            }
-            res.status(200).render("searchTitle", { param, critics: critics, userId });
+        if (param.Response) {
+            console.log("SEARCH TITLE");
+            const critics = await startScraping(req.params.title);
+        res.status(200).render("searchTitle", { param, critics: critics, /*userId*/ });
 
         } else {
-            console.log("ENTRE EN EL ELSE");
             res.render("noMovie");
-
         }
-    } catch (error) {
-        res.status(500).send({ error: "An error occurred while searching in OMDB API: " + error.message });
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({ err: err.message });
     }
 };
 
 /**
- * Description: This function gets all the movies in the database.
+ * Description: This function collects the name of the movie that the user wants to search.
  * @memberof searchControllers
  * @method postFilmForm
  * @async 
@@ -133,7 +110,6 @@ const getSearchForTitle = async (req, res) => {
  * @return {void} The function does not return any value.
  */
 const postFilmForm = async (req, res) => {
-
     const title = "/search/local/" + req.body.title
     res.redirect(title)
 }
