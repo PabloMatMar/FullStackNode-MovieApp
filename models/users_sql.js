@@ -29,16 +29,15 @@ const addFavorite = async (fav, emailFK) => {
         client = await pool.connect();
         const data = await client.query(queries.addFavorite, [title, year, director, genre, runtime, img, emailFK ]);
         result = data.rowCount;
-        console.log("POST FAVS");
     }
     catch (err) {
         console.log(err);
         throw err;
     } finally {
         client.release()
-    }
-    return result
-}
+    };
+    return result;
+};
 /**
  * Description: This function returns the user's favorites to the database
  * @memberof SQLQueries 
@@ -54,16 +53,15 @@ const getFavorites = async (user) => {
         client = await pool.connect();
         const data = await client.query(queries.getFavorites, [user]);
         result = data.rows;
-        console.log(result);
     }
     catch (err) {
         console.log(err);
         throw err;
     } finally {
-        client.release()
-    }
-    return result
-}
+        client.release();
+    };
+    return result;
+};
 
 const deleteFavorite = async (userId, title) => {
     console.log(userId, title);
@@ -72,32 +70,30 @@ const deleteFavorite = async (userId, title) => {
         client = await pool.connect();
         const data = await client.query(queries.deleteFavorite, [userId, title]);
         result = data.rows;
-        console.log(result);
     }
     catch (err) {
         console.log(err);
         throw err;
     } finally {
-        client.release()
-    }
-    return result
-}
+        client.release();
+    };
+    return result;
+};
 
 const createUser = async (user) => {
     const { emailSignup, passwordSignup } = user;
     let client, result;
     try {
         client = await pool.connect(); // Espera a abrir conexion
-        const data = await client.query(queries.createUser, [emailSignup, passwordSignup])
-        result = data.rowCount
-        console.log("Respuesta a POST SIGN UP")
+        const data = await client.query(queries.createUser, [emailSignup, passwordSignup]);
+        result = data.rowCount;
     } catch (err) {
         console.log(err);
         throw err;
     } finally {
-        client.release()
-    }
-    return result
+        client.release();
+    };
+    return result;
 };
 
 const validatedUser = async (user) => {
@@ -105,16 +101,15 @@ const validatedUser = async (user) => {
     let client, result;
     try {
         client = await pool.connect(); // Espera a abrir conexion
-        const data = await client.query(queries.validatedUser,[email, password])
-        result = data.rowCount
-        console.log("Respuesta a POST LOGIN")
+        const data = await client.query(queries.validatedUser,[email, password]);
+        result = data.rowCount;
     } catch (err) {
         console.log(err);
         throw err;
     } finally {
-        client.release()
-    }
-    return result
+        client.release();
+    };
+    return result;
 };
 
 const users = {

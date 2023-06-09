@@ -11,18 +11,12 @@ html(lang="en")
         main
             h3 Welcome
             section
-                if !token
-                     
-                    a(class='login' href='/login') Log In / Sign Up
+                if !user
+                        a(class='login' href='/login') Log In / Sign Up
+                        p Login to navigate
                 else 
-                     
-                    a(class='logout' href="/logout") Log Out
-
-
-            if token
-                p logged
-            else
-                p No user
+                        a(class='logout' href="/logout") Log Out
+                        p Youre logged
 
 
         include ./footer.pug

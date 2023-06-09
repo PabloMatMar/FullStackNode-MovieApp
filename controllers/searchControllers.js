@@ -19,9 +19,7 @@ const { API_KEY } = process.env
  * @param {Object} res HTTP response object
  */
 
-const getSearch = (req, res) => {
-    res.render('search');
-}
+const getSearch = (req, res) => res.render('search');
 
 /**
  * Description: This function gets all the movies in the database.
@@ -40,7 +38,6 @@ const startScraping = async (title) => {
     } catch (err) {
         res.status(500).send({ err });
     };
-
 }
 /**
  * Description: This function searches first in mongo, if it does not find the movie there it redirects the search to the api
@@ -54,21 +51,19 @@ const startScraping = async (title) => {
  */
 
 const getSearchForTitleInMongo = async (req, res) => {
-
     try {
-        const title = req.params.title;
-        let param = await Movies.find({ title }, { _id: 0, __v: 0 })[0];
-        if (param != undefined) {
+        let movie = await Movies.find({ title: req.params.title }, { _id: 0, __v: 0 });
+        if (movie[0] != undefined) {
             console.log("SEARCH MONGO");
-            const critics = await startScraping(title);
-            res.status(200).render("searchInMongoForTitle", { param, critics: critics, /*userId*/ });
+            const critics = await startScraping(req.params.title);
+        res.status(200).render("searchInMongoForTitle", { param: movie[0], critics});
 
         } else {
             res.redirect("/search/" + req.params.title);
         }
     } catch (error) {
         res.status(500).send({ error: error.message });
-    }
+    };
 };
 
 /**
@@ -88,7 +83,7 @@ const getSearchForTitle = async (req, res) => {
         if (param.Response) {
             console.log("SEARCH TITLE");
             const critics = await startScraping(req.params.title);
-        res.status(200).render("searchTitle", { param, critics: critics, /*userId*/ });
+            res.status(200).render("searchTitle", { param, critics });
 
         } else {
             res.render("noMovie");
@@ -109,10 +104,7 @@ const getSearchForTitle = async (req, res) => {
  * @param {string} title - The title to search for.
  * @return {void} The function does not return any value.
  */
-const postFilmForm = async (req, res) => {
-    const title = "/search/local/" + req.body.title
-    res.redirect(title)
-}
+const postFilmForm = async (req, res) => res.redirect("/search/local/" + req.body.title);
 
 
 

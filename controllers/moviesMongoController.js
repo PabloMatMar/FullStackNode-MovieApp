@@ -78,14 +78,12 @@ const createMovie = async (req, res) => {
  */
 const deleteMovie = async (req,res)=>{
     try {
-        let {title} = req.query
-        let answer = await Movies.findOneAndDelete({title})
-
-        const msj = `Has eliminado la pelicula: ${answer.title}, de la base de datos` ;
-        console.log("Respondiendo a la ruta DELETE MOVIES")
-        res.status(200).json({"message":msj})
+        let {title} = req.query;
+        let answer = await Movies.findOneAndDelete({title});
+        const msj = `Has eliminado la pelicula: ${answer.title}, de la base de datos`;
+        res.status(200).json({"message":msj});
     } catch (err) {
-        res.status(400).json({msj: err.message});
+        res.status(500).json({msj: err.message});
     }
 }
 
@@ -99,9 +97,7 @@ const deleteMovie = async (req,res)=>{
  */
 
 
-const formUpdateMovie = (req, res) => {
-    res.render('updateMovie');
-}
+const formUpdateMovie = (req, res) => res.render('updateMovie');
 /**
  * Description: This function updates a movie in the database.
  * @memberof MongoControllers
@@ -115,24 +111,16 @@ const formUpdateMovie = (req, res) => {
 const updateMovie = async (req, res) => {
 
     const { img, title, year, director, genre, runtime, plot, actors, language } = req.body
-    console.log(req.body)
-
-
     try {
-        const movieUpdate = await Movies.findOneAndUpdate({ title }, { img, year, director, genre, runtime, plot, actors, language })
-        console.log(req.body)
-        await movieUpdate.save()
-        console.log("Respondiendo a la ruta PUT MOVIES")
+        const movieUpdate = await Movies.findOneAndUpdate({ title }, { img, year, director, genre, runtime, plot, actors, language });
+        await movieUpdate.save();
         res.status(201).json({
             msj: `La pelicula ${title} ha sido actualizado.`,
             movie: movieUpdate
-        })
+        });
 
     } catch (err) {
-        console.log(err)
-
-        res.status(400).json({ msj: err.message })
-
+        res.status(500).json({ msj: err.message });
     }
 
 }

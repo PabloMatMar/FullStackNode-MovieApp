@@ -13,10 +13,7 @@
  * @param {Object} res HTTP response object
  */
 
-const createMovie = (req, res) => {
-    res.render('createMovie');
-  
-}
+const createMovie = (req, res) => res.render('createMovie');
 
 module.exports = {
     createMovie
