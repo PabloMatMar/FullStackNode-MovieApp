@@ -11,7 +11,7 @@ html(lang="en")
         main
             h3 Welcome
             section
-                if !isAuthenticated
+                if !token
                      
                     a(class='login' href='/login') Log In / Sign Up
                 else 
@@ -19,8 +19,8 @@ html(lang="en")
                     a(class='logout' href="/logout") Log Out
 
 
-            if isAuthenticated
-                p User logged as #{email}
+            if token
+                p logged
             else
                 p No user
 
