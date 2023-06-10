@@ -27,7 +27,7 @@ const objectSchema = {
         required: true,
         unique: true
     },
-    img: {
+    poster: {
         type: String,
         required: true
     },
@@ -59,7 +59,12 @@ const objectSchema = {
     language:{
         type: String,
         required: true
+    },
+    critics:{
+        type: Array,
+        requiered: false
     }
+
 
 };
 

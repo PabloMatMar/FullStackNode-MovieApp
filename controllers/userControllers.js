@@ -59,42 +59,46 @@ const deleteFavoriteMovie = async (req, res) => {
 };
 
 const createUser = async (req, res) => {
-    const response = await users.createUser(req.body);
-    if (response !== 0) {
-        const payload = {
-            check: true,
-            user: req.body.emailSignup
+    try {
+        const response = await users.createUser(req.body);
+        if (response !== 0) {
+            const payload = {
+                check: true,
+                user: req.body.emailSignup
+            };
+            const token = jwt.sign(payload, SECRET, {
+                expiresIn: "3000000ms" // 30 minutos hasta que expira
+            });
+            //Almacenamos el token en las cookies
+            res.cookie('token', token).status(200).redirect("/");
         };
-        const token = jwt.sign(payload, SECRET, {
-            expiresIn: "12000000ms" // 1200 segundos para que expire
-        });
-        //Almacenamos el token en las cookies
-        res.cookie('token', token).status(200).redirect("/");
-    }
-
+    } catch (err) {
+        res.status(403).json({ msj: err.message })
+    };
 };
 
 const validatedUser = async (req, res) => {
-
-    const response = await users.validatedUser(req.body);
-    if (response != 0) {
-        const payload = {
-            check: true,
-            user: req.body.email
+    try {
+        const response = await users.validatedUser(req.body);
+        if (response != 0) {
+            const payload = {
+                check: true,
+                user: req.body.email
+            };
+            const token = jwt.sign(payload, SECRET, {
+                expiresIn: "12000000ms" // 1200 segundos para que expire
+            });
+            //Almacenamos el token en las cookies
+            res.cookie('token', token).status(200).redirect("/");
         };
-        const token = jwt.sign(payload, SECRET, {
-            expiresIn: "12000000ms" // 1200 segundos para que expire
-        });
-        //Almacenamos el token en las cookies
-        res.cookie('token', token).status(200).redirect("/");
-    } else {
-        res.status(401).json({ msj: "User not found, check if you write your user correctly" })
+    } catch (err) {
+        res.status(401).json({ msj: err.message })
     };
 };
 
 const getLogin = (req, res) => {
     try {
-        res.render('login');   
+        res.render('login');
     } catch (err) {
         res.status(500).json({ msj: err.message });
     };
@@ -102,7 +106,7 @@ const getLogin = (req, res) => {
 
 const getSingup = (req, res) => {
     try {
-        res.render('signup');  
+        res.render('signup');
     } catch (err) {
         res.status(500).json({ msj: err.message });
     };
