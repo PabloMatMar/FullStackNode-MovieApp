@@ -11,12 +11,16 @@
  * @async 
  * @param {Object} req HTTP request object
  * @param {Object} res HTTP response object
+ * @throws {Err} message with the error if render fails.
  */
 
 const createMovie = (req, res) => {
-    res.render('createMovie');
-  
-}
+    try {
+        res.render('createMovie');  
+    } catch (err) {
+        res.status(500).send({ err: err.message });
+    };
+};
 
 module.exports = {
     createMovie

@@ -11,15 +11,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/GabrielaSpace/MovieApp.git"
+    "url": "git+https://github.com/PabloMatMar/FullStackNode-MovieApp.git"
   },
-  "author": "",
+  "author": "Pablo Mateos Martin, Gabriela Garcia Serrano, Javier Fuertes Gimeno",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/GabrielaSpace/MovieApp/issues"
+    "url": "https://github.com/PabloMatMar/FullStackNode-MovieApp/issues"
   },
-  "homepage": "https://github.com/GabrielaSpace/MovieApp#readme",
+  "homepage": "https://github.com/PabloMatMar/FullStackNode-MovieApp#readme",
   "dependencies": {
+    "bcrypt": "^5.1.0",
     "chrome-aws-lambda": "10.1.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",

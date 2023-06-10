@@ -5,37 +5,35 @@ html(lang="en")
         meta(http-equiv="X-UA-Compatible", content="IE=edge")
         meta(name="viewport", content="width=device-width, initial-scale=1.0")
         link(rel="stylesheet", href="/styles.css")
-        title Search
+        title search
     body 
         include ./header.pug
         main
             h3 Search User
-
-            
             form(action="/search" method="post" target="_blank" id="form1")
                 label(for="fname") TITLE: 
                 input(type="text" id="fname" name="title")
                 |
                 |
                 input(type="submit" value="SEARCH" class='css-button-arrow--red')
+            if categories
+                section(class="card")
+                    h1(id="title") Title: #{categories.title}
+                    img(id="img" src=categories.img)
+                    p(id="year") Year: #{categories.year}
+                    p(id="director") Director: #{categories.director}
+                    p(id="genre") Genre: #{categories.genre}
+                    p(id="runtime") Runtime: #{categories.runtime}
+                    p Plot : #{categories.plot}
+                    p Actors : #{categories.actors}
+                    p Language : #{categories.language}
+                    if critics 
+                        each item , i in critics 
+                            p Critics: #{critics[i].Critics}
+                            p Punctuation: #{critics[i].Punctuation}
+                    if categories
+                            button(id='fav' type="button" class ="css-button-arrow--red") Add to Favorites   
 
-            a(href="http://localhost:3000/favmovies" class ="css-button-arrow--red") Look your favorites 
-
-
-            if movies
-                section
-                    each film, index in movies 
-                        img(src=film[index] .Poster)
-                        h1 Title: #{film[index].Title}
-                        p Year: #{film[index].Year}
-                        p Director: #{film[index].Director}
-                        p Genre: #{film[index].Genre}
-                        p Runtime: #{film[index].Runtime}
-                        p Plot : #{film[index].Plot}
-                        p Actors : #{film[index].Actors}
-                        p Ratings: #{film[index].Ratings} 
-                        p Language : #{film[index].Language}
-                        button(class ="css-button-arrow--red"  id=`addFav${index}`) Add to favorites 
-            
+            a(href="http://localhost:3000/favmovies" class ="css-button-arrow--red") Look your favorites      
         include ./footer.pug
         script(type="module" src="/scripts.js")

@@ -15,20 +15,18 @@ const { API_KEY } = process.env
  * @memberof  Renders
  * @method  getSearch
  * @async 
- * @param {Object} req HTTP request object
- * @param {Object} res HTTP response object
+ * @categories {Object} req HTTP request object
+ * @categories {Object} res HTTP response object
  */
 
-const getSearch = (req, res) => {
-    res.render('search');
-}
+const getSearch = (req, res) => res.render('search');
 
 /**
  * Description: This function gets all the movies in the database.
  * @memberof searchControllers
  * @method startScraping
  * @async 
- * @param {string} title - The title to search for.
+ * @categories {string} title - The title to search for.
  * @return {Object} - an object containing the scraped info.
  * @throws {Error} message with the error during the scraping process.
  */
@@ -40,35 +38,31 @@ const startScraping = async (title) => {
     } catch (err) {
         res.status(500).send({ err });
     };
-
 }
 /**
  * Description: This function searches first in mongo, if it does not find the movie there it redirects the search to the api
  * @memberof searchControllers
  * @method getSearchForTitleInMongo 
  * @async 
- * @param {Object} req HTTP request object
- * @param {Object} res HTTP response object
+ * @categories {Object} req HTTP request object
+ * @categories {Object} res HTTP response object
  * @return {Object} - an object containing the scraped info.
  * @throws {Error} message with the error during the search process.
  */
 
 const getSearchForTitleInMongo = async (req, res) => {
-
     try {
-        const title = req.params.title;
-        let param = await Movies.find({ title }, { _id: 0, __v: 0 })[0];
-        if (param != undefined) {
+        let movie = await Movies.find({ title: req.params.title }, { _id: 0, __v: 0 });
+        if (movie[0] != undefined) {
             console.log("SEARCH MONGO");
-            const critics = await startScraping(title);
-            res.status(200).render("searchInMongoForTitle", { param, critics: critics, /*userId*/ });
-
+            const critics = await startScraping(req.params.title);
+            res.status(200).render("search", { categories: movie[0], critics });
         } else {
             res.redirect("/search/" + req.params.title);
-        }
-    } catch (error) {
-        res.status(500).send({ error: error.message });
-    }
+        };
+    } catch (err) {
+        res.status(500).send({ err: err.message });
+    };
 };
 
 /**
@@ -76,27 +70,36 @@ const getSearchForTitleInMongo = async (req, res) => {
  * @memberof searchControllers
  * @method getSearchForTitle
  * @async 
- * @param {Object} req HTTP request object
- * @param {Object} res HTTP response object
+ * @categories {Object} req HTTP request object
+ * @categories {Object} res HTTP response object
  * @return {Object} - an object containing the scraped info.
- * @throws {Error} message with the error during the search process.
+ * @throws {Err} message with the error during the search process.
  */
 const getSearchForTitle = async (req, res) => {
     try {
         const resp = await fetch(`http://www.omdbapi.com/?t=${req.params.title}&apikey=` + API_KEY);
-        let param = await resp.json();
-        if (param.Response) {
+        let categoriesMovie = await resp.json();
+        if (categoriesMovie.Error != 'Movie not found!') {
             console.log("SEARCH TITLE");
             const critics = await startScraping(req.params.title);
-        res.status(200).render("searchTitle", { param, critics: critics, /*userId*/ });
-
+            const categories = {
+                title: categoriesMovie.Title,
+                year: categoriesMovie.Year,
+                runtime: categoriesMovie.Runtime,
+                genre: categoriesMovie.Genre,
+                director: categoriesMovie.Director,
+                actors: categoriesMovie.Actors,
+                plot: categoriesMovie.Plot,
+                language: categoriesMovie.Language,
+                img: categoriesMovie.Poster,
+            };
+        res.status(200).render("search", { categories, critics });
         } else {
             res.render("noMovie");
-        }
+        };
     } catch (err) {
-        console.log(err);
         res.status(500).send({ err: err.message });
-    }
+    };
 };
 
 /**
@@ -104,15 +107,18 @@ const getSearchForTitle = async (req, res) => {
  * @memberof searchControllers
  * @method postFilmForm
  * @async 
- * @param {Object} req HTTP request object
- * @param {Object} res HTTP response object
- * @param {string} title - The title to search for.
+ * @categories {Object} req HTTP request object
+ * @categories {Object} res HTTP response object
+ * @categories {string} title - The title to search for.
  * @return {void} The function does not return any value.
  */
 const postFilmForm = async (req, res) => {
-    const title = "/search/local/" + req.body.title
-    res.redirect(title)
-}
+    try {
+        res.redirect("/search/local/" + req.body.title.toLowerCase());   
+    } catch (err) {
+        res.status(500).send({ err: err.message });
+    };
+};
 
 
 

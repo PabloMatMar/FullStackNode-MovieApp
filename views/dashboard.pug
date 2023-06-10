@@ -9,14 +9,12 @@ html(lang="en")
     body 
         include ./header.pug
         main
-            h3 What do you want?
-    
             section 
                 fieldset
                   button 
-                    a(href='/search' id  = 'icon' class='css-button-arrow--red') Search a Movie
+                    a(href='/search' id  = 'icon' class='css-button-arrow--red') Search in API
                   button 
-                    a(href='/movies' id  = 'icon'  class='css-button-arrow--red' value = 'Look your Movies') Check your favorites
+                    a(href='/movies' id  = 'icon'  class='css-button-arrow--red' value = 'Look your Movies') Search In Mongo
 
         include ./footer.pug
         script(type="module" src="/scripts.js") 

@@ -5,14 +5,16 @@
  * @async 
  * @param {Object} req HTTP request object
  * @param {Object} res HTTP response object
+ * @throws {Err} message with the error if render fails.
  */
 const getDashboard = (req, res) => {
-    if (req.oidc.isAuthenticated()) {
+    try {
         res.render('dashboard');
-    } else {
-        res.send("Log In First")
-    }
-}
+    } catch (err) {
+        res.status(500).send({ err: err.message });
+    };
+};
+
 module.exports = {
     getDashboard
 }
