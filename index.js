@@ -5,19 +5,11 @@ const express = require('express');
 const morgan = require('morgan');
 const path = require('path');
 const cors = require('cors');
+const jwt = require('express-jwt');
 const cookieParser = require('cookie-parser');
 require('./utils/mongoBase');
 require('./utils/pg_pool');
-const { auth } = require('express-openid-connect');
 
-const Config = {
-    authRequired: false,
-    auth0Logout: true,
-    secret: SECRET,
-    baseURL: BASE_URL,
-    clientID: CLIENT_ID,
-    issuerBaseURL: ISSUER
-};
 
 //swagger
 const swaggerUi = require('swagger-ui-express');//Requiere libreria de Swagger (La UI)
@@ -28,6 +20,9 @@ const swaggerDocument = require('./swagger.json'); //Requiere ruta relativa del 
 
 
 //Exportacion de las rutas
+const userSingupRoutes = require('./routes/userSingUpRoutes');
+const userLoginRoutes = require('./routes/userLoginRoutes');
+const logoutRoutes = require('./routes/logoutRoutes');
 const adminRoutes = require('./routes/moviesAdminRoutes');
 const homeRoutes = require('./routes/homeRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
@@ -48,24 +43,27 @@ app.use(express.static(path.join(__dirname, '/public')));
 app.use(morgan('combined'));
 app.use(cors());
 app.use(cookieParser());
-app.use(auth(Config));
-app.use('/api-docs-swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocument));//Endpoint que servirá la documentación en el navegador, se le pasa la variable que apunta al .json que contiene la documentación
-const check = require('./middleware/checkAuth');
-const roles = require('./middleware/checkAdmin');
+app.use('/api-docs-swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocument));//Endpoint que servirá la documentación en el navegador, se le pasa la variable que apunta al .json que contiene la documentación.
+const checkToken = require('./middleware/checkToken').token;
 
 
 //RUTAS:
-
-//Ruta home para logearse o crear usuario/admin:
+//Ruta home
 app.use('/', homeRoutes);
+//Ruta para registrarse
+app.use('/signup', userSingupRoutes);
+//Ruta para logearse
+app.use('/login', userLoginRoutes);
+//Ruta para deslogearse
+app.use('/logout', logoutRoutes);
 //Rutas del dashboard para ir hacia lado usuario o lado administrador:
-app.use('/dashboard', check.isAuth, roles.isAdmin, dashboardRoutes);
+app.use('/dashboard',checkToken, dashboardRoutes);
 //Rutas para usuario:
-app.use('/search', check.isAuth, searchRoutes);
+app.use('/search',checkToken, searchRoutes);
 //Rutas para administrador:
-app.use('/movies', check.isAuth, adminRoutes);
-
-app.use('/favmovies', check.isAuth, roles.isAdmin, favMoviesRoutes);
+app.use('/movies',checkToken, adminRoutes);
+//Rutas para ver las peliculas favoritas de un usuario:
+app.use('/favmovies',checkToken, favMoviesRoutes);
 
 app.listen(port, () => {
     console.log(`server running on http://localhost:${port}`)

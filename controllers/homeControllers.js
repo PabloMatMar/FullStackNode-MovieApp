@@ -1,3 +1,5 @@
+const token = require('../middleware/checkToken').token;
+
 /**
  * Description: This function renders the home view
  * @memberof Renders
@@ -5,25 +7,15 @@
  * @async 
  * @param {Object} req HTTP request object
  * @param {Object} res HTTP response object
+ * @throws {Err} message with the error if render fails.
  */
-
 
 const getHome = (req, res) => {
     try {
-        let response = req.oidc.isAuthenticated();
-        console.log(response);
-        let userData = req.oidc.user;
-        console.log(userData);
-        if (userData !== undefined) {
-            let userEmail = userData.email;
-            res.render('home', { isAuthenticated: req.oidc.isAuthenticated(), email: userEmail });
-        } else {
-            res.render('home', { isAuthenticated: req.oidc.isAuthenticated() });
-        }
-    } catch (error) {
-        console.error(error);
-        res.status(500).send("Internal server error");
-    }
+        req.cookies.token == undefined ? res.render("home", { user: false }) : res.render("home", { user: true });
+    } catch (err) {
+        res.status(500).send({ err: err.message });
+    };
 };
 
 
