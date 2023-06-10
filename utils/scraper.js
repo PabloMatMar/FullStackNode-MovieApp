@@ -11,27 +11,28 @@ const extractfilmaffinityData = async (url, browser) => {
         return filmaffinityData
     }
     catch (err) {
-        console.log(err.message);
+        return { error: err }
     }
 }
 const scrap = async (url) => {
     try {
         const scrapedData = []
-        const browser = await puppeteer.launch({ headless: true });
+        const browser = await puppeteer.launch({headless: true});
         const page = await browser.newPage();
         await page.goto(url);
-        const tmpurls = await page.$$eval("div.mc-title > a", data => data.map(a => a.href));
-        const urls = tmpurls.filter((link, index) => tmpurls.indexOf(link) === index);
+        const tmpurls = await page.$$eval("div.mc-title > a", data => data.map(a => a.href))
+        const urls = tmpurls.filter((link, index) => { return tmpurls.indexOf(link) === index })
         for (i in urls) {
-            const filmaffinity = await extractfilmaffinityData(urls[i], browser);
-            if (filmaffinity.Title)
-                scrapedData.push(filmaffinity);
+            const filmaffinity = await extractfilmaffinityData(urls[i], browser)
+            if(filmaffinity.Title) {
+            scrapedData.push(filmaffinity)
+            }
         }
         // console.log(scrapedData, "Lo que devuelve mi función scraper", scrapedData.length)
-        await browser.close();
+        await browser.close()
         return scrapedData;
     } catch (err) {
-        console.log(err.message);
+        console.log("Error:", err);
     }
 }
 

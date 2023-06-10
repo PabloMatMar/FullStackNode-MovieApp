@@ -9,6 +9,7 @@
 require('dotenv').config();
 const Movies = require('../models/moviesMongo');
 const scraper = require('../utils/scraper');
+const { updateMovie } = require('./updateMovieControllers');
 const { API_KEY } = process.env
 
 /**
@@ -66,6 +67,7 @@ const postFilmForm = async (req, res) => {
     };
 };
 
+
 /**
  * Description: This function searches first in mongo, if it does not find the movie there it redirects the search to the api
  * @memberof searchControllers
@@ -102,7 +104,7 @@ const pushMovieApiInMongo = async (categories) => {
     try {
         const response = await new Movies(categories);
         let answer = await response.save();
-        console.log("PUSHEANDO PELI ", answer, " A MONGO")
+        console.log("Push movie ", answer, " to MongoDB")
     } catch (err) {
         console.log(err);
     };
@@ -125,7 +127,7 @@ const getSearchForTitle = async (req, res) => {
         let categoriesMovie = await resp.json();
         if (categoriesMovie.Error != 'Movie not found!') {
             console.log("FIND MOVIE IN API");
-            const critics = await startScraping(req.params.title);
+            const critics = await startScraping(categoriesMovie.Title);
             const scrapingCritics = { "critics": critics }
             let categories = {};
             Object
