@@ -169,49 +169,45 @@ if (document.title === "CreateMovie") {
     const form = document.querySelector(".createMovie").elements;
     const data = {};
     for (let input of form)
-      data[input.name] = input.value;
+      input.name == 'title' ? data[input.name] = input.value.toLowerCase() : data[input.name] = input.value;
     await createMovie(data);
   });
 };
 //Evento para capturar los datos y llamar a la funcion para añadir pelicula favorita de la lista de un usuario:
 
-if (document.title === "searchTitle") {
+if (document.title === "search") {
   let favButton = document.getElementById("fav");
-  favButton.addEventListener('click', async (e) => {
-    e.preventDefault();
-    let id = document.getElementById("userId").innerHTML;
-    let title = document.getElementById("title").innerHTML;
-    let year = document.getElementById("year").innerHTML;
-    let director = document.getElementById("director").innerHTML;
-    let runtime = document.getElementById("runtime").innerHTML;
-    let genre = document.getElementById("genre").innerHTML;
-    let img = document.getElementById("img").src;
-    const data = {
-      user: id.trim(),
-      title: title.slice(7,),
-      year: year,
-      director: director,
-      genre: genre,
-      runtime: runtime,
-      img: img
-    };
-    const postResponse = await addFavorite(data);
-  });
+  if (favButton != undefined)
+    favButton.addEventListener('click', async (e) => {
+      e.preventDefault();
+      let title = document.getElementById("title").innerHTML;
+      let year = document.getElementById("year").innerHTML;
+      let director = document.getElementById("director").innerHTML;
+      let runtime = document.getElementById("runtime").innerHTML;
+      let genre = document.getElementById("genre").innerHTML;
+      let img = document.getElementById("img").src;
+      const data = {
+        title: title.slice(7),
+        year: year,
+        director: director,
+        genre: genre,
+        runtime: runtime,
+        img: img
+      };
+      await addFavorite(data);
+    });
 };
 
 //Evento para capturar los datos y llamar a la funcion para eliminar pelicula favorita de la lista de un usuario:
 
 if (document.title === "Favorites") {
   const buttons = document.getElementsByClassName("delete")
-  console.log(buttons.length)
   for (let i = 0; i < buttons.length; i++) {
     let deleteButton = document.getElementById(`delete${i}`);
     deleteButton.addEventListener('click', async (e) => {
       e.preventDefault;
-      let id = document.getElementById("userId").innerHTML;
       let title = document.getElementById(`title${i}`).innerHTML;
       const data = {
-        user: id.trim(),
         title: title.slice(7,)
       };
       const postResponse = await deleteFavMovie(data);

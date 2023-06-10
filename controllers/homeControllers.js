@@ -7,10 +7,16 @@ const token = require('../middleware/checkToken').token;
  * @async 
  * @param {Object} req HTTP request object
  * @param {Object} res HTTP response object
+ * @throws {Err} message with the error if render fails.
  */
 
-// res.status(200).render("searchTitle", { param, critics });
-const getHome = (req, res) => req.cookies.token == undefined ? res.render("home", { user: false }) : res.render("home", { user: true });
+const getHome = (req, res) => {
+    try {
+        req.cookies.token == undefined ? res.render("home", { user: false }) : res.render("home", { user: true });
+    } catch (err) {
+        res.status(500).send({ err: err.message });
+    };
+};
 
 
 module.exports = {

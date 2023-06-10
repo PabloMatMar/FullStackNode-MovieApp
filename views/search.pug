@@ -5,7 +5,7 @@ html(lang="en")
         meta(http-equiv="X-UA-Compatible", content="IE=edge")
         meta(name="viewport", content="width=device-width, initial-scale=1.0")
         link(rel="stylesheet", href="/styles.css")
-        title Search
+        title search
     body 
         include ./header.pug
         main
@@ -16,6 +16,23 @@ html(lang="en")
                 |
                 |
                 input(type="submit" value="SEARCH" class='css-button-arrow--red')
+            if categories
+                section(class="card")
+                    h1(id="title") Title: #{categories.title}
+                    img(id="img" src=categories.img)
+                    p(id="year") Year: #{categories.year}
+                    p(id="director") Director: #{categories.director}
+                    p(id="genre") Genre: #{categories.genre}
+                    p(id="runtime") Runtime: #{categories.runtime}
+                    p Plot : #{categories.plot}
+                    p Actors : #{categories.actors}
+                    p Language : #{categories.language}
+                    if critics 
+                        each item , i in critics 
+                            p Critics: #{critics[i].Critics}
+                            p Punctuation: #{critics[i].Punctuation}
+                    if categories
+                            button(id='fav' type="button" class ="css-button-arrow--red") Add to Favorites   
 
             a(href="http://localhost:3000/favmovies" class ="css-button-arrow--red") Look your favorites      
         include ./footer.pug

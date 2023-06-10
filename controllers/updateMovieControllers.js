@@ -9,8 +9,13 @@ const Movies = require('../models/moviesMongo')
  * @param {Object} res HTTP response object
  */
 
-
-const formUpdateMovie = (req, res) => res.render('updateMovie');
+const formUpdateMovie = (req, res) => {
+    try {
+        res.render('updateMovie');  
+    } catch (err) {
+        res.status(400).json({ msj: err.message });
+    };
+};
 /**
  * Description: This function updates a movie in the database.
  * @memberof MongoControllers
@@ -19,22 +24,19 @@ const formUpdateMovie = (req, res) => res.render('updateMovie');
  * @param {Object} req HTTP request object
  * @param {Object} res HTTP response object
  * @return {Object} JSON, message indicating that the movie was successfully updated to the database.
- * @throws {Error} message with the error.
+ * @throws {err} message with the error.
  */
+
 const updateMovie = async (req, res) => {
 
     const { img, title, year, director, genre, runtime, plot, actors, language } = req.body;
     try {
         const movieUpdate = await Movies.findOneAndUpdate({ title }, { img, year, director, genre, runtime, plot, actors, language });
         await movieUpdate.save();
-        res.status(201).json({
-            msj: `La pelicula ${title} ha sido actualizado.`,
-            movie: movieUpdate
-        })
+        res.status(201).json({ msj: `La pelicula ${title} ha sido actualizado.`, movie: movieUpdate })
     } catch (err) {
         res.status(400).json({ msj: err.message });
-    }
-
+    };
 }
 
 module.exports = {

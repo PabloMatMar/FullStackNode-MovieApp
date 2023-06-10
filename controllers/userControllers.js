@@ -19,14 +19,12 @@ const { SECRET } = process.env;
  * @param {Object} req HTTP request object
  * @param {Object} res HTTP response object
  * @return {Object} - an object containing the scraped info.
- * @throws {Error} message with the error during save process.
+ * @throws {Err} message with the err during save process.
  */
 const addFavorite = async (req, res) => {
     try {
         const response = await users.addFavorite(req.body, req.decoded.user);
-        res.status(201).json({
-            msg: response
-        });
+        res.status(201).json({ msj: response });
     } catch (err) {
         res.status(500).json({ msj: err.message });
     };
@@ -54,15 +52,10 @@ const getFavorites = async (req, res) => {
 const deleteFavoriteMovie = async (req, res) => {
     try {
         const answer = await users.deleteFavorite(req.decoded.user, req.body.title);
-        if (answer) {
-            const msj = `Has eliminado la pelicula: ${req.body.title} de la tabla de favoritos`;
-            res.status(200).json({ "message": msj })
-        } else {
-            res.status(404).json({ msj: "La pelicula que quieres eliminar no existe" });
-        }
+        answer ? res.status(200).json({ msj: `Has eliminado la pelicula: ${req.body.title} de la tabla de favoritos` }) : res.status(404).json({ msj: "La pelicula que quieres eliminar no existe" });
     } catch (err) {
         res.status(500).json({ msj: err.message });
-    }
+    };
 };
 
 const createUser = async (req, res) => {
@@ -99,9 +92,21 @@ const validatedUser = async (req, res) => {
     };
 };
 
-const getLogin = (req, res) => res.render('login');
+const getLogin = (req, res) => {
+    try {
+        res.render('login');   
+    } catch (err) {
+        res.status(500).json({ msj: err.message });
+    };
+};
 
-const getSingup = (req, res) => res.render('signup');
+const getSingup = (req, res) => {
+    try {
+        res.render('signup');  
+    } catch (err) {
+        res.status(500).json({ msj: err.message });
+    };
+};
 
 
 

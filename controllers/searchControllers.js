@@ -15,8 +15,8 @@ const { API_KEY } = process.env
  * @memberof  Renders
  * @method  getSearch
  * @async 
- * @param {Object} req HTTP request object
- * @param {Object} res HTTP response object
+ * @categories {Object} req HTTP request object
+ * @categories {Object} res HTTP response object
  */
 
 const getSearch = (req, res) => res.render('search');
@@ -26,7 +26,7 @@ const getSearch = (req, res) => res.render('search');
  * @memberof searchControllers
  * @method startScraping
  * @async 
- * @param {string} title - The title to search for.
+ * @categories {string} title - The title to search for.
  * @return {Object} - an object containing the scraped info.
  * @throws {Error} message with the error during the scraping process.
  */
@@ -44,8 +44,8 @@ const startScraping = async (title) => {
  * @memberof searchControllers
  * @method getSearchForTitleInMongo 
  * @async 
- * @param {Object} req HTTP request object
- * @param {Object} res HTTP response object
+ * @categories {Object} req HTTP request object
+ * @categories {Object} res HTTP response object
  * @return {Object} - an object containing the scraped info.
  * @throws {Error} message with the error during the search process.
  */
@@ -56,13 +56,12 @@ const getSearchForTitleInMongo = async (req, res) => {
         if (movie[0] != undefined) {
             console.log("SEARCH MONGO");
             const critics = await startScraping(req.params.title);
-        res.status(200).render("searchInMongoForTitle", { param: movie[0], critics});
-
+            res.status(200).render("search", { categories: movie[0], critics });
         } else {
             res.redirect("/search/" + req.params.title);
-        }
-    } catch (error) {
-        res.status(500).send({ error: error.message });
+        };
+    } catch (err) {
+        res.status(500).send({ err: err.message });
     };
 };
 
@@ -71,27 +70,36 @@ const getSearchForTitleInMongo = async (req, res) => {
  * @memberof searchControllers
  * @method getSearchForTitle
  * @async 
- * @param {Object} req HTTP request object
- * @param {Object} res HTTP response object
+ * @categories {Object} req HTTP request object
+ * @categories {Object} res HTTP response object
  * @return {Object} - an object containing the scraped info.
- * @throws {Error} message with the error during the search process.
+ * @throws {Err} message with the error during the search process.
  */
 const getSearchForTitle = async (req, res) => {
     try {
         const resp = await fetch(`http://www.omdbapi.com/?t=${req.params.title}&apikey=` + API_KEY);
-        let param = await resp.json();
-        if (param.Response) {
+        let categoriesMovie = await resp.json();
+        if (categoriesMovie.Error != 'Movie not found!') {
             console.log("SEARCH TITLE");
             const critics = await startScraping(req.params.title);
-            res.status(200).render("searchTitle", { param, critics });
-
+            const categories = {
+                title: categoriesMovie.Title,
+                year: categoriesMovie.Year,
+                runtime: categoriesMovie.Runtime,
+                genre: categoriesMovie.Genre,
+                director: categoriesMovie.Director,
+                actors: categoriesMovie.Actors,
+                plot: categoriesMovie.Plot,
+                language: categoriesMovie.Language,
+                img: categoriesMovie.Poster,
+            };
+        res.status(200).render("search", { categories, critics });
         } else {
             res.render("noMovie");
-        }
+        };
     } catch (err) {
-        console.log(err);
         res.status(500).send({ err: err.message });
-    }
+    };
 };
 
 /**
@@ -99,12 +107,18 @@ const getSearchForTitle = async (req, res) => {
  * @memberof searchControllers
  * @method postFilmForm
  * @async 
- * @param {Object} req HTTP request object
- * @param {Object} res HTTP response object
- * @param {string} title - The title to search for.
+ * @categories {Object} req HTTP request object
+ * @categories {Object} res HTTP response object
+ * @categories {string} title - The title to search for.
  * @return {void} The function does not return any value.
  */
-const postFilmForm = async (req, res) => res.redirect("/search/local/" + req.body.title);
+const postFilmForm = async (req, res) => {
+    try {
+        res.redirect("/search/local/" + req.body.title.toLowerCase());   
+    } catch (err) {
+        res.status(500).send({ err: err.message });
+    };
+};
 
 
 
