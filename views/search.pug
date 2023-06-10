@@ -19,7 +19,7 @@ html(lang="en")
             if categories
                 section(class="card")
                     h1(id="title") Title: #{categories.title}
-                    img(id="img" src=categories.img)
+                    img(id="img" src=categories.poster)
                     p(id="year") Year: #{categories.year}
                     p(id="director") Director: #{categories.director}
                     p(id="genre") Genre: #{categories.genre}
@@ -27,10 +27,10 @@ html(lang="en")
                     p Plot : #{categories.plot}
                     p Actors : #{categories.actors}
                     p Language : #{categories.language}
-                    if critics 
-                        each item , i in critics 
-                            p Critics: #{critics[i].Critics}
-                            p Punctuation: #{critics[i].Punctuation}
+                    if categories.critics 
+                        each item , i in categories.critics
+                            p Critics: #{categories.critics[i].Critics}
+                            p Punctuation: #{categories.critics[i].Punctuation}
                     if categories
                             button(id='fav' type="button" class ="css-button-arrow--red") Add to Favorites   
 
