@@ -200,7 +200,7 @@ if (document.title === "search") {
 
 //Evento para capturar los datos y llamar a la funcion para eliminar pelicula favorita de la lista de un usuario:
 
-if (document.title === "Favorites") {
+if (document.getElementById("favMovies") != null) {
   const buttons = document.getElementsByClassName("delete")
   for (let i = 0; i < buttons.length; i++) {
     let deleteButton = document.getElementById(`delete${i}`);
@@ -210,7 +210,7 @@ if (document.title === "Favorites") {
       const data = {
         title: title.slice(7,)
       };
-      const postResponse = await deleteFavMovie(data);
+      await deleteFavMovie(data);
     });
   };
 };

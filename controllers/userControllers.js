@@ -42,8 +42,8 @@ const addFavorite = async (req, res) => {
 
 const getFavorites = async (req, res) => {
     try {
-        const userMoviesApi = await users.getFavorites(req.decoded.user);
-        res.status(200).render("moviesUser", { favMoviesApi: userMoviesApi });
+        const userFavMovies = await users.getFavorites(req.decoded.user);
+        res.status(200).render("search", { userFavMovies });
     } catch (err) {
         res.status(500).json({ msj: err.message });
     };

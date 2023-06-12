@@ -19,7 +19,7 @@ const Movies = require('../models/moviesMongo')
 const getMovies = async (req, res) => {
     try {
         let movies = await Movies.find({ Movies }, { _id: 0, __v: 0 });
-        res.status(200).render("moviesAdmin", { allMovies: movies });
+        res.status(200).render("moviesAdmin", { allMovies: movies.reverse() });
     }
     catch (err) {
         res.status(400).json({ msj: err.message });

@@ -1,0 +1,9 @@
+section(class="card")
+    img(id="img" src=categories.poster)
+    each val, key in categories
+        if !excludes.includes(key)
+            p(id=key)= key.split('').map((e,i)=> i==0 ? e.toUpperCase(): e).join('') +': '+ val
+    each item , i in categories.critics
+        p Sensacine Review: #{categories.critics[i].Critics}
+        p Sensacione Punctuation: #{categories.critics[i].Punctuation}
+    button(id='fav' type="button" class ="css-button-arrow--red") Add to Favorites

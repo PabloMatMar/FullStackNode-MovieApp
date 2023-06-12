@@ -9,31 +9,13 @@ html(lang="en")
     body 
         include ./header.pug
         main
-            h3 Search User
-            form(action="/search" method="post" target="_blank" id="form1")
-                label(for="fname") TITLE: 
-                input(type="text" id="fname" name="title")
-                |
-                |
-                input(type="submit" value="SEARCH" class='css-button-arrow--red')
+            include ./searchFragments/formToSearch.pug
             if categories
-                section(class="card")
-                    h1(id="title") Title: #{categories.title}
-                    img(id="img" src=categories.poster)
-                    p(id="year") Year: #{categories.year}
-                    p(id="director") Director: #{categories.director}
-                    p(id="genre") Genre: #{categories.genre}
-                    p(id="runtime") Runtime: #{categories.runtime}
-                    p Plot : #{categories.plot}
-                    p Actors : #{categories.actors}
-                    p Language : #{categories.language}
-                    if categories.critics 
-                        each item , i in categories.critics
-                            p Critics: #{categories.critics[i].Critics}
-                            p Punctuation: #{categories.critics[i].Punctuation}
-                    if categories
-                            button(id='fav' type="button" class ="css-button-arrow--red") Add to Favorites   
-
+                include ./searchFragments/movie.pug
+            if noMovie
+                include ./searchFragments/noMovie.pug
+            if userFavMovies
+                include ./searchFragments/favMovies.pug
             a(href="http://localhost:3000/favmovies" class ="css-button-arrow--red") Look your favorites      
         include ./footer.pug
         script(type="module" src="/scripts.js")
