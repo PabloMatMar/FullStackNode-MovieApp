@@ -107,7 +107,7 @@ const deleteFavMovie = async (data) => {
 
 //Eventos para capturar los datos de los formularios
 
-if (document.title === "singup") {
+if (document.getElementById("singup") != null) {
   //validacion de la contraseña y el usuario cuando se registra:
   document.querySelector("form.signup").addEventListener("submit", (event) => {
     event.preventDefault(); // parar envío

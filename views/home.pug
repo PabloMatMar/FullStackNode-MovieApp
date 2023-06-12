@@ -10,14 +10,11 @@ html(lang="en")
         include ./header.pug
         main
             h3 Welcome
-            section
-                if !user
-                        a(class='login' href='/login') Log In / Sign Up
-                        p Login to navigate
-                else 
-                        a(class='logout' href="/logout") Log Out
-                        p Youre logged
-
-
+            if !login && !singup
+                include ./homeFragments/loginButtons.pug
+            if login
+                include ./homeFragments/login.pug
+            if singup
+                include ./homeFragments/singup.pug
         include ./footer.pug
         script(type="module" src="/scripts.js")

@@ -136,7 +136,7 @@ const getSearchForTitle = async (req, res) => {
                 .map((_, i, arrOfKeys) => arrOfKeys[i] == 'Title' ? categories[arrOfKeys[i].toLowerCase()] = categoriesMovie[arrOfKeys[i]].toLowerCase() : categories[arrOfKeys[i].toLowerCase()] = categoriesMovie[arrOfKeys[i]]);
             // Mongo Saves movie and scraping
             pushMovieApiInMongo({ ...categories, ...scrapingCritics });
-            res.status(200).render("search", { categories: { ...categories, ...scrapingCritics }, excludes: ['rated', 'released', 'runtime', 'writer', 'awards', 'ratings', 'metascore', 'imdbrating', 'imdbvotes', 'imdbid', 'type', 'dvd', 'boxoffice', 'production', 'response', 'website', 'poster', 'critics', 'poster'] });
+            res.status(200).render("search", { categories: { ...categories, ...scrapingCritics }, excludes: ['rated', 'released', 'writer', 'awards', 'ratings', 'metascore', 'imdbrating', 'imdbvotes', 'imdbid', 'type', 'dvd', 'boxoffice', 'production', 'response', 'website', 'poster', 'critics', 'poster', 'country'] });
         } else {
             res.render("search", { noMovie: true });
         };

@@ -98,7 +98,7 @@ const validatedUser = async (req, res) => {
 
 const getLogin = (req, res) => {
     try {
-        res.render('login');
+        res.render('home', { login: true });
     } catch (err) {
         res.status(500).json({ msj: err.message });
     };
@@ -106,7 +106,7 @@ const getLogin = (req, res) => {
 
 const getSingup = (req, res) => {
     try {
-        res.render('signup');
+        res.render('home', { singup: true });
     } catch (err) {
         res.status(500).json({ msj: err.message });
     };
