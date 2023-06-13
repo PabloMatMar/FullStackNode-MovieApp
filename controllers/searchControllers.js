@@ -9,7 +9,6 @@
 require('dotenv').config();
 const Movies = require('../models/moviesMongo');
 const scraper = require('../utils/scraper');
-const { updateMovie } = require('./updateMovieControllers');
 const { API_KEY } = process.env
 
 /**

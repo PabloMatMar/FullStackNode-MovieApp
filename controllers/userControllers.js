@@ -43,7 +43,7 @@ const addFavorite = async (req, res) => {
 const getFavorites = async (req, res) => {
     try {
         const userFavMovies = await users.getFavorites(req.decoded.user);
-        res.status(200).render("search", { userFavMovies });
+        res.status(200).render("search", { userFavMovies: userFavMovies.reverse() });
     } catch (err) {
         res.status(500).json({ msj: err.message });
     };

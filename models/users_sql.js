@@ -23,11 +23,11 @@ const queries = require('../queries/queriesUser');
  * @throws {Error} error saving the movie in the database, message with the error
  */
 const addFavorite = async (fav, emailFK) => {
-    const { title, year, director, genre, runtime, img } = fav;
+    const { title, year, director, genre, runtime, poster } = fav;
     let client, result;
     try {
         client = await pool.connect();
-        const data = await client.query(queries.addFavorite, [title, year, director, genre, runtime, img, emailFK ]);
+        const data = await client.query(queries.addFavorite, [title, year, director, genre, runtime, poster, emailFK ]);
         result = data.rowCount;
     }
     catch (err) {

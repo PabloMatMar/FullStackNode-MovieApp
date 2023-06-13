@@ -1,0 +1,15 @@
+section
+    a(href="../Movies" class ="css-button-arrow--red" ) Go back 
+    h3 #{idValue.slice(0, 6).toUpperCase()} MOVIE
+section
+    fieldset
+        form(action="movies/createMovie" method="post" class=idValue)
+            each item in ["Poster", "Title", "Year", "Director", "Genre", "Runtime", "Plot", "Actors", "Language"]
+                if item != "Year" && item != titleUpdate
+                    lengend= item
+                    input(type="text" name=item.toLowerCase() required)
+                else if item != titleUpdate
+                    lengend= item
+                    input(type="number" name=item.toLowerCase() min="1902" required)        
+            br
+            input(type="submit" value=idValue.slice(0, 6).toUpperCase() id=idValue  class ="css-button-arrow--red" )

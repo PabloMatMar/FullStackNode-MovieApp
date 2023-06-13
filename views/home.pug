@@ -1,20 +1,14 @@
-doctype html
-html(lang="en")
-    head
-        meta(charset="UTF-8")
-        meta(http-equiv="X-UA-Compatible", content="IE=edge")
-        meta(name="viewport", content="width=device-width, initial-scale=1.0")
-        link(rel="stylesheet", href="/styles.css")
-        title Home
-    body
-        include ./header.pug
-        main
-            h3 Welcome
-            if !login && !singup
-                include ./homeFragments/loginButtons.pug
-            if login
-                include ./homeFragments/login.pug
-            if singup
-                include ./homeFragments/singup.pug
-        include ./footer.pug
-        script(type="module" src="/scripts.js")
+include ./basicStructures/head.pug
+    title Home
+body
+    include ./basicStructures/header.pug
+    main
+        h3 Welcome
+        if !login && !singup
+            include ./homeFragments/loginButtons.pug
+        if login
+            include ./homeFragments/login.pug
+        if singup
+            include ./homeFragments/singup.pug
+    include ./basicStructures/footer.pug
+    script(type="module" src="/scripts.js")
