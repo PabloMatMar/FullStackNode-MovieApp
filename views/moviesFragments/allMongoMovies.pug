@@ -1,0 +1,16 @@
+section
+    a(href="../movies/createMovie" class='css-button-arrow--red') Add New Movie
+section(class="cardSection")
+    each item, i in allMovies
+        article(class="card")
+            h3(id="title" + i)  Title: #{allMovies[i].title}
+            img(src=allMovies[i].poster  class="imgMongo")
+            each val, key in allMovies[i]._doc
+                if key != 'title' && key != 'poster' && key != 'critics'
+                    p(id=key)= key.split('').map((e,i)=> i==0 ? e.toUpperCase(): e).join('') +': '+ val
+                if key == 'critics'
+                    each item , j in allMovies[i].critics
+                        p Sensacine Review: #{allMovies[i].critics[j].Critics}
+                        p Sensacione Punctuation: #{allMovies[i].critics[j].Punctuation}
+            button(class ="css-button-arrow--red" class="delete" id="delete" + i) Delete
+            a(href="../movies/updateMovie" class="css-button-arrow--red" class="update" id="update" + i) Update

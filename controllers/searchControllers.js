@@ -1,10 +1,11 @@
 //search controllers
 
 /**
- * @author Javier Fuertes, Gabriela García y Pablo Mateos 
+ * @author Pablo Mateos 
  * @exports search
  * @namespace searchControllers
  */
+
 require('dotenv').config();
 const Movies = require('../models/moviesMongo');
 const scraper = require('../utils/scraper');
@@ -17,9 +18,16 @@ const { API_KEY } = process.env
  * @async 
  * @categories {Object} req HTTP request object
  * @categories {Object} res HTTP response object
+ * @throws {Err} message with the error when render search view.
  */
 
-const getSearch = (req, res) => res.render('search');
+const getSearch = (req, res) => {
+    try {
+        res.render('search');
+    } catch (err) {
+        res.status(500).send({ err });
+    };
+};
 
 /**
  * Description: This function gets all the movies in the database.
@@ -28,7 +36,7 @@ const getSearch = (req, res) => res.render('search');
  * @async 
  * @categories {string} title - The title to search for.
  * @return {Object} - an object containing the scraped info.
- * @throws {Error} message with the error during the scraping process.
+ * @throws {Err} message with the error during the scraping process.
  */
 
 const startScraping = async (title) => {
@@ -37,68 +45,6 @@ const startScraping = async (title) => {
         return movies;
     } catch (err) {
         res.status(500).send({ err });
-    };
-}
-/**
- * Description: This function searches first in mongo, if it does not find the movie there it redirects the search to the api
- * @memberof searchControllers
- * @method getSearchForTitleInMongo 
- * @async 
- * @categories {Object} req HTTP request object
- * @categories {Object} res HTTP response object
- * @return {Object} - an object containing the scraped info.
- * @throws {Error} message with the error during the search process.
- */
-
-const getSearchForTitleInMongo = async (req, res) => {
-    try {
-        let movie = await Movies.find({ title: req.params.title }, { _id: 0, __v: 0 });
-        if (movie[0] != undefined) {
-            console.log("SEARCH MONGO");
-            const critics = await startScraping(req.params.title);
-            res.status(200).render("search", { categories: movie[0], critics });
-        } else {
-            res.redirect("/search/" + req.params.title);
-        };
-    } catch (err) {
-        res.status(500).send({ err: err.message });
-    };
-};
-
-/**
- * Description: This function looks for the movie in the api, if it doesn't find it, it renders a movie view not found
- * @memberof searchControllers
- * @method getSearchForTitle
- * @async 
- * @categories {Object} req HTTP request object
- * @categories {Object} res HTTP response object
- * @return {Object} - an object containing the scraped info.
- * @throws {Err} message with the error during the search process.
- */
-const getSearchForTitle = async (req, res) => {
-    try {
-        const resp = await fetch(`http://www.omdbapi.com/?t=${req.params.title}&apikey=` + API_KEY);
-        let categoriesMovie = await resp.json();
-        if (categoriesMovie.Error != 'Movie not found!') {
-            console.log("SEARCH TITLE");
-            const critics = await startScraping(req.params.title);
-            const categories = {
-                title: categoriesMovie.Title,
-                year: categoriesMovie.Year,
-                runtime: categoriesMovie.Runtime,
-                genre: categoriesMovie.Genre,
-                director: categoriesMovie.Director,
-                actors: categoriesMovie.Actors,
-                plot: categoriesMovie.Plot,
-                language: categoriesMovie.Language,
-                img: categoriesMovie.Poster,
-            };
-        res.status(200).render("search", { categories, critics });
-        } else {
-            res.render("noMovie");
-        };
-    } catch (err) {
-        res.status(500).send({ err: err.message });
     };
 };
 
@@ -114,13 +60,89 @@ const getSearchForTitle = async (req, res) => {
  */
 const postFilmForm = async (req, res) => {
     try {
-        res.redirect("/search/local/" + req.body.title.toLowerCase());   
+        res.redirect("/search/local/" + req.body.title.toLowerCase().trim());
     } catch (err) {
         res.status(500).send({ err: err.message });
     };
 };
 
 
+/**
+ * Description: This function searches first in mongo, if it does not find the movie there it redirects the search to the api
+ * @memberof searchControllers
+ * @method getSearchForTitleInMongo 
+ * @async 
+ * @categories {Object} req HTTP request object
+ * @categories {Object} res HTTP response object
+ * @return {Object} - try find movie in mongo.
+ * @throws {Err} message with the error during the search process.
+ */
+
+const getSearchForTitleInMongo = async (req, res) => {
+    try {
+        let movie = await Movies.find({ title: req.params.title }, { _id: 0, __v: 0 });
+        console.log({ ...movie[0] }._doc)
+        movie[0] != undefined ? res.status(200).render("search", { categories: { ...movie[0] }._doc, excludes: ['poster', 'critics', 'poster'] }) : res.redirect("/search/" + req.params.title);
+    } catch (err) {
+        res.status(500).send({ err: err.message });
+    };
+};
+
+/**
+ * Description: This function looks for the movie in the api, if it doesn't find it, it renders a movie view not found
+ * @memberof searchControllers
+ * @method pushMovieApiInMongo
+ * @async 
+ * @categories {Object} req HTTP request object
+ * @categories {Object} res HTTP response object
+ * @return {Object} - Mongo saves the movie and the reviews from the scraping, so that once a user searches for it, the rest will have it without having to wait for the scraping.
+ * @throws {Err} message with the error during the search process.
+ */
+
+
+const pushMovieApiInMongo = async (categories) => {
+    try {
+        const response = await new Movies(categories);
+        let answer = await response.save();
+        console.log("Push movie ", answer, " to MongoDB")
+    } catch (err) {
+        console.log(err);
+    };
+};
+
+/**
+ * Description: This function looks for the movie in the api, if it doesn't find it, it renders a movie view not found
+ * @memberof searchControllers
+ * @method getSearchForTitle
+ * @async 
+ * @categories {Object} req HTTP request object
+ * @categories {Object} res HTTP response object
+ * @return {Object} - try find movie in API, and array whit the excludes categories to render.
+ * @throws {Err} message with the error during the search process.
+ */
+
+const getSearchForTitle = async (req, res) => {
+    try {
+        const resp = await fetch(`http://www.omdbapi.com/?t=${req.params.title}&apikey=` + API_KEY);
+        let categoriesMovie = await resp.json();
+        if (categoriesMovie.Error != 'Movie not found!') {
+            console.log("FIND MOVIE IN API");
+            const critics = await startScraping(categoriesMovie.Title);
+            const scrapingCritics = { "critics": critics }
+            let categories = {};
+            Object
+                .keys(categoriesMovie)
+                .map((_, i, arrOfKeys) => arrOfKeys[i] == 'Title' ? categories[arrOfKeys[i].toLowerCase()] = categoriesMovie[arrOfKeys[i]].toLowerCase() : categories[arrOfKeys[i].toLowerCase()] = categoriesMovie[arrOfKeys[i]]);
+            // Mongo Saves movie and scraping
+            pushMovieApiInMongo({ ...categories, ...scrapingCritics });
+            res.status(200).render("search", { categories: { ...categories, ...scrapingCritics }, excludes: ['rated', 'released', 'writer', 'awards', 'ratings', 'metascore', 'imdbrating', 'imdbvotes', 'imdbid', 'type', 'dvd', 'boxoffice', 'production', 'response', 'website', 'poster', 'critics', 'poster', 'country'] });
+        } else {
+            res.render("search", { noMovie: true });
+        };
+    } catch (err) {
+        res.status(500).send({ err: err.message });
+    };
+};
 
 module.exports = {
     getSearch,
