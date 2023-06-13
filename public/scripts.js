@@ -1,20 +1,11 @@
 console.log("SCRIPT LINKADO");
 
 //despliegue del menu 'hamburguesa'
-
-if (document.title !== "Movies" && document
-  .title !== "updateMovie") {
-  let burger = document.querySelector(".burger_menu");
-
-  burger.addEventListener("click", () => {
-    let links = document.getElementById("links_menu");
-    if (links.style.display === "block") {
-      links.style.display = "none";
-    } else {
-      links.style.display = "block";
-    }
-  });
-};
+let burger = document.querySelector(".burger_menu");
+burger.addEventListener("click", () => {
+  let links = document.getElementById("links_menu");
+  links.style.display === "block" ? links.style.display = "none" : links.style.display = "block";
+});
 
 
 //LLAMADAS A RUTAS DE ADMIN
@@ -107,7 +98,7 @@ const deleteFavMovie = async (data) => {
 
 //Eventos para capturar los datos de los formularios
 
-if (document.title === "singup") {
+if (document.getElementById("singup") != null) {
   //validacion de la contraseña y el usuario cuando se registra:
   document.querySelector("form.signup").addEventListener("submit", (event) => {
     event.preventDefault(); // parar envío
@@ -138,17 +129,28 @@ if (document.title === "singup") {
 };
 
 //Evento para capturar los datos y llamar a la funcion para actualizar pelicula a lista de mongo a traves de admin:
-if (document.title === "updateMovie") {
 
+if (document.title == "Movies") {
+  const anchors = document.getElementsByClassName("update");
+  for (let i = 0; i < anchors.length; i++)
+    document.getElementById(`update${i}`).addEventListener('click', async (e) => {
+      e.preventDefault;
+      let title = document.getElementById(`title${i}`).innerHTML;
+      title = title.slice(7).trim();
+      localStorage.setItem("title", title);
+    });
+};
+
+if (document.title === "updateMovie") {
   document.getElementById("updateMovie").addEventListener("click", async (e) => {
     e.preventDefault();
     const form = document.querySelector(".updateMovie").elements;
     const data = {};
     for (let input of form)
       data[input.name] = input.value;
-    await updateMovie(data);
+    await updateMovie({ ...{ 'title': localStorage.getItem("title") }, ...data });
   });
-}
+};
 //Evento para capturar los datos y llamar a la funcion para eliminar pelicula a lista de mongo a traves de admin:
 if (document.title === "Movies") {
   const buttons = document.getElementsByClassName("delete")
@@ -156,14 +158,14 @@ if (document.title === "Movies") {
     document.getElementById(`delete${i}`).addEventListener('click', async (e) => {
       e.preventDefault;
       let movie = document.getElementById(`title${i}`).innerHTML;
-      const cleanTitle = movie.slice(7,);
+      const cleanTitle = movie.slice(7);
       const titleMovie = cleanTitle.trim();
       if (movie)
         await deleteFavorite(titleMovie);
     });
-}
+};
 //Evento para capturar los datos y llamar a la funcion para crear pelicula a lista de mongo a traves de admin:
-if (document.title === "CreateMovie") {
+if (document.title == "CreateMovie") {
   document.getElementById("createMovie").addEventListener("click", async (e) => {
     e.preventDefault();
     const form = document.querySelector(".createMovie").elements;
@@ -185,14 +187,14 @@ if (document.title === "search") {
       let director = document.getElementById("director").innerHTML;
       let runtime = document.getElementById("runtime").innerHTML;
       let genre = document.getElementById("genre").innerHTML;
-      let img = document.getElementById("img").src;
+      let poster = document.getElementById("poster").src;
       const data = {
         title: title.slice(7),
         year: year,
         director: director,
         genre: genre,
         runtime: runtime,
-        img: img
+        poster: poster
       };
       await addFavorite(data);
     });
@@ -200,7 +202,7 @@ if (document.title === "search") {
 
 //Evento para capturar los datos y llamar a la funcion para eliminar pelicula favorita de la lista de un usuario:
 
-if (document.title === "Favorites") {
+if (document.getElementById("favMovies") != null) {
   const buttons = document.getElementsByClassName("delete")
   for (let i = 0; i < buttons.length; i++) {
     let deleteButton = document.getElementById(`delete${i}`);
@@ -210,7 +212,7 @@ if (document.title === "Favorites") {
       const data = {
         title: title.slice(7,)
       };
-      const postResponse = await deleteFavMovie(data);
+      await deleteFavMovie(data);
     });
   };
 };

@@ -19,7 +19,7 @@ const Movies = require('../models/moviesMongo')
 const getMovies = async (req, res) => {
     try {
         let movies = await Movies.find({ Movies }, { _id: 0, __v: 0 });
-        res.status(200).render("moviesAdmin", { allMovies: movies });
+        res.status(200).render("moviesAdmin", { allMovies: movies.reverse() });
     }
     catch (err) {
         res.status(400).json({ msj: err.message });
@@ -38,7 +38,7 @@ const getMovies = async (req, res) => {
 
 const getFormMovie = (req, res) => {
     try {
-        res.render('createMovie');
+        res.render('createMovie', { idValue: "createMovie", titleUpdate: null });
     } catch (err) {
         res.status(500).json({ msj: err.message });
     };
@@ -97,7 +97,7 @@ const deleteMovie = async (req, res) => {
 
 const formUpdateMovie = (req, res) => {
     try {
-        res.render('updateMovie');
+        res.render('updateMovie', { idValue: "updateMovie", titleUpdate: "Title" });
     } catch (err) {
         res.status(500).json({ msj: err.message });
     };
@@ -113,9 +113,9 @@ const formUpdateMovie = (req, res) => {
  * @throws {err} message with the error.
  */
 const updateMovie = async (req, res) => {
-    const { img, title, year, director, genre, runtime, plot, actors, language } = req.body
+    const { poster, title, year, director, genre, runtime, plot, actors, language } = req.body
     try {
-        const movieUpdate = await Movies.findOneAndUpdate({ title }, { img, year, director, genre, runtime, plot, actors, language });
+        const movieUpdate = await Movies.findOneAndUpdate({ title }, { poster, year, director, genre, runtime, plot, actors, language });
         await movieUpdate.save();
         res.status(201).json({ msj: `La pelicula ${title} ha sido actualizado.`, movie: movieUpdate });
     } catch (err) {

@@ -1,5 +1,4 @@
 require('dotenv').config();
-const {SECRET, BASE_URL, CLIENT_ID, ISSUER} = process.env
 
 const express = require('express');
 const morgan = require('morgan');
@@ -25,7 +24,6 @@ const userLoginRoutes = require('./routes/userLoginRoutes');
 const logoutRoutes = require('./routes/logoutRoutes');
 const adminRoutes = require('./routes/moviesAdminRoutes');
 const homeRoutes = require('./routes/homeRoutes');
-const dashboardRoutes = require('./routes/dashboardRoutes');
 const searchRoutes = require('./routes/searchRoutes');
 const favMoviesRoutes = require('./routes/favMoviesRoutes');
 
@@ -56,8 +54,6 @@ app.use('/signup', userSingupRoutes);
 app.use('/login', userLoginRoutes);
 //Ruta para deslogearse
 app.use('/logout', logoutRoutes);
-//Rutas del dashboard para ir hacia lado usuario o lado administrador:
-app.use('/dashboard',checkToken, dashboardRoutes);
 //Rutas para usuario:
 app.use('/search',checkToken, searchRoutes);
 //Rutas para administrador:

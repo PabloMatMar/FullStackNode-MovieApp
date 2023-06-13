@@ -9,7 +9,6 @@
 require('dotenv').config();
 const Movies = require('../models/moviesMongo');
 const scraper = require('../utils/scraper');
-const { updateMovie } = require('./updateMovieControllers');
 const { API_KEY } = process.env
 
 /**
@@ -61,7 +60,7 @@ const startScraping = async (title) => {
  */
 const postFilmForm = async (req, res) => {
     try {
-        res.redirect("/search/local/" + req.body.title.toLowerCase());
+        res.redirect("/search/local/" + req.body.title.toLowerCase().trim());
     } catch (err) {
         res.status(500).send({ err: err.message });
     };
@@ -82,7 +81,8 @@ const postFilmForm = async (req, res) => {
 const getSearchForTitleInMongo = async (req, res) => {
     try {
         let movie = await Movies.find({ title: req.params.title }, { _id: 0, __v: 0 });
-        movie[0] != undefined ? res.status(200).render("search", { categories: movie[0] }) : res.redirect("/search/" + req.params.title);
+        console.log({ ...movie[0] }._doc)
+        movie[0] != undefined ? res.status(200).render("search", { categories: { ...movie[0] }._doc, excludes: ['poster', 'critics', 'poster'] }) : res.redirect("/search/" + req.params.title);
     } catch (err) {
         res.status(500).send({ err: err.message });
     };
@@ -117,7 +117,7 @@ const pushMovieApiInMongo = async (categories) => {
  * @async 
  * @categories {Object} req HTTP request object
  * @categories {Object} res HTTP response object
- * @return {Object} - try find movie in API.
+ * @return {Object} - try find movie in API, and array whit the excludes categories to render.
  * @throws {Err} message with the error during the search process.
  */
 
@@ -132,11 +132,12 @@ const getSearchForTitle = async (req, res) => {
             let categories = {};
             Object
                 .keys(categoriesMovie)
-                .map((e, i, keys) => keys[i] == 'Title' ? categories[keys[i].toLowerCase()] = categoriesMovie[keys[i]].toLowerCase() : categories[keys[i].toLowerCase()] = categoriesMovie[keys[i]]);
-            pushMovieApiInMongo({ ...categories, ...scrapingCritics });// Mongo Saves movie and scraping
-            res.status(200).render("search", { categories: { ...categories, ...scrapingCritics } });
+                .map((_, i, arrOfKeys) => arrOfKeys[i] == 'Title' ? categories[arrOfKeys[i].toLowerCase()] = categoriesMovie[arrOfKeys[i]].toLowerCase() : categories[arrOfKeys[i].toLowerCase()] = categoriesMovie[arrOfKeys[i]]);
+            // Mongo Saves movie and scraping
+            pushMovieApiInMongo({ ...categories, ...scrapingCritics });
+            res.status(200).render("search", { categories: { ...categories, ...scrapingCritics }, excludes: ['rated', 'released', 'writer', 'awards', 'ratings', 'metascore', 'imdbrating', 'imdbvotes', 'imdbid', 'type', 'dvd', 'boxoffice', 'production', 'response', 'website', 'poster', 'critics', 'poster', 'country'] });
         } else {
-            res.render("noMovie");
+            res.render("search", { noMovie: true });
         };
     } catch (err) {
         res.status(500).send({ err: err.message });

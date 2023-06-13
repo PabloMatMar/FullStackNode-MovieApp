@@ -1,0 +1,14 @@
+section
+    fieldset 
+        form(action="/login" method="post")
+            legend  Email
+            input(type="text" name ="email" required)
+            |
+            |
+            legend Password
+            input(type="text" name ="password" required)
+            br
+            input(type="submit" value="Login")
+
+section
+    a(class='login' href='/signup') Go to Sign Up

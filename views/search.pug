@@ -1,39 +1,16 @@
-doctype html
-html(lang="en")
-    head
-        meta(charset="UTF-8")
-        meta(http-equiv="X-UA-Compatible", content="IE=edge")
-        meta(name="viewport", content="width=device-width, initial-scale=1.0")
-        link(rel="stylesheet", href="/styles.css")
-        title search
-    body 
-        include ./header.pug
-        main
-            h3 Search User
-            form(action="/search" method="post" target="_blank" id="form1")
-                label(for="fname") TITLE: 
-                input(type="text" id="fname" name="title")
-                |
-                |
-                input(type="submit" value="SEARCH" class='css-button-arrow--red')
-            if categories
-                section(class="card")
-                    h1(id="title") Title: #{categories.title}
-                    img(id="img" src=categories.poster)
-                    p(id="year") Year: #{categories.year}
-                    p(id="director") Director: #{categories.director}
-                    p(id="genre") Genre: #{categories.genre}
-                    p(id="runtime") Runtime: #{categories.runtime}
-                    p Plot : #{categories.plot}
-                    p Actors : #{categories.actors}
-                    p Language : #{categories.language}
-                    if categories.critics 
-                        each item , i in categories.critics
-                            p Critics: #{categories.critics[i].Critics}
-                            p Punctuation: #{categories.critics[i].Punctuation}
-                    if categories
-                            button(id='fav' type="button" class ="css-button-arrow--red") Add to Favorites   
-
+include ./basicStructures/head.pug
+    title search
+body 
+    include ./basicStructures/header.pug
+    main
+        include ./searchFragments/formToSearch.pug
+        if categories
+            include ./searchFragments/movie.pug
+        if noMovie
+            include ./searchFragments/noMovie.pug
+        if userFavMovies
+            include ./searchFragments/favMovies.pug
+        if !userFavMovies
             a(href="http://localhost:3000/favmovies" class ="css-button-arrow--red") Look your favorites      
-        include ./footer.pug
-        script(type="module" src="/scripts.js")
+    include ./basicStructures/footer.pug
+    script(type="module" src="/scripts.js")
