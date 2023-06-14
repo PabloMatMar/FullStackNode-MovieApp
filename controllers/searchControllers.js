@@ -15,7 +15,7 @@ const { API_KEY } = process.env
  * @method  getSearch
  * @async 
  * @param {Object} res - HTTP response to render view home
- * @throws {Err} message with the error when render search view.
+ * @throws {Error} message with the error when render search view.
  */
 
 const getSearch = (req, res) => {
@@ -33,7 +33,7 @@ const getSearch = (req, res) => {
  * @async 
  * @param {string} title - The title to search reviews whit the scraped
  * @return {Object} - Containing the scraped reviews
- * @throws {Err} message with the error during the scraping process
+ * @throws {Error} message with the error during the scraping process
  */
 
 const startScraping = async (title) => {
@@ -71,7 +71,7 @@ const postFilmForm = async (req, res) => {
  * @param {Array} movie - The array whit the movies finded in mongo. Only takes the first.
  * @param {Object} res - if the movie is finded the HTTP response is to render search view, else HTTP response redirect the search to the api
  * @return {Object} - try find movie in mongo.
- * @throws {Err} message with the error during the search process.
+ * @throws {Error} message with the error during the search process.
  */
 
 const getSearchForTitleInMongo = async (req, res) => {
@@ -89,7 +89,7 @@ const getSearchForTitleInMongo = async (req, res) => {
  * @method pushApiMovieInMongo
  * @async 
  * @param {Object} answer - Response of the attempt to save the movie in mongo
- * @throws {Err} message with the error during the save process.
+ * @throws {Error} message with the error during the save process.
  */
 
 
@@ -118,7 +118,7 @@ const pushApiMovieInMongo = async (categories) => {
  * @param {Array} exclude - Array with the categories that the pug loop should not render.
 
  * @param {Object} res - HTTP response is to render search view (movie or noMovie depending categoriesMovie.Error)
- * @throws {Err} message with the error during the search process
+ * @throws {Error} message with the error during the search process
  */
 
 const getSearchForTitle = async (req, res) => {

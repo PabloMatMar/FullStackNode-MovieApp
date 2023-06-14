@@ -13,7 +13,7 @@ const Movies = require('../models/moviesMongo')
  * @param {Object} Movies - schema of Movies mongo
  * @param {Array} movies - All movies mongo conteins
  * @param {Object} res - HTTP response whit the movies to render on moviesAdmin view
- * @throws {err} message with the error.
+ * @throws {Error} message with the error.
  */
 
 const getMovies = async (req, res) => {
@@ -34,7 +34,7 @@ const getMovies = async (req, res) => {
  * @param {Object} res - HTTP response to render the form
  * @param {string} idValue - String to assing name of ids because the render is a multi-rendered template
  * @param {null} titleUpdate - This value is null to render the correct fragment of pug 
- * @throws {err} message with the error.
+ * @throws {Error} message with the error.
  */
 
 const getFormMovie = (req, res) => {
@@ -53,7 +53,7 @@ const getFormMovie = (req, res) => {
  * @param {Object} req.body - Movie values to send mongo to create a movie
  * @param {Object} answer - Response of the attempt to save the movie in mongo
  * @param {Object} res - HTTP response of the response of mongo
- * @throws {err} - JSON, message with the error. See in your tool REST
+ * @throws {Error} - JSON, message with the error. See in your tool REST
  */
 
 const createMovie = async (req, res) => {
@@ -73,7 +73,7 @@ const createMovie = async (req, res) => {
  * @param {string} req.query.title - Movie title to remove
  * @param {Object} answer - Response of the attempt to delete the movie in mongo
  * @param {Object} res - HTTP response of the response of mongo
- * @throws {err} - JSON, message with the error. See in your tool REST
+ * @throws {Error} - JSON, message with the error. See in your tool REST
  */
 const deleteMovie = async (req, res) => {
     try {
@@ -92,7 +92,7 @@ const deleteMovie = async (req, res) => {
  * @param {Object} res - HTTP response to Render the form
  * @param {string} idValue - String to assing name of ids because the render is a multi-rendered template
  * @param {null} titleUpdate - This value prevents the rendering of the input title in the multi-rendered template, because the title is not updateable. 
- * @throws {err} message with the error.
+ * @throws {Error} message with the error.
  */
 
 
@@ -111,7 +111,7 @@ const formUpdateMovie = (req, res) => {
  * @param {Object} req.body - All the values ​​that will be set in the update and the value (title) to find the movie in mongo
  * @param {Object} answer - Response of the attempt to update the movie in mongo
  * @param {Object} res - HTTP response of the response of mongo
- * @throws {err} - JSON, message with the error. See in your tool REST
+ * @throws {Error} - JSON, message with the error. See in your tool REST
  */
 const updateMovie = async (req, res) => {
     try {
