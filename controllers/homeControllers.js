@@ -1,13 +1,19 @@
+/**
+ * @author Pablo Mateos
+ * @version 2.0
+ * @namespace homeControllers
+ */
+
 const token = require('../middleware/checkToken').token;
 
 /**
  * Description: This function renders the home view
- * @memberof Renders
+ * @memberof ControllersBackend
  * @method  getHome
  * @async 
- * @param {Object} req HTTP request object
- * @param {Object} res HTTP response object
- * @throws {Err} message with the error if render fails.
+ * @param {string} req.cookies.token - token of user
+ * @param {Object} res - HTTP response to render view home
+ * @throws {Error} message with the error if render fails.
  */
 
 const getHome = (req, res) => {

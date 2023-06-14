@@ -1,18 +1,18 @@
 /**
- * @author Javier Fuertes, Gabriela García y Pablo Mateos 
- * @exports moviesAdmin
+ * @author Pablo Mateos
+ * @version 2.0
  * @namespace MongoControllers
  */
 
 const Movies = require('../models/moviesMongo')
 /**
  * Description: This function gets all the movies in the database.
- * @memberof MongoControllers
+ * @memberof ControllersBackend
  * @method getMovies
  * @async 
- * @param {Object} req HTTP request object
- * @param {Object} res HTTP response object
- * @return {Object} movies in the database
+ * @param {Object} Movies - schema of Movies mongo
+ * @param {Array} movies - All movies mongo conteins
+ * @param {Object} res - HTTP response whit the movies to render on moviesAdmin view
  * @throws {err} message with the error.
  */
 
@@ -27,12 +27,13 @@ const getMovies = async (req, res) => {
 };
 
 /**
- * Description: This function renders the create movie view
- * @memberof Renders
- * @method  createMovie
+ * Description: Render a form on the view createMovie to create a movie.
+ * @memberof ControllersBackend
+ * @method  getFormMovie
  * @async 
- * @param {Object} req HTTP request object
- * @param {Object} res HTTP response object
+ * @param {Object} res - HTTP response to render the form
+ * @param {string} idValue - String to assing name of ids because the render is a multi-rendered template
+ * @param {null} titleUpdate - This value is null to render the correct fragment of pug 
  * @throws {err} message with the error.
  */
 
@@ -46,51 +47,51 @@ const getFormMovie = (req, res) => {
 
 /**
  * Description: This function creates a movie in the database.
- * @memberof MongoControllers
+ * @memberof ControllersBackend
  * @method createMovie
  * @async 
- * @param {Object} req HTTP request object
- * @param {Object} res HTTP response object
- * @return {Object} JSON, message indicating that the movie was successfully added to the database.
- * @throws {err} message with the error.
+ * @param {Object} req.body - Movie values to send mongo to create a movie
+ * @param {Object} answer - Response of the attempt to save the movie in mongo
+ * @param {Object} res - HTTP response of the response of mongo
+ * @throws {err} - JSON, message with the error. See in your tool REST
  */
 
 const createMovie = async (req, res) => {
-    const newMovie = req.body;
     try {
-        let response = await new Movies(newMovie);
+        let response = await new Movies(req.body);
         let answer = await response.save();
-        res.status(201).json({ msj: `New movie added to DB.`, movie: answer });
+        res.status(201).json({ "msj": `The movie with title ${answer.title} has been added to mongodb`, movie: answer });
     } catch (err) {
         res.status(400).json({ msj: err.message })
     }
 };
 /**
  * Description: This function deletes a movie in the database.
- * @memberof MongoControllers
+ * @memberof ControllersBackend
  * @method deleteMovie
  * @async 
- * @param {Object} req HTTP request object
- * @param {Object} res HTTP response object
- * @return {Object} JSON, message indicating that the movie was successfully deleted to the database.
- * @throws {err} message with the error.
+ * @param {string} req.query.title - Movie title to remove
+ * @param {Object} answer - Response of the attempt to delete the movie in mongo
+ * @param {Object} res - HTTP response of the response of mongo
+ * @throws {err} - JSON, message with the error. See in your tool REST
  */
 const deleteMovie = async (req, res) => {
     try {
         let answer = await Movies.findOneAndDelete({ title: req.query.title });
-        res.status(200).json({ "msj": `Has eliminado la pelicula: ${answer.title}, de la base de datos` });
+        res.status(200).json({ "msj": `You have removed the movie: ${answer.title}, from the data base` });
     } catch (err) {
         res.status(500).json({ msj: err.message });
     };
 };
 
 /**
- * Description: This function renders the update movie view
- * @memberof Renders
- * @method  updateMovie
+ * Description: Render a form on the view update to update a movie.
+ * @memberof ControllersBackend
+ * @method formUpdateMovie
  * @async 
- * @param {Object} req HTTP request object
- * @param {Object} res HTTP response object
+ * @param {Object} res - HTTP response to Render the form
+ * @param {string} idValue - String to assing name of ids because the render is a multi-rendered template
+ * @param {null} titleUpdate - This value prevents the rendering of the input title in the multi-rendered template, because the title is not updateable. 
  * @throws {err} message with the error.
  */
 
@@ -104,20 +105,20 @@ const formUpdateMovie = (req, res) => {
 };
 /**
  * Description: This function updates a movie in the database.
- * @memberof MongoControllers
+ * @memberof ControllersBackend
  * @method updateMovie
  * @async 
- * @param {Object} req HTTP request object
- * @param {Object} res HTTP response object
- * @return {Object} JSON, message indicating that the movie was successfully updated to the database.
- * @throws {err} message with the error.
+ * @param {Object} req.body - All the values ​​that will be set in the update and the value (title) to find the movie in mongo
+ * @param {Object} answer - Response of the attempt to update the movie in mongo
+ * @param {Object} res - HTTP response of the response of mongo
+ * @throws {err} - JSON, message with the error. See in your tool REST
  */
 const updateMovie = async (req, res) => {
-    const { poster, title, year, director, genre, runtime, plot, actors, language } = req.body
     try {
-        const movieUpdate = await Movies.findOneAndUpdate({ title }, { poster, year, director, genre, runtime, plot, actors, language });
-        await movieUpdate.save();
-        res.status(201).json({ msj: `La pelicula ${title} ha sido actualizado.`, movie: movieUpdate });
+        const { poster, title, year, director, genre, runtime, plot, actors, language } = req.body;
+        const response = await Movies.findOneAndUpdate({ title }, { poster, year, director, genre, runtime, plot, actors, language });
+        let answer = await response.save();
+        res.status(201).json({ msj: `The movie: ${answer.title}, has been updated`, movie: answer });
     } catch (err) {
         res.status(500).json({ msj: err.message });
     };

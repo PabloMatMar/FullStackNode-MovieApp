@@ -6,6 +6,6 @@
     },
     "recurseDepth": 10,                         
     "opts": {
-        "destination": "./jsondocs/",          
+        "destination": "./JSDoc/",          
         "recurse": true                         
  }}
