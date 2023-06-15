@@ -1,6 +1,6 @@
 const express = require('express');
 
-const moviesAdminControllers = require("../controllers/moviesMongoController");
+const moviesAdminControllers = require("../controllers/moviesMongoControllers");
 const adminRouter = express.Router();
 
 

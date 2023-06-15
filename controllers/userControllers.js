@@ -1,7 +1,7 @@
 /**
  * @author Pablo Mateos
  * @version 2.0
- * @namespace ControllersBackend
+ * @namespace userControllers
  */
 
 const process = require('process');
@@ -13,18 +13,20 @@ const { SECRET } = process.env;
 
 /**
  * Description: This function save a favorite movie of user in the database.
- * @memberof ControllersBackend
+ * @memberof userControllers
  * @method addFavorite
  * @async  
- * @param {Object} req.body - The values ​​to enter in SQL
- * @param {string} req.decoded.user - The name of user that is forenkey in SQL
- * @param {Object} res - message "The movie was add" if process was succesful.
+ * @param {Object} req - HTTP request
+ * @param {Object} res - HTTP response
+ * @property {Object} req.body - The values ​​to enter in SQL
+ * @property {string} req.decoded.user - The name of user that is forenkey in SQL
+ * @property {function} res.json - Formatting the response to JSON whit the message "The movie was adds"
  * @throws {Error} message with the err during save process.
  */
 const addFavorite = async (req, res) => {
     try {
         await users.addFavorite(req.body, req.decoded.user);
-        res.status(201).json({ msj: "The movie was add" });
+        res.status(201).json({ msj: "The movie was adds" });
     } catch (err) {
         res.status(500).json({ msj: err.message });
     };
@@ -32,13 +34,15 @@ const addFavorite = async (req, res) => {
 
 /**
  * Description: This function get all favorites movies of user in the database.
- * @memberof ControllersBackend
+ * @memberof userControllers
  * @method getFavorites
  * @async  
- * @param {function} deleteFavorite - Calls the function in charge of using the queries to obtein all the favorites movies of the user.
- * @param {string} req.decoded.user - The username that acts as the forenkey in the SQL favorites table.
- * @param {Array} userFavMovies - SQL return with all the user's favorite movies.
- * @param {Object} res - HTTP response whit the favs movies to render on search view
+ * @param {Object} req - HTTP request
+ * @param {Object} res - HTTP response
+ * @property {function} getFavorites - Calls the function in charge of using the queries to obtein all the favorites movies of the user.
+ * @property {string} req.decoded.user - The username that acts as the forenkey in the SQL favorites table.
+ * @const {Array} userFavMovies - SQL return with all the user's favorite movies.
+ * @property {function}  res.render - Rendering of the response with the user's favorite movies in the search view.
  * @throws {Error} message with the error during the fetch process.
  */
 
@@ -53,14 +57,15 @@ const getFavorites = async (req, res) => {
 
 /**
  * Description: This function get all favorites movies of user in the database.
- * @memberof ControllersBackend
+ * @memberof userControllers
  * @method deleteFavoriteMovie
  * @async  
- * @param {function} deleteFavorite - Calls the function in charge of using the queries to eliminate the movie.
- * @param {string} req.decoded.user - The username that acts as the forenkey in the SQL favorites table.
- * @param {string} req.body.title - The username that will be used in the where clause of the query
- * @param {Array} userFavMovies - SQL return with all the user's favorite movies.
- * @param {Object} res - message "The movie was delete" if process was succesful.
+ * @param {Object} req - HTTP request.
+ * @param {Object} res - HTTP response.
+ * @property {function} deleteFavorite - Calls the function in charge of using the queries to eliminate the movie.
+ * @property {string} req.decoded.user - The username that acts as the forenkey in the SQL favorites table.
+ * @property {string} req.body.title - The username that will be used in the where clause of the query.
+ * @property {function} res.json - Formatting the response to JSON whit the message "The movie was delete"
  * @throws {Error} message with the error during the delete process.
  */
 
@@ -75,19 +80,21 @@ const deleteFavoriteMovie = async (req, res) => {
 
 /**
  * Description: This calls the function that created one user and, in case of success, creates the token for the user's navigation.
- * @memberof ControllersBackend
+ * @memberof userControllers
  * @method createUSer
  * @async 
- * @param {function} createUser - Call to the function in charge of using the queries to create a new user row in the users table.
- * @param {number} response - The value is one if the user wascreated, else, 0.
- * @param {Object} req.body - The username, the password, and the boolean admin-user.
- * @param {Object} payload - The user information that will be on the server side.
- * @param {string} SECRET - The key to sing the token.
- * @param {string} req.body.emailSignup - The unique username. 
- * @param {Object} res.cookie - HTTP response to save the token in the cookie and redirect to the home view.
- * @param {boolean} login - Boolean that informs the pug template to allow the form to be rendered.
- * @param {boolean} alreadyExist - Boolean that informs the pug template to allow the message "User already Exisst" to be rendered.
- * @param {Object} res.render - HTTP response to render home with the login form and the message "User does not exist"
+ * @param {Object} req - HTTP request.
+ * @param {Object} res - HTTP response.
+ * @property {function} createUser - Call to the function in charge of using the queries to create a new user row in the users table.
+ * @const {number} response - The value is one if the user wascreated, else, 0.
+ * @property {Object} req.body - The username, the password, and the boolean admin-user.
+ * @const {Object} payload - The user information that will be on the server side.
+ * @const {string} SECRET - The key to sing the token.
+ * @property {string} req.body.emailSignup - The unique username. 
+ * @property {function} res.cookie - HTTP response to save the token in the cookie and redirect to the home view.
+ * @property {boolean} login - Boolean that informs the pug template to allow the login form to be rendered.
+ * @property {boolean} alreadyExist - Boolean that informs the pug template to allow the message "User already Exisst" to be rendered.
+ * @property {function} res.render - Rendering of the response in the home view with the login form and the message "User does not exist".
  * @throws {Error} message with the error during the delete process.
  */
 
@@ -116,19 +123,21 @@ const createUser = async (req, res) => {
 
 /**
  * Description: This calls the function that validated the credential of user and, in case of success, creates the token for the user's navigation.
- * @memberof ControllersBackend
+ * @memberof userControllers
  * @method validateUser
  * @async 
- * @param {function} validatedUser - Call to the function in charge of using the queries to validate the login credentials.
- * @param {number} response - The value is one if the validation of the credential was okey, else, 0.
- * @param {Object} req.body - The username, the password, and the boolean admin-user.
- * @param {Object} payload - The user information that will be on the server side.
- * @param {string} SECRET - The key to sing the token.
- * @param {string} req.body.emailSignup - The unique username. 
- * @param {Object} res.cookie - HTTP response to save the token in the cookie and redirect to the home view.
- * @param {boolean} login - Boolean that informs the pug template to allow the form to be rendered.
- * @param {boolean} incorrectUser - Boolean that informs the pug template to allow the message "User does not exist" to be rendered.
- * @param {Object} res.render - HTTP response to render home with the login form and the message "User does not exist"
+ * @param {Object} req - HTTP request.
+ * @param {Object} res - HTTP response.
+ * @property {function} validatedUser - Call to the function in charge of using the queries to validate the login credentials.
+ * @const {number} response - The value is one if the validation of the credential was okey, else, 0.
+ * @property {Object} req.body - The username, the password, and the boolean admin-user.
+ * @const {Object} payload - The user information that will be on the server side.
+ * @const {string} SECRET - The key to sing the token.
+ * @property {string} req.body.emailSignup - The unique username. 
+ * @property {function} res.cookie - HTTP response to save the token in the cookie and redirect to the home view.
+ * @property {boolean} login - Boolean that informs the pug template to allow the form to be rendered.
+ * @property {boolean} incorrectUser - Boolean that informs the pug template to allow the message "User does not exist" to be rendered.
+ * @property {function} res.render - Rendering of the response in the home view with the login form and the message "User does not exist"
  * @throws {Error} message with the error during the delete process.
  */
 
@@ -155,11 +164,12 @@ const validatedUser = async (req, res) => {
 
 /**
  * Description: This function renders the home view whit the form to login.
- * @memberof ControllersBackend
+ * @memberof userControllers
  * @method  getLogin
  * @async 
- * @param {boolean} login - Boolean that informs the pug template to allow the form to be rendered.
- * @param {Object} res - HTTP response to render the view home whit the form of login.
+ * @param {Object} res - HTTP response.
+ * @property {boolean} login - Boolean that informs the pug template to allow the form to be rendered.
+ * @property {function} res.render - Rendering of the response in the home view whit the form of login.
  * @throws {Error} message with the error if render fail.
  */
 
@@ -173,11 +183,12 @@ const getLogin = (_, res) => {
 
 /**
  * Description: This function renders the home view whit the form to singup.
- * @memberof ControllersBackend
+ * @memberof userControllers
  * @method  getSingup
  * @async 
- * @param {boolean} singup - Boolean that informs the pug template to allow the form to be rendered.
- * @param {Object} res - HTTP response to render the view home whit the form of login.
+ * @param {Object} res - HTTP response.
+ * @property {boolean} singup - Boolean that informs the pug template to allow the form to be rendered.
+ * @property {function} res.render - Rendering of the response in the home view whit the form of login.
  * @throws {Error} message with the error if render fail.
  */
 
@@ -188,7 +199,6 @@ const getSingup = (_, res) => {
         res.status(500).json({ msj: err.message });
     };
 };
-
 
 
 module.exports = {

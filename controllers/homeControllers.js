@@ -4,15 +4,16 @@
  * @namespace homeControllers
  */
 
-const token = require('../middleware/checkToken').token;
-
 /**
  * Description: This function renders the home view
- * @memberof ControllersBackend
+ * @memberof homeControllers
  * @method  getHome
  * @async 
- * @param {string} req.cookies.token - token of user
- * @param {Object} res - HTTP response to render view home
+ * @param {Object} req - HTTP request.
+ * @param {Object} res - HTTP response.
+ * @property {string} req.cookies.token - token of user
+ * @property {boolean} user - Boolean that informs the pug template to allow the anchors to login/singup to be rendered.
+ * @property {function} res.render - Rendering of the response in the home view with the login.
  * @throws {Error} message with the error if render fails.
  */
 
