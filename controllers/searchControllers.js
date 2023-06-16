@@ -34,7 +34,7 @@ const getSearch = (_, res) => {
  * @method startScraping
  * @async 
  * @param {string} title - The title to search reviews whit the scraped.
- * @const {function} scraper - Contais the Script of scrapper.
+ * @property {function} scraper - Contais the Script of scrapper.
  * @property {function} scrap - The first argument is the url where the data will be searched (filmafinity) the second is the information for the scrapping search selectors (the title of the movie).
  * @return {Object} - Containing the scraped reviews.
  * @throws {Error} message with the error during the scraping process.
@@ -79,7 +79,7 @@ const postFilmForm = async (req, res) => {
  * @param {Object} res - HTTP response.
  * @property {string} req.params.title - The title of the movie that has been redirected from postfilm
  * @property {function} find - Method to find in mongo a movie for title.
- * @const {Array} movie - The array whit the movies finded in mongo. Only takes the first element.
+ * @property {Array} movie - The array whit the movies finded in mongo. Only takes the first element.
  * @property {Array} categories - The array whit the values to render in the pug template.
  * @property {function} res.render - if the movie is finded the rendering of the response is produced in the search view
  * @property {function} res.redirect if the movie is not finded the response is redirected to path that search in the api.
@@ -104,7 +104,7 @@ const getSearchForTitleInMongo = async (req, res) => {
  * @param {object} movie - Movie and reviews values to send mongo to create a movie.
  * @property {function} Movies - Method that caugth mongo schema to insert a movie in mongo.
  * @property {function} save - The method to save the movie in mongo.
- * @const {Object} answer - Response of the attempt to save the movie in mongo.
+ * @property {Object} answer - Response of the attempt to save the movie in mongo.
  * @throws {Error} console.log message with the error during the save process.
  */
 
@@ -128,11 +128,11 @@ const pushApiMovieInMongo = async (movie) => {
  * @param {Object} res - HTTP response.
  * @property {function} fetch - Make a get request to url `http://www.omdbapi.com/?t=${req.params.title}&apikey=` + API_KEY
  * @property {string} req.params.title - The title of the movie to search in API.
- * @const {string} API_KEY - The key of the API movies.
- * @const {string} categoriesMovie.Error  - If this is not equal to "Movie not found" then movie rendering is started, else, the search view is rendered with the noMovie property set to true.
+ * @property {string} API_KEY - The key of the API movies.
+ * @property {string} categoriesMovie.Error  - If this is not equal to "Movie not found" then movie rendering is started, else, the search view is rendered with the noMovie property set to true.
  * @func startScraping - Call to the function that initiates the scrapping. Receives as argument the title of the movie.
- * @const {Object} scrappingCritics - The reviews obtained in the scraped. Value of property is an Array.
- * @const {Object} categories - It contains the properties and values ​​of the movie from the api but correcting the bad practice in the naming of the properties without camel case.
+ * @property {Object} scrappingCritics - The reviews obtained in the scraped. Value of property is an Array.
+ * @property {Object} categories - It contains the properties and values ​​of the movie from the api but correcting the bad practice in the naming of the properties without camel case.
  * @func pushApiMovieInMongo - Call to the function that saves the movie from the api plus the scrapping reviews in mongo
  * @property {Object} categories - The values send to render.
  * @property {string} Title - The value of the title property is passed to lower case to unify searches once it is saved in mongo

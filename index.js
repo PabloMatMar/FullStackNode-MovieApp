@@ -11,8 +11,8 @@ require('./utils/pg_pool');
 
 
 //swagger
-const swaggerUi = require('swagger-ui-express');//Requiere libreria de Swagger (La UI)
-const swaggerDocument = require('./swagger.json'); //Requiere ruta relativa del json que contiene la documentación de la API
+// const swaggerUi = require('swagger-ui-express');//Requiere libreria de Swagger (La UI)
+// const swaggerDocument = require('./swagger.json'); //Requiere ruta relativa del json que contiene la documentación de la API
 
 //jsdoc
 //const jsdoc = require('express-jsdoc-swagger');
@@ -41,7 +41,7 @@ app.use(express.static(path.join(__dirname, '/public')));
 app.use(morgan('combined'));
 app.use(cors());
 app.use(cookieParser());
-app.use('/api-docs-swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocument));//Endpoint que servirá la documentación en el navegador, se le pasa la variable que apunta al .json que contiene la documentación.
+// app.use('/api-docs-swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocument));//Endpoint que servirá la documentación en el navegador, se le pasa la variable que apunta al .json que contiene la documentación.
 const checkToken = require('./middleware/checkToken').token;
 
 

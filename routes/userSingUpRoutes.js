@@ -4,6 +4,6 @@ const userSingupRouter = express.Router();
 
 
 userSingupRouter.post('/', userCrontrolers.createUser);
-userSingupRouter.get('/', userCrontrolers.getSingup);
+userSingupRouter.get('/:errSignup', userCrontrolers.getSingup);
 
 module.exports = userSingupRouter

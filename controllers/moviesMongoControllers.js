@@ -11,8 +11,8 @@ const Movies = require('../models/moviesMongo')
  * @method getMovies
  * @async 
  * @param {Object} res - HTTP response.
- * @const {Object} Movies - schema of Movies mongo.
- * @const {Array} movies - All movies mongo conteins.
+ * @property {Object} Movies - schema of Movies mongo.
+ * @property {Array} movies - All movies mongo conteins.
  * @property {Array} allMovies - Conteins the allMovies to rendering in a templeate.
  * @property {function} res.render  Rendering of the response in the moviesAdmin.
  * @throws {Error} message with the error.
@@ -58,7 +58,7 @@ const getFormMovie = (_, res) => {
  * @property {function} Movies - Method that caugt mongo schema to insert a movie in mongo.
  * @property {Object} req.body - Movie values to send mongo to create a movie
  * @property {function} save - The method to save the movie in mongo.
- * @const {Object} answer - Response of the attempt to save the movie in mongo
+ * @property {Object} answer - Response of the attempt to save the movie in mongo
  * @property {object} movie - Conteins the values of the movie that was created. 
  * @property {function} res.json - Formatting the response to JSON whit the message `The movie with title ${answer.title} has been added to mongodb` and the object to contains the new movie.
  * @throws {Error} - JSON, message with the error. See in your tool REST
@@ -80,10 +80,10 @@ const createMovie = async (req, res) => {
  * @async 
  * @param {Object} req - HTTP request
  * @param {Object} res - HTTP response
- * @const {Object} Movies - Mongo schema
+ * @property {Object} Movies - Mongo schema
  * @property {function} findOneAndDelete - Method to search in mongo a movie for title and deleted it. 
  * @property {string} req.query.title - Movie title to remove
- * @const {Object} answer - Response of the attempt to delete the movie in mongo
+ * @property {Object} answer - Response of the attempt to delete the movie in mongo
  * @property {function} res.json - Formatting the response to JSON whit the message `You have removed the movie: ${answer.title}, from the data base`.
  * @throws {Error} - JSON, message with the error. See in your tool REST
  */
@@ -126,7 +126,7 @@ const formUpdateMovie = (_, res) => {
  * @property {Object} req.body - All the values ​​that will be set in the update and the value of field (title) to find the movie in mongo
  * @property {function} findOneAndUpdate - Method to search in mongo a movie for title and updated it. 
  * @property {function} save - The method to save the updated movie in mongo.
- * @const {Object} answer - Response of the attempt to update the movie in mongo.
+ * @property {Object} answer - Response of the attempt to update the movie in mongo.
  * @property {object} movie - Conteins the values of the movie that was updated.
  * @property {function} res.json - Formatting the response to JSON whit the message `The movie: ${answer.title}, has been updated` and the object to contains the updated movie.
  * @throws {Error} - JSON, message with the error. See in your tool REST

@@ -41,7 +41,7 @@ const addFavorite = async (req, res) => {
  * @param {Object} res - HTTP response
  * @property {function} getFavorites - Calls the function in charge of using the queries to obtein all the favorites movies of the user.
  * @property {string} req.decoded.user - The username that acts as the forenkey in the SQL favorites table.
- * @const {Array} userFavMovies - SQL return with all the user's favorite movies.
+ * @property {Array} userFavMovies - SQL return with all the user's favorite movies.
  * @property {function}  res.render - Rendering of the response with the user's favorite movies in the search view.
  * @throws {Error} message with the error during the fetch process.
  */
@@ -86,10 +86,10 @@ const deleteFavoriteMovie = async (req, res) => {
  * @param {Object} req - HTTP request.
  * @param {Object} res - HTTP response.
  * @property {function} createUser - Call to the function in charge of using the queries to create a new user row in the users table.
- * @const {number} response - The value is one if the user wascreated, else, 0.
+ * @property {number} response - The value is one if the user wascreated, else, 0.
  * @property {Object} req.body - The username, the password, and the boolean admin-user.
- * @const {Object} payload - The user information that will be on the server side.
- * @const {string} SECRET - The key to sing the token.
+ * @property {Object} payload - The user information that will be on the server side.
+ * @property {string} SECRET - The key to sing the token.
  * @property {string} req.body.emailSignup - The unique username. 
  * @property {function} res.cookie - HTTP response to save the token in the cookie and redirect to the home view.
  * @property {boolean} login - Boolean that informs the pug template to allow the login form to be rendered.
@@ -129,10 +129,10 @@ const createUser = async (req, res) => {
  * @param {Object} req - HTTP request.
  * @param {Object} res - HTTP response.
  * @property {function} validatedUser - Call to the function in charge of using the queries to validate the login credentials.
- * @const {number} response - The value is one if the validation of the credential was okey, else, 0.
+ * @property {number} response - The value is one if the validation of the credential was okey, else, 0.
  * @property {Object} req.body - The username, the password, and the boolean admin-user.
- * @const {Object} payload - The user information that will be on the server side.
- * @const {string} SECRET - The key to sing the token.
+ * @property {Object} payload - The user information that will be on the server side.
+ * @property {string} SECRET - The key to sing the token.
  * @property {string} req.body.emailSignup - The unique username. 
  * @property {function} res.cookie - HTTP response to save the token in the cookie and redirect to the home view.
  * @property {boolean} login - Boolean that informs the pug template to allow the form to be rendered.
@@ -192,9 +192,9 @@ const getLogin = (_, res) => {
  * @throws {Error} message with the error if render fail.
  */
 
-const getSingup = (_, res) => {
+const getSingup = (req, res) => {
     try {
-        res.render('home', { singup: true });
+        req.params.errSignup == ':' ? res.render('home', { singup: true }) : res.render('home', { singup: true, errSignup: JSON.parse(req.params.errSignup.slice(1)) });
     } catch (err) {
         res.status(500).json({ msj: err.message });
     };
