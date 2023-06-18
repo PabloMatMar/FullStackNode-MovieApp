@@ -8,7 +8,7 @@ const process = require('process');
 const users = require('../models/users_sql')
 jwt = require('jsonwebtoken');
 require('dotenv').config();
-const { SECRET } = process.env;
+const { SECRET} = process.env;
 
 
 /**
@@ -49,7 +49,7 @@ const addFavorite = async (req, res) => {
 const getFavorites = async (req, res) => {
     try {
         const userFavMovies = await users.getFavorites(req.decoded.user);
-        res.status(200).render("search", { userFavMovies: userFavMovies.reverse() });
+        res.status(200).render("search", { userFavMovies: userFavMovies });
     } catch (err) {
         res.status(500).json({ msj: err.message });
     };
@@ -104,19 +104,17 @@ const createUser = async (req, res) => {
         if (response == 1) {
             const payload = {
                 check: true,
-                user: req.body.emailSignup/*,
-                admin: req.body.admin*/
+                user: req.body.emailSignup,
+                admin: req.body.admin
             };
             const token = jwt.sign(payload, SECRET, {
                 expiresIn: "3000000ms" // 30 minutos hasta que expira
             });
-            //Almacenamos el token en las cookies
             res.cookie('token', token).status(200).redirect("/");
         } else {
             res.render("home", { singup: true, alreadyExist: true });
         }
     } catch (err) {
-        console.log("ERRORRRR");
         res.status(403).json({ msj: err.message })
     };
 };
@@ -143,17 +141,16 @@ const createUser = async (req, res) => {
 
 const validatedUser = async (req, res) => {
     try {
-        const response = await users.validatedUser(req.body);
-        if (response == 1) {
+        const {credential, admin} = await users.validatedUser(req.body);
+        if (credential == 1) {
             const payload = {
                 check: true,
-                user: req.body.email/*,
-                admin: req.body.admin*/
+                user: req.body.email,
+                admin: admin
             };
             const token = jwt.sign(payload, SECRET, {
                 expiresIn: "12000000ms" // 1200 segundos para que expire
             });
-            //Almacenamos el token en las cookies
             res.cookie('token', token).status(200).redirect("/");
         } else
             res.render("home", { login: true, incorrectUser: true })

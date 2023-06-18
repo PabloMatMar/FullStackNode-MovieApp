@@ -4,6 +4,7 @@
  * @namespace moviesMongoControllers
  */
 
+const { toDecided } = require('../middleware/toDecided');
 const Movies = require('../models/moviesMongo')
 /**
  * Description: This function gets all the movies in the database.
@@ -18,10 +19,10 @@ const Movies = require('../models/moviesMongo')
  * @throws {Error} message with the error.
  */
 
-const getMovies = async (_, res) => {
+const getMovies = async (req, res) => {
     try {
         const movies = await Movies.find({ Movies }, { _id: 0, __v: 0 });
-        res.status(200).render("moviesAdmin", { allMovies: movies.reverse() });
+        res.status(200).render("moviesAdmin", { allMovies: movies.reverse(), admin: req.decoded.admin });
     }
     catch (err) {
         res.status(400).json({ msj: err.message });
@@ -40,9 +41,9 @@ const getMovies = async (_, res) => {
  * @throws {Error} message with the error.
  */
 
-const getFormMovie = (_, res) => {
+const getFormMovie = (req, res) => {
     try {
-        res.render('createMovie', { idValue: "createMovie", titleUpdate: null });
+        res.render('createMovie', { idValue: "createMovie", titleUpdate: null, admin: req.decoded.admin });
     } catch (err) {
         res.status(500).json({ msj: err.message });
     };
@@ -109,9 +110,9 @@ const deleteMovie = async (req, res) => {
  */
 
 
-const formUpdateMovie = (_, res) => {
+const formUpdateMovie = (req, res) => {
     try {
-        res.render('updateMovie', { idValue: "updateMovie", titleUpdate: "Title" });
+        res.render('updateMovie', { idValue: "updateMovie", titleUpdate: "Title", admin: req.decoded.admin });
     } catch (err) {
         res.status(500).json({ msj: err.message });
     };

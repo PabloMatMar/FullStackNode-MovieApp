@@ -1,7 +1,8 @@
 include ./basicStructures/head.pug
     title Home
 body
-    include ./basicStructures/header.pug
+    if logged
+        include ./basicStructures/header.pug
     main
         h3 Welcome
         if !login && !singup
@@ -10,5 +11,14 @@ body
             include ./homeFragments/login.pug
         if singup
             include ./homeFragments/singup.pug
+        if noLogin
+            section
+                h4 You cant navegete if you dont register.
+        if noUser
+            section
+                h4 This section is only for Users.
+        if noAdmin
+            section
+                h4 This section is only for Admins.
     include ./basicStructures/footer.pug
     script(type="module" src="/scripts.js")

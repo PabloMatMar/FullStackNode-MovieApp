@@ -1,9 +1,10 @@
 //despliegue del menu 'hamburguesa'
-let burger = document.querySelector(".burger_menu");
-burger.addEventListener("click", () => {
-  let links = document.getElementById("links_menu");
-  links.style.display == "block" ? links.style.display = "none" : links.style.display = "block";
-});
+if (document.querySelector(".burger_menu")) {
+  document.querySelector(".burger_menu").addEventListener("click", () => {
+    let links = document.getElementById("links_menu");
+    links.style.display == "block" ? links.style.display = "none" : links.style.display = "block";
+  });
+}
 
 
 //LLAMADAS A RUTAS DE ADMIN
@@ -12,47 +13,53 @@ burger.addEventListener("click", () => {
 const createMovie = async (movie) => {
   let response = { status: 500 };
   try {
-    response = await fetch('http://localhost:3000/movies/createMovie', {
+    response = await fetch('/movies/createMovie', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(movie)
     });
+    location.href = `/movies`;
   } catch (err) {
     console.log(err);
   };
-  response.status == 201 ? alert("The film " + movie.title + " has been created") : alert("The movie " + movie.title + " could not be created check that the title is not repeated");
+  if (response.status != 201)
+    alert("The movie " + movie.title + " could not be created check that the title is not repeated");
 };
 
 //Ruta para eliminar pelicula de mongo:
-const deleteFavorite = async (title) => {
+const deleteMovie = async (title) => {
   let response = { status: 500 };
   try {
-    response = await fetch('http://localhost:3000/movies/deleteMovie?title=' + title, {
+    response = await fetch('/movies/deleteMovie?title=' + title, {
       method: 'DELETE'
     });
+    location.href = `/movies`;
   } catch (err) {
     console.log(err);
   };
-  response.status == 200 ? alert("The movie " + title + " has been deleted") : alert("The movie " + title + " could not be deleted, you probably have already deleted it, refresh the page to check it.");
+  if (response.status != 200)
+    alert("The movie " + title + " could not be deleted, you probably have already deleted it, refresh the page to check it.");
 };
 
 //Ruta para actualizar pelicula de mongo:
 const updateMovie = async (movie) => {
   let response = { status: 500 };
   try {
-    response = await fetch('http://localhost:3000/movies/updateMovie', {
+    response = await fetch('/movies/updateMovie', {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(movie)
     });
+    location.href = `/movies`;
   } catch (err) {
     console.log(err);
   };
-  response.status === 201 ? alert("The movie " + movie.title + " has been updated") : alert("The movie " + movie.title + " could not be deleted, you probably have already deleted it, refresh the page to check it.");
+  if (response.status != 201)
+    alert("The movie " + movie.title + " could not be deleted, you probably have already deleted it, refresh the page to check it.");
 };
 
 //LLAMADAS A RUTAS DE USUARIO
@@ -60,35 +67,39 @@ const updateMovie = async (movie) => {
 const addFavorite = async (movie) => {
   let response = { status: 500 };
   try {
-    response = await fetch('http://localhost:3000/favMovies', {
+    response = await fetch('/favMovies', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(movie)
     });
+    location.href = `/favmovies`;
   } catch (err) {
     console.log(err);
   };
-  response.status == 201 ? alert("The movie " + movie.title + " has been add to your favorite list") : alert("The movie " + movie.title + " could not be add to favorites list, you probably have already deleted it, refresh the page to check it.");
+  if (response.status != 201)
+    alert("The movie " + movie.title + " could not be add to favorites list, you probably have already deleted it, refresh the page to check it.");
 };
 
 //Ruta para eliminar pelicula de favoritos:
 const deleteFavMovie = async (data) => {
   let response = { status: 500 };
   try {
-    response = await fetch('http://localhost:3000/favmovies', {
+    response = await fetch('/favmovies', {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(data)
     });
+    location.href = `/favmovies`;
   } catch (err) {
     alert(err);
     console.log(err);
   };
-  response.status == 200 ? alert("The movie " + data.title + " has been deleted from your favorites list.") : alert("The movie " + data.title + " could not be deleted from favorites list, you probably have already deleted it, refresh the page to check it.");
+  if (response.status != 200)
+    alert("The movie " + data.title + " could not be deleted from favorites list, you probably have already deleted it, refresh the page to check it.");
 };
 
 //Ruta para renderizar mensajes en los intentos de registro:
@@ -97,7 +108,7 @@ const render = async (param) => {
   try {
     let path;
     JSON.parse(param).find(e => e == 1) == undefined ? path = "/" : path = "/signup/:" + JSON.stringify(param);
-    location.href =`http://localhost:3000${path}`;
+    location.href = `${path}`;
   } catch (err) {
     console.log(err);
   };
@@ -112,7 +123,7 @@ if (document.getElementById("singup") != null) {
     event.preventDefault(); // parar envío
 
     let validated = true;
-    let errs = [0, 0, 0]
+    let errs = [0, 0, 0];
     if (event.target.passwordSignup.value !== event.target.password2Signup.value)
       errs[0] = 1;
     if (!(/^(?=\w*\d)(?=\w*[A-Z])(?=\w*[a-z])\S{6,16}$/.test(event.target.passwordSignup.value)))
@@ -164,7 +175,7 @@ if (document.title === "Movies") {
       const cleanTitle = movie.slice(7);
       const titleMovie = cleanTitle.trim();
       if (movie)
-        await deleteFavorite(titleMovie);
+        await deleteMovie(titleMovie);
     });
 };
 //Evento para capturar los datos y llamar a la funcion para crear pelicula a lista de mongo a traves de admin:

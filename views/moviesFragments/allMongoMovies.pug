@@ -4,7 +4,7 @@ section(class="cardSection")
     each item, i in allMovies
         article(class="card")
             h3(id="title" + i)  Title: #{allMovies[i].title}
-            img(src=allMovies[i].poster  class="imgMongo")
+            img(src=allMovies[i].poster  class="poster")
             each val, key in allMovies[i]._doc
                 if key != 'title' && key != 'poster' && key != 'critics'
                     p(id=key)= key.split('').map((e,i)=> i==0 ? e.toUpperCase(): e).join('') +': '+ val

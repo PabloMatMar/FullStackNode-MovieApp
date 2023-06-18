@@ -1,32 +1,32 @@
 const queries = {
     createUser:`
-    INSERT INTO users2(email, password)
-    VALUES ($1,$2);
+    INSERT INTO users(email, password, admin)
+    VALUES ($1,$2,$3);
     `,
     validatedUser:`
     SELECT *
-    FROM users2
+    FROM users
     WHERE email = $1 AND password = $2;
     `,
     addFavorite:`
-    INSERT INTO favorites2
-    (title, year, director, genre, runtime, img, emailfk)
+    INSERT INTO favorites
+    (title, year, director, genre, runtime, poster, emailfk)
     VALUES ($1, $2, $3, $4, $5, $6, $7);
     `,
     getFavorites:`
-    SELECT title, img, director, year, genre, runtime
-    FROM favorites2
+    SELECT title, poster, director, year, genre, runtime
+    FROM favorites
     WHERE emailFK = $1;
     `,
     deleteFavorite:`
     DELETE
-    FROM favorites2 AS e
+    FROM favorites AS e
     WHERE e.emailFK = $1 AND e.title = $2;
     `,
     isAdmin:`
-    SELECT *
-    FROM users2
-    WHERE email = $1 AND admin = 'true';
+    SELECT admin
+    FROM users
+    WHERE email = $1;
     `
 }
 module.exports = queries;

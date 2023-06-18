@@ -19,7 +19,10 @@
 
 const getHome = (req, res) => {
     try {
-        req.cookies.token == undefined ? res.render("home", { user: false }) : res.render("home", { user: true });
+        let admin;
+        req.cookies.token ?
+            (admin = JSON.parse(Buffer.from(req.cookies.token.split('.')[1], 'base64').toString()).admin, res.render("home", { logged: true, admin: admin }))
+            : res.render("home");
     } catch (err) {
         res.status(500).send({ err: err.message });
     };

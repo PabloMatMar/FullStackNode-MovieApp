@@ -3,6 +3,11 @@ include ./basicStructures/head.pug
 body 
     include ./basicStructures/header.pug
     main
-       include ./moviesFragments/allMongomovies.pug
+        if !noAdmin
+            include ./moviesFragments/allMongomovies.pug
+        else
+            section
+                h4 This view is only for Admins.
+
     include ./basicStructures/footer.pug
     script(type="module" src="/scripts.js")

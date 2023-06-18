@@ -3,6 +3,10 @@ include ./basicStructures/head.pug
 body 
     include ./basicStructures/header.pug
     main
-        include ./moviesFragments/formMovie.pug
+        if !noAdmin
+            include ./moviesFragments/formMovie.pug
+        else
+            section
+                h4 This view is only for Admins.
     include ./basicStructures/footer.pug
     script(type="module" src="/scripts.js")

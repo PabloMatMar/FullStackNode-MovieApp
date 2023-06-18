@@ -1,8 +1,8 @@
 each film, i in userFavMovies                     
     article(class='card')
-        img(src=userFavMovies[i].img class="imgFav")
+        img(src=userFavMovies[i].poster class="poster")
         each val, key in userFavMovies[i]
-            if key != 'img'
+            if key != 'poster'
                 p(id=key + i)= key.split('').map((e,i)=> i==0 ? e.toUpperCase(): e).join('') +': '+ val
         button(id='delete'+i class="delete" type="button" class ="css-button-arrow--red") Remove
         p(id="favMovies" hidden=true)

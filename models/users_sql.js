@@ -3,6 +3,8 @@
  * @version 2.0
  * @namespace users_sql 
  */
+require('dotenv').config();
+const { ADMIN_KEY } = process.env
 const pool = require('../utils/pg_pool');
 const queries = require('../queries/queriesUser');
 
@@ -107,6 +109,7 @@ const deleteFavorite = async (emailFK, title) => {
  * @param {Object} user - User name and password to create a user.
  * @property {string} user.emailSignup - User name to create a user.
  * @property {string} user.passwordSignup - password to create a user.
+ * @property {string} user.admin - The code that allows the registration as admin
  * @const {Object} pool - Host, username, database and password of ElephantSQL.
  * @property {function} connect - Method to connect to sql server.
  * @property {function} release - Method to disconnect to sql server.
@@ -121,9 +124,9 @@ const deleteFavorite = async (emailFK, title) => {
 const createUser = async (user) => {
     let client, result;
     try {
-        const { emailSignup, passwordSignup } = user;
+        const { emailSignup, passwordSignup, admin } = user;
         client = await pool.connect();
-        const data = await client.query(queries.createUser, [emailSignup, passwordSignup]);
+        const data = await client.query(queries.createUser, [emailSignup, passwordSignup, admin]);
         result = data.rowCount;
     } catch (err) {
         if (err.detail != undefined && err.detail.endsWith('already exists.'))
@@ -144,6 +147,7 @@ const createUser = async (user) => {
  * @param {Object} user - Credentials to validate.
  * @property {string} user.emailSignup - User name to validate.
  * @property {string} user.passwordSignup - password to validate.
+ * @property {string} user.admin - The code to validate the admin.
  * @const {Object} pool - Host, username, database and password of ElephantSQL.
  * @property {function} connect - Method to connect to sql server.
  * @property {function} release - Method to disconnect to sql server.
@@ -155,20 +159,29 @@ const createUser = async (user) => {
  */
 
 const validatedUser = async (user) => {
-    let client, result;
+    let client;
+    let result = {
+        credential: 0,
+        admin: false
+    }
     try {
         const { email, password } = user;
         client = await pool.connect();
         const data = await client.query(queries.validatedUser, [email, password]);
-        console.log(data);
-        result = data.rowCount;
+        const checkAdmin = await client.query(queries.isAdmin, [email]);
+        let admin = false;
+        if (checkAdmin.rows[0].admin == ADMIN_KEY)
+            admin = true;
+        result = {
+            credential: data.rowCount,
+            admin
+        };
     } catch (err) {
         console.log(err);
         throw err;
     } finally {
         client.release();
     };
-    console.log(result);
     return result;
 };
 

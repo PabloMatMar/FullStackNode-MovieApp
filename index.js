@@ -42,7 +42,10 @@ app.use(morgan('combined'));
 app.use(cors());
 app.use(cookieParser());
 // app.use('/api-docs-swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocument));//Endpoint que servirá la documentación en el navegador, se le pasa la variable que apunta al .json que contiene la documentación.
-const checkToken = require('./middleware/checkToken').token;
+const { token } = require('./middleware/checkToken');
+const { admin } = require('./middleware/checkAdmin');
+const { user } = require('./middleware/checkUser');
+const { toDecided } = require('./middleware/toDecided');
 
 
 //RUTAS:
@@ -55,11 +58,11 @@ app.use('/login', userLoginRoutes);
 //Ruta para deslogearse
 app.use('/logout', logoutRoutes);
 //Rutas para usuario:
-app.use('/search',checkToken, searchRoutes);
+app.use('/search', toDecided, token, searchRoutes);
 //Rutas para administrador:
-app.use('/movies',checkToken, adminRoutes);
+app.use('/movies', admin, token, adminRoutes);
 //Rutas para ver las peliculas favoritas de un usuario:
-app.use('/favmovies',checkToken, favMoviesRoutes);
+app.use('/favmovies', user, token, favMoviesRoutes);
 
 app.listen(port, () => {
     console.log(`server running on http://localhost:${port}`)

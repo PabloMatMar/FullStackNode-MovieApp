@@ -7,22 +7,24 @@
 require('dotenv').config();
 const Movies = require('../models/moviesMongo');
 const scraper = require('../utils/scraper');
-const { API_KEY } = process.env
+const { API_KEY } = process.env;
 
 /**
  * Description: This function renders the search view.
  * @memberof  searchControllers
  * @method  getSearch
  * @async 
+ * @param {Object} req - HTTP request.
  * @param {Object} res - HTTP response.
+ * @property {boolean} admin - Informs the renderer if it is a user or an administrator so that it displays the corresponding navigation bar.
  * @property {function} res.render - Rendering of the response in the search view.
  * @throws {Error} message with the error when render search view.
  * @property {function} res.status.send - Send a json to error message.
  */
 
-const getSearch = (_, res) => {
+const getSearch = (req, res) => {
     try {
-        res.render('search');
+        res.render("search", { admin: req.decoded.admin });
     } catch (err) {
         res.status(500).send({ err });
     };
@@ -137,6 +139,7 @@ const pushApiMovieInMongo = async (movie) => {
  * @property {Object} categories - The values send to render.
  * @property {string} Title - The value of the title property is passed to lower case to unify searches once it is saved in mongo
  * @property {Array} exclude - Array with the categories that the pug loop should not render.
+ * @property {boolean} admin - Informs the renderer if it is a user or an administrator so that it displays the corresponding navigation bar.
  * @property {boolean} noMovie - Tells the renderer of the search view to use the pug template for movie not found.
  * @property {function} res.render - Rendering of the response with the movie in the search view.
  * @throws {Error} message with the error during the search process
@@ -148,16 +151,16 @@ const getSearchForTitle = async (req, res) => {
         const categoriesMovie = await resp.json();
         if (categoriesMovie.Error != 'Movie not found!') {
             console.log("FIND MOVIE IN API");
-            const scrapingCritics = { "critics": await startScraping(categoriesMovie.Title)}
+            const scrapingCritics = { "critics": await startScraping(categoriesMovie.Title) }
             const categories = {};
             Object
                 .keys(categoriesMovie)
                 .map((_, i, arrOfKeys) => arrOfKeys[i] == 'Title' ? categories[arrOfKeys[i].toLowerCase()] = categoriesMovie[arrOfKeys[i]].toLowerCase() : categories[arrOfKeys[i].toLowerCase()] = categoriesMovie[arrOfKeys[i]]);
             // Mongo Saves movie and scraping
             pushApiMovieInMongo({ ...categories, ...scrapingCritics });
-            res.status(200).render("search", { categories: { ...categories, ...scrapingCritics }, excludes: ['rated', 'released', 'writer', 'awards', 'ratings', 'metascore', 'imdbrating', 'imdbvotes', 'imdbid', 'type', 'dvd', 'boxoffice', 'production', 'response', 'website', 'poster', 'critics', 'poster', 'country'] });
+            res.status(200).render("search", { categories: { ...categories, ...scrapingCritics }, excludes: ['rated', 'released', 'writer', 'awards', 'ratings', 'metascore', 'imdbrating', 'imdbvotes', 'imdbid', 'type', 'dvd', 'boxoffice', 'production', 'response', 'website', 'poster', 'critics', 'poster', 'country'],  admin: req.decoded.admin });
         } else {
-            res.render("search", { noMovie: true });
+            res.render("search", { noMovie: true,  admin: req.decoded.admin });
         };
     } catch (err) {
         res.status(500).send({ err: err.message });
