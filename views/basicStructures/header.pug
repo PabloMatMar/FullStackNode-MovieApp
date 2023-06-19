@@ -1,4 +1,5 @@
-header
+header(id="nickName")
+    img(src="/logos/popcorn.png" alt="popcorn" width=44 + (nickName.indexOf('@')*8) height=50 class="popcorn")
     nav(class="topnav")
         a(href="#" class="burger_button" id="burger_button")
             img(src="/logos/burger.png" alt='menu-burger' class="burger_menu")
@@ -12,3 +13,6 @@ header
                 each item in [['../search', 'Search'], ['../favmovies','Favorites'], ['../logout' , 'Logout']]
                     button  
                         a(href=  item[0])= item[1]
+    div 
+        img(src="/logos/user.jpg" class="imgUser")
+        p User: #{nickName.slice(0, nickName.indexOf('@'))}

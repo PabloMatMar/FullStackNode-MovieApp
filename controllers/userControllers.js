@@ -8,7 +8,7 @@ const process = require('process');
 const users = require('../models/users_sql')
 jwt = require('jsonwebtoken');
 require('dotenv').config();
-const { SECRET} = process.env;
+const { SECRET } = process.env;
 
 
 /**
@@ -42,6 +42,7 @@ const addFavorite = async (req, res) => {
  * @property {function} getFavorites - Calls the function in charge of using the queries to obtein all the favorites movies of the user.
  * @property {string} req.decoded.user - The username that acts as the forenkey in the SQL favorites table.
  * @property {Array} userFavMovies - SQL return with all the user's favorite movies.
+ * @property {string} nickName - The username/administrator for rendering.
  * @property {function}  res.render - Rendering of the response with the user's favorite movies in the search view.
  * @throws {Error} message with the error during the fetch process.
  */
@@ -49,7 +50,7 @@ const addFavorite = async (req, res) => {
 const getFavorites = async (req, res) => {
     try {
         const userFavMovies = await users.getFavorites(req.decoded.user);
-        res.status(200).render("search", { userFavMovies: userFavMovies });
+        res.status(200).render("search", { userFavMovies: userFavMovies, nickName: req.decoded.user });
     } catch (err) {
         res.status(500).json({ msj: err.message });
     };
@@ -141,7 +142,7 @@ const createUser = async (req, res) => {
 
 const validatedUser = async (req, res) => {
     try {
-        const {credential, admin} = await users.validatedUser(req.body);
+        const { credential, admin } = await users.validatedUser(req.body);
         if (credential == 1) {
             const payload = {
                 check: true,
@@ -184,7 +185,9 @@ const getLogin = (_, res) => {
  * @method  getSingup
  * @async 
  * @param {Object} res - HTTP response.
+ * @property {string} req.params.errSignup - A stringified array containing error information on the character constraint singup attempt. If params is empty, the log view is rendered without error reporting.
  * @property {boolean} singup - Boolean that informs the pug template to allow the form to be rendered.
+ * @property {Array} errSignup - Contains information about any error produced in the character requirement for singup. The array consists of three binary elements, 1 corresponds to error, 0 is no error, each is read in the pug template to inform the user on rendering.
  * @property {function} res.render - Rendering of the response in the home view whit the form of login.
  * @throws {Error} message with the error if render fail.
  */

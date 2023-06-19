@@ -27,6 +27,9 @@ main {
 }
 
 header {
+  display: flex;
+  justify-content: space-between;
+  text-align: center;
   position: sticky;
   top: 0;
   padding: 15px;
@@ -34,12 +37,6 @@ header {
   background: rgba(0, 0, 0, 0.6);
   color: #fff;
   z-index: 9999;
-}
-
-section {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
 }
 
 footer {
@@ -51,6 +48,12 @@ footer {
   width: 100%;
   bottom: 0px;
   color: #fff;
+}
+
+section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 fieldset {
@@ -77,8 +80,10 @@ h4 {
   color: red;
 }
 
-#links_menu {
-  display: none;
+.imgUser{
+  width: 30px;
+  height: 30px;
+  border-radius: 20%;
 }
 
 .burger_menu {
@@ -174,4 +179,8 @@ h4 {
   font-size: 15px;
   padding: 10px 20px;
   border-radius: 10px;
+}
+
+#links_menu {
+  display: none;
 }

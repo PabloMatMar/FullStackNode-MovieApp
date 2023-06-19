@@ -26,6 +26,7 @@ const adminRoutes = require('./routes/moviesAdminRoutes');
 const homeRoutes = require('./routes/homeRoutes');
 const searchRoutes = require('./routes/searchRoutes');
 const favMoviesRoutes = require('./routes/favMoviesRoutes');
+const apiToMongoApi = require('./routes/movieApiToMongoApi');
 
 const app = express();
 const port = 3000;
@@ -45,7 +46,6 @@ app.use(cookieParser());
 const { token } = require('./middleware/checkToken');
 const { admin } = require('./middleware/checkAdmin');
 const { user } = require('./middleware/checkUser');
-const { toDecided } = require('./middleware/toDecided');
 
 
 //RUTAS:
@@ -58,11 +58,13 @@ app.use('/login', userLoginRoutes);
 //Ruta para deslogearse
 app.use('/logout', logoutRoutes);
 //Rutas para usuario:
-app.use('/search', toDecided, token, searchRoutes);
+app.use('/search', token, searchRoutes);
 //Rutas para administrador:
 app.use('/movies', admin, token, adminRoutes);
 //Rutas para ver las peliculas favoritas de un usuario:
 app.use('/favmovies', user, token, favMoviesRoutes);
+//Ruta para transferir una pelicula de la API de imb a la Api de mongo
+app.use('/transferToMongo', admin, token, apiToMongoApi);
 
 app.listen(port, () => {
     console.log(`server running on http://localhost:${port}`)

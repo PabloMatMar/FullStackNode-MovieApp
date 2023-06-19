@@ -119,7 +119,7 @@
     
 
     
-    <h4 class="name" id=".getSearch"><span class="type-signature">(async, static) </span>getSearch<span class="signature">(res)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id=".getSearch"><span class="type-signature">(async, static) </span>getSearch<span class="signature">(req, res)</span><span class="type-signature"></span></h4>
     
 
     
@@ -159,6 +159,29 @@
     </thead>
 
     <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>req</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">HTTP request.</td>
+        </tr>
+
     
 
         <tr>
@@ -213,6 +236,52 @@
     </thead>
 
     <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>admin</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Informs the renderer if it is a user or an administrator so that it displays the corresponding navigation bar.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>nickName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The username/administrator for rendering.</td>
+        </tr>
+
     
 
         <tr>
@@ -550,6 +619,29 @@
 
         <tr>
             
+                <td class="name"><code>admin</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Informs the renderer if it is a user or an administrator so that it displays the corresponding navigation bar.</td>
+        </tr>
+
+    
+
+        <tr>
+            
                 <td class="name"><code>categories</code></td>
             
 
@@ -567,6 +659,29 @@
             
 
             <td class="description last">The array whit the values to render in the pug template.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>nickName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The username/administrator for rendering.</td>
         </tr>
 
     
@@ -651,7 +766,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="controllers_searchControllers.js.html">controllers/searchControllers.js</a>, <a href="controllers_searchControllers.js.html#line73">line 73</a>
+        <a href="controllers_searchControllers.js.html">controllers/searchControllers.js</a>, <a href="controllers_searchControllers.js.html#line76">line 76</a>
     </li></ul></dd>
     
 
@@ -727,6 +842,270 @@
 </dl>
 
     
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id=".insertApiMovieInMongo"><span class="type-signature">(async, static) </span>insertApiMovieInMongo<span class="signature">(movie)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Description: This function saves in mongo the movie(and scraped) found in the api.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>movie</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Movie and reviews values to send mongo to create a movie.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>Movies</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Method that caugth mongo schema to insert a movie in mongo.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>save</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The method to save the movie in mongo.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>answer</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Response of the attempt to save the movie in mongo.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="controllers_searchControllers.js.html">controllers/searchControllers.js</a>, <a href="controllers_searchControllers.js.html#line104">line 104</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
+
+        
+
+<dl>
+    <dt>
+        <div class="param-desc">
+        console.log message with the error during the save process.
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">Error</span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+
+    
+
+
 
 
 
@@ -960,7 +1339,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="controllers_searchControllers.js.html">controllers/searchControllers.js</a>, <a href="controllers_searchControllers.js.html#line52">line 52</a>
+        <a href="controllers_searchControllers.js.html">controllers/searchControllers.js</a>, <a href="controllers_searchControllers.js.html#line55">line 55</a>
     </li></ul></dd>
     
 
@@ -1025,7 +1404,7 @@
     
 
     
-    <h4 class="name" id=".pushApiMovieInMongo"><span class="type-signature">(async, static) </span>pushApiMovieInMongo<span class="signature">(movie)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id=".pushApiMovieInMongo"><span class="type-signature">(async, static) </span>pushApiMovieInMongo<span class="signature">(req, res)</span><span class="type-signature"></span></h4>
     
 
     
@@ -1069,13 +1448,13 @@
 
         <tr>
             
-                <td class="name"><code>movie</code></td>
+                <td class="name"><code>req</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">object</span>
+<span class="param-type">Object</span>
 
 
             
@@ -1085,7 +1464,30 @@
 
             
 
-            <td class="description last">Movie and reviews values to send mongo to create a movie.</td>
+            <td class="description last">HTTP request.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>res</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">HTTP response.</td>
         </tr>
 
     
@@ -1146,6 +1548,29 @@
 
         <tr>
             
+                <td class="name"><code>movieToPush</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Global variable that conteins the movie searched in api imd to transfer to mongo.</td>
+        </tr>
+
+    
+
+        <tr>
+            
                 <td class="name"><code>save</code></td>
             
 
@@ -1189,6 +1614,121 @@
         </tr>
 
     
+
+        <tr>
+            
+                <td class="name"><code>allMovies</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Conteins the movie to rendering in a templeate.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>added</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Allows rendering of the added movie message.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>admin</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Informs the renderer if it is a user or an administrator so that it displays the corresponding navigation bar.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>nickName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The username/administrator for rendering.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>res.render</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Rendering of the response with the movie in the moviesAdmin view.</td>
+        </tr>
+
+    
     </tbody>
 </table>
 
@@ -1224,7 +1764,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="controllers_searchControllers.js.html">controllers/searchControllers.js</a>, <a href="controllers_searchControllers.js.html#line99">line 99</a>
+        <a href="controllers_searchControllers.js.html">controllers/searchControllers.js</a>, <a href="controllers_searchControllers.js.html#line127">line 127</a>
     </li></ul></dd>
     
 
@@ -1502,6 +2042,29 @@
 
         <tr>
             
+                <td class="name"><code>req.decoded.admin</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Allows executing the block of code that calls the function to add the movie to the mongo API if the searcher is a user and not an admin</td>
+        </tr>
+
+    
+
+        <tr>
+            
                 <td class="name"><code>scrappingCritics</code></td>
             
 
@@ -1617,6 +2180,52 @@
 
         <tr>
             
+                <td class="name"><code>admin</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Informs the renderer if it is a user or an administrator so that it displays the corresponding navigation bar.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>addToMongo</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Allows rendering of the button to add movie to mongo</td>
+        </tr>
+
+    
+
+        <tr>
+            
                 <td class="name"><code>noMovie</code></td>
             
 
@@ -1634,6 +2243,29 @@
             
 
             <td class="description last">Tells the renderer of the search view to use the pug template for movie not found.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>nickName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The username/administrator for rendering.</td>
         </tr>
 
     
@@ -1695,7 +2327,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="controllers_searchControllers.js.html">controllers/searchControllers.js</a>, <a href="controllers_searchControllers.js.html#line122">line 122</a>
+        <a href="controllers_searchControllers.js.html">controllers/searchControllers.js</a>, <a href="controllers_searchControllers.js.html#line161">line 161</a>
     </li></ul></dd>
     
 
@@ -1936,7 +2568,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="controllers_searchControllers.js.html">controllers/searchControllers.js</a>, <a href="controllers_searchControllers.js.html#line31">line 31</a>
+        <a href="controllers_searchControllers.js.html">controllers/searchControllers.js</a>, <a href="controllers_searchControllers.js.html#line34">line 34</a>
     </li></ul></dd>
     
 
@@ -2039,7 +2671,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Fri Jun 16 2023 17:43:46 GMT+0200 (hora de verano de Europa central)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Mon Jun 19 2023 22:19:59 GMT+0200 (hora de verano de Europa central)
 </footer>
 
 <script> prettyPrint(); </script>

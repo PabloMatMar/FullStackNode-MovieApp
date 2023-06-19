@@ -6,4 +6,4 @@ section
         a(class='login' href='/signup/:') Sing Up
         p Login to navigate
     else 
-        p Youre logged
+        h3 Welcome #{nickName.slice(0, nickName.indexOf('@'))}

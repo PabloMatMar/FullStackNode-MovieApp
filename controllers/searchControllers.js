@@ -17,6 +17,7 @@ const { API_KEY } = process.env;
  * @param {Object} req - HTTP request.
  * @param {Object} res - HTTP response.
  * @property {boolean} admin - Informs the renderer if it is a user or an administrator so that it displays the corresponding navigation bar.
+ * @property {string} nickName - The username/administrator for rendering.
  * @property {function} res.render - Rendering of the response in the search view.
  * @throws {Error} message with the error when render search view.
  * @property {function} res.status.send - Send a json to error message.
@@ -24,7 +25,7 @@ const { API_KEY } = process.env;
 
 const getSearch = (req, res) => {
     try {
-        res.render("search", { admin: req.decoded.admin });
+        res.render("search", { admin: req.decoded.admin, nickName: req.decoded.user });
     } catch (err) {
         res.status(500).send({ err });
     };
@@ -82,7 +83,9 @@ const postFilmForm = async (req, res) => {
  * @property {string} req.params.title - The title of the movie that has been redirected from postfilm
  * @property {function} find - Method to find in mongo a movie for title.
  * @property {Array} movie - The array whit the movies finded in mongo. Only takes the first element.
+ * @property {boolean} admin - Informs the renderer if it is a user or an administrator so that it displays the corresponding navigation bar.
  * @property {Array} categories - The array whit the values to render in the pug template.
+ * @property {string} nickName - The username/administrator for rendering.
  * @property {function} res.render - if the movie is finded the rendering of the response is produced in the search view
  * @property {function} res.redirect if the movie is not finded the response is redirected to path that search in the api.
  * @return {Object} - try find movie in mongo.
@@ -92,7 +95,7 @@ const postFilmForm = async (req, res) => {
 const getSearchForTitleInMongo = async (req, res) => {
     try {
         const movie = await Movies.find({ title: req.params.title }, { _id: 0, __v: 0 });
-        movie[0] != undefined ? res.status(200).render("search", { categories: { ...movie[0] }._doc, excludes: ['poster', 'critics', 'poster'] }) : res.redirect("/search/" + req.params.title);
+        movie[0] != undefined ? res.status(200).render("search", { categories: { ...movie[0] }._doc, excludes: ['poster', 'critics', 'poster'], admin: req.decoded.admin, nickName: req.decoded.user }) : res.redirect("/search/" + req.params.title);
     } catch (err) {
         res.status(500).send({ err: err.message });
     };
@@ -101,7 +104,7 @@ const getSearchForTitleInMongo = async (req, res) => {
 /**
  * Description: This function saves in mongo the movie(and scraped) found in the api.
  * @memberof searchControllers
- * @method pushApiMovieInMongo
+ * @method insertApiMovieInMongo
  * @async 
  * @param {object} movie - Movie and reviews values to send mongo to create a movie.
  * @property {function} Movies - Method that caugth mongo schema to insert a movie in mongo.
@@ -111,11 +114,45 @@ const getSearchForTitleInMongo = async (req, res) => {
  */
 
 
-const pushApiMovieInMongo = async (movie) => {
+const insertApiMovieInMongo = async (movie) => {
     try {
         const response = await new Movies(movie);
         const answer = await response.save();
-        console.log("Push movie ", answer, " to MongoDB")
+        console.log("Push movie ", answer, " to MongoDB");
+    } catch (err) {
+        console.log(err);
+    };
+};
+
+/**
+ * Description: This function saves in mongo the movie(and scraped) found in the api.
+ * @memberof searchControllers
+ * @method pushApiMovieInMongo
+ * @async
+ * @param {Object} req - HTTP request.
+ * @param {Object} res - HTTP response.
+ * @property {function} Movies - Method that caugth mongo schema to insert a movie in mongo.
+ * @property {Object} movieToPush - Global variable that conteins the movie searched in api imd to transfer to mongo.
+ * @property {function} save - The method to save the movie in mongo.
+ * @property {Object} answer - Response of the attempt to save the movie in mongo.
+ * @property {Array} allMovies - Conteins the movie to rendering in a templeate.
+ * @property {boolean} added - Allows rendering of the added movie message.
+ * @property {boolean} admin - Informs the renderer if it is a user or an administrator so that it displays the corresponding navigation bar.
+ * @property {string} nickName - The username/administrator for rendering.
+ * @property {function} res.render - Rendering of the response with the movie in the moviesAdmin view.
+ * @throws {Error} console.log message with the error during the save process.
+ */
+
+let movieToPush = {};
+const pushApiMovieInMongo = async (req, res) => {
+    try {
+        const response = await new Movies(movieToPush);
+        const answer = await response.save();
+        movieToPush = {};
+        delete response._doc.__v;
+        delete response._doc._id;
+        console.log("Push movie ", answer.title, " to MongoDB");
+        res.render("moviesAdmin", {allMovies: [response], admin: req.decoded.admin, nickName: req.decoded.user, added: true })
     } catch (err) {
         console.log(err);
     };
@@ -132,6 +169,7 @@ const pushApiMovieInMongo = async (movie) => {
  * @property {string} req.params.title - The title of the movie to search in API.
  * @property {string} API_KEY - The key of the API movies.
  * @property {string} categoriesMovie.Error  - If this is not equal to "Movie not found" then movie rendering is started, else, the search view is rendered with the noMovie property set to true.
+ * @property {boolean} req.decoded.admin - Allows executing the block of code that calls the function to add the movie to the mongo API if the searcher is a user and not an admin
  * @func startScraping - Call to the function that initiates the scrapping. Receives as argument the title of the movie.
  * @property {Object} scrappingCritics - The reviews obtained in the scraped. Value of property is an Array.
  * @property {Object} categories - It contains the properties and values ​​of the movie from the api but correcting the bad practice in the naming of the properties without camel case.
@@ -140,7 +178,9 @@ const pushApiMovieInMongo = async (movie) => {
  * @property {string} Title - The value of the title property is passed to lower case to unify searches once it is saved in mongo
  * @property {Array} exclude - Array with the categories that the pug loop should not render.
  * @property {boolean} admin - Informs the renderer if it is a user or an administrator so that it displays the corresponding navigation bar.
+ * @property {boolean} addToMongo - Allows rendering of the button to add movie to mongo
  * @property {boolean} noMovie - Tells the renderer of the search view to use the pug template for movie not found.
+ * @property {string} nickName - The username/administrator for rendering.
  * @property {function} res.render - Rendering of the response with the movie in the search view.
  * @throws {Error} message with the error during the search process
  */
@@ -157,10 +197,10 @@ const getSearchForTitle = async (req, res) => {
                 .keys(categoriesMovie)
                 .map((_, i, arrOfKeys) => arrOfKeys[i] == 'Title' ? categories[arrOfKeys[i].toLowerCase()] = categoriesMovie[arrOfKeys[i]].toLowerCase() : categories[arrOfKeys[i].toLowerCase()] = categoriesMovie[arrOfKeys[i]]);
             // Mongo Saves movie and scraping
-            pushApiMovieInMongo({ ...categories, ...scrapingCritics });
-            res.status(200).render("search", { categories: { ...categories, ...scrapingCritics }, excludes: ['rated', 'released', 'writer', 'awards', 'ratings', 'metascore', 'imdbrating', 'imdbvotes', 'imdbid', 'type', 'dvd', 'boxoffice', 'production', 'response', 'website', 'poster', 'critics', 'poster', 'country'],  admin: req.decoded.admin });
+            !req.decoded.admin ? insertApiMovieInMongo({ ...categories, ...scrapingCritics }) : movieToPush = { ...categories, ...scrapingCritics };
+            res.status(200).render("search", { categories: { ...categories, ...scrapingCritics }, excludes: ['rated', 'released', 'writer', 'awards', 'ratings', 'metascore', 'imdbrating', 'imdbvotes', 'imdbid', 'type', 'dvd', 'boxoffice', 'production', 'response', 'website', 'poster', 'critics', 'poster', 'country'], admin: req.decoded.admin, nickName: req.decoded.user, addToMongo: req.decoded.admin });
         } else {
-            res.render("search", { noMovie: true,  admin: req.decoded.admin });
+            res.render("search", { noMovie: true, admin: req.decoded.admin, nickName: req.decoded.user });
         };
     } catch (err) {
         res.status(500).send({ err: err.message });
@@ -172,5 +212,6 @@ module.exports = {
     getSearchForTitle,
     postFilmForm,
     getSearchForTitleInMongo,
-    startScraping
+    startScraping,
+    pushApiMovieInMongo
 }

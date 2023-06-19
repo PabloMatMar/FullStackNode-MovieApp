@@ -10,7 +10,9 @@ body
             include ./searchFragments/noMovie.pug
         if userFavMovies
             include ./searchFragments/favMovies.pug
-        if !userFavMovies
-            a(href="http://localhost:3000/favmovies" class ="css-button-arrow--red") Look your favorites      
+        if !userFavMovies && !admin
+            a(href="/favmovies" class ="css-button-arrow--red") Look your favorites
+        if addToMongo
+            a(href="/transferToMongo" class ="css-button-arrow--red") Add Movie to Mongo DB      
     include ./basicStructures/footer.pug
     script(type="module" src="/scripts.js")

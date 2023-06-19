@@ -4,7 +4,6 @@ body
     if logged
         include ./basicStructures/header.pug
     main
-        h3 Welcome
         if !login && !singup
             include ./homeFragments/loginButtons.pug
         if login

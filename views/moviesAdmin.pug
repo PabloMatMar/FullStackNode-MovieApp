@@ -3,6 +3,9 @@ include ./basicStructures/head.pug
 body 
     include ./basicStructures/header.pug
     main
+        if added
+            section
+                h3 added movie, you can make changes to it if you want
         if !noAdmin
             include ./moviesFragments/allMongomovies.pug
         else

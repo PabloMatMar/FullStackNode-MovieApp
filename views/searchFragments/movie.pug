@@ -6,4 +6,5 @@ section(class="card")
     each item , i in categories.critics
         p Sensacine Review: #{categories.critics[i].Critics}
         p Sensacione Punctuation: #{categories.critics[i].Punctuation}
-    button(id='fav' type="button" class ="css-button-arrow--red") Add to Favorites
+    if !admin
+        button(id='fav' type="button" class ="css-button-arrow--red") Add to Favorites
