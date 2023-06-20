@@ -39,7 +39,7 @@ const getSearch = (req, res) => {
  * @async 
  * @param {string} title - The title to search reviews whit the scraped.
  * @property {function} scraper - Contais the Script of scrapper.
- * @property {function} scrap - The first argument is the url where the data will be searched (filmafinity) the second is the information for the scrapping search selectors (the title of the movie).
+ * @property {function} scrap - Initialize scrapping. The argument is the url where the data will be searched (filmafinity and the title of the movie).
  * @return {Object} - Containing the scraped reviews.
  * @throws {Error} message with the error during the scraping process.
  */
@@ -49,7 +49,7 @@ const startScraping = async (title) => {
         const movies = await scraper.scrap("https://www.filmaffinity.com/en/search.php?stype=title&stext=" + title);
         return movies;
     } catch (err) {
-        res.status(500).send({ err });
+        res.status(500).send({ err: err.message });
     };
 };
 
