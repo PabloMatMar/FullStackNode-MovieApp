@@ -8,6 +8,7 @@ require('dotenv').config();
 const Movies = require('../models/moviesMongo');
 const scraper = require('../utils/scraper');
 const { API_KEY } = process.env;
+let movieToPush = {};
 
 /**
  * Description: This function renders the search view.
@@ -95,7 +96,7 @@ const postFilmForm = async (req, res) => {
 const getSearchForTitleInMongo = async (req, res) => {
     try {
         const movie = await Movies.find({ title: req.params.title }, { _id: 0, __v: 0 });
-        movie[0] != undefined ? res.status(200).render("search", { categories: { ...movie[0] }._doc, excludes: ['poster', 'critics', 'poster'], admin: req.decoded.admin, nickName: req.decoded.user }) : res.redirect("/search/" + req.params.title);
+        movie[0] != undefined ? res.status(200).render("search", { categories: { ...movie[0] }._doc, excludes: ['poster', 'critics'], admin: req.decoded.admin, nickName: req.decoded.user }) : res.redirect("/search/" + req.params.title);
     } catch (err) {
         res.status(500).send({ err: err.message });
     };
@@ -143,7 +144,6 @@ const insertApiMovieInMongo = async (movie) => {
  * @throws {Error} console.log message with the error during the save process.
  */
 
-let movieToPush = {};
 const pushApiMovieInMongo = async (req, res) => {
     try {
         const response = await new Movies(movieToPush);
@@ -195,10 +195,14 @@ const getSearchForTitle = async (req, res) => {
             const categories = {};
             Object
                 .keys(categoriesMovie)
-                .map((_, i, arrOfKeys) => arrOfKeys[i] == 'Title' ? categories[arrOfKeys[i].toLowerCase()] = categoriesMovie[arrOfKeys[i]].toLowerCase() : categories[arrOfKeys[i].toLowerCase()] = categoriesMovie[arrOfKeys[i]]);
+                .map((_, i, arrOfKeys) => {
+                    arrOfKeys[i] == 'Title' ? categories[arrOfKeys[i].toLowerCase()] = categoriesMovie[arrOfKeys[i]].toLowerCase() : categories[arrOfKeys[i].toLowerCase()] = categoriesMovie[arrOfKeys[i]];
+                    if(arrOfKeys[i] == 'totalSeasons') // If is a serie
+                    categories.year = Number(categoriesMovie.totalSeasons)
+                });
             // Mongo Saves movie and scraping
             !req.decoded.admin ? insertApiMovieInMongo({ ...categories, ...scrapingCritics }) : movieToPush = { ...categories, ...scrapingCritics };
-            res.status(200).render("search", { categories: { ...categories, ...scrapingCritics }, excludes: ['rated', 'released', 'writer', 'awards', 'ratings', 'metascore', 'imdbrating', 'imdbvotes', 'imdbid', 'type', 'dvd', 'boxoffice', 'production', 'response', 'website', 'poster', 'critics', 'poster', 'country'], admin: req.decoded.admin, nickName: req.decoded.user, addToMongo: req.decoded.admin });
+            res.status(200).render("search", { categories: { ...categories, ...scrapingCritics }, excludes: ['rated', 'released', 'writer', 'awards', 'ratings', 'metascore', 'imdbrating', 'imdbvotes', 'imdbid', 'type', 'dvd', 'boxoffice', 'production', 'response', 'website', 'poster', 'critics', 'poster', 'country', 'totalseasons'], admin: req.decoded.admin, nickName: req.decoded.user, addToMongo: req.decoded.admin });
         } else {
             res.render("search", { noMovie: true, admin: req.decoded.admin, nickName: req.decoded.user });
         };

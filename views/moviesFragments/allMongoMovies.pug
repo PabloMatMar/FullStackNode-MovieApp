@@ -7,10 +7,13 @@ section(class="cardSection")
             img(src=allMovies[i].poster  class="poster")
             each val, key in allMovies[i]._doc
                 if key != 'title' && key != 'poster' && key != 'critics'
-                    p(id=key)= key.split('').map((e,i)=> i==0 ? e.toUpperCase(): e).join('') +': '+ val
+                    if key == 'year' && val.length != 4
+                        p(id=key)= 'Total Seasons: ' + val
+                    else
+                        p(id=key)= key.split('').map((e,i)=> i==0 ? e.toUpperCase(): e).join('') + ': ' + val
                 if key == 'critics'
                     each item , j in allMovies[i].critics
-                        p Sensacine Review: #{allMovies[i].critics[j].Critics}
-                        p Sensacione Punctuation: #{allMovies[i].critics[j].Punctuation}
+                        p Filmaffinity Review: #{allMovies[i].critics[j].Critics}
+                        p Review Punctuation: #{allMovies[i].critics[j].Punctuation}
             button(class ="css-button-arrow--red" class="delete" id="delete" + i) Delete
             a(href="../movies/updateMovie" class="css-button-arrow--red" class="update" id="update" + i) Update
