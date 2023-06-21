@@ -2,14 +2,12 @@ const puppeteer = require('puppeteer')
 
 const extractfilmaffinityData = async (url, browser) => {
     try {
-        console.time(`${url}`);
         const filmaffinityData = {};
         const page = await browser.newPage();
         await page.goto(url);
         filmaffinityData['Title'] = await page.$eval("dd:nth-child(2)", name => name.innerHTML);
         filmaffinityData['Critics'] = await page.$eval("#pro-reviews > li:nth-child(1) > div > a > div", critica => critica.innerHTML.slice(0, (critica.innerHTML.indexOf("&"))));
         filmaffinityData['Punctuation'] = await page.$eval("#movie-rat-avg", note => note.innerHTML);
-        console.timeEnd(`${url}`);
         return filmaffinityData;
     }
     catch (err) {
@@ -18,7 +16,6 @@ const extractfilmaffinityData = async (url, browser) => {
 }
 const scrap = async (url) => {
     try {
-        console.time("scrap");
         const scrapedData = [];
         const browser = await puppeteer.launch({ headless: true });
         const page = await browser.newPage();
@@ -28,10 +25,11 @@ const scrap = async (url) => {
         let i = 0;
         while (scrapedData.length == 0 && i < urls.length && i < 10) {
             const filmaffinity = await extractfilmaffinityData(urls[i], browser);
+            if (filmaffinity.Critics != undefined && filmaffinity.Critics.indexOf("[") == 1)
+                filmaffinity.Critics = filmaffinity.Critics.slice(filmaffinity.Critics.indexOf("]") + 2, filmaffinity.Critics.length - 1);
             filmaffinity.Critics != undefined && filmaffinity.Punctuation != undefined ? scrapedData.push(filmaffinity) : i++;
         };
-        await browser.close()
-        console.timeEnd("scrap")
+        await browser.close();
         return scrapedData;
     } catch (err) {
         console.log("Error:", err);

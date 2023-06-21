@@ -9,15 +9,6 @@ const cookieParser = require('cookie-parser');
 require('./utils/mongoBase');
 require('./utils/pg_pool');
 
-
-//swagger
-// const swaggerUi = require('swagger-ui-express');//Requiere libreria de Swagger (La UI)
-// const swaggerDocument = require('./swagger.json'); //Requiere ruta relativa del json que contiene la documentación de la API
-
-//jsdoc
-//const jsdoc = require('express-jsdoc-swagger');
-
-
 //Exportacion de las rutas
 const userSingupRoutes = require('./routes/userSingUpRoutes');
 const userLoginRoutes = require('./routes/userLoginRoutes');
@@ -42,7 +33,8 @@ app.use(express.static(path.join(__dirname, '/public')));
 app.use(morgan('combined'));
 app.use(cors());
 app.use(cookieParser());
-// app.use('/api-docs-swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocument));//Endpoint que servirá la documentación en el navegador, se le pasa la variable que apunta al .json que contiene la documentación.
+
+//Middlewares de acceso
 const { token } = require('./middleware/checkToken');
 const { admin } = require('./middleware/checkAdmin');
 const { user } = require('./middleware/checkUser');

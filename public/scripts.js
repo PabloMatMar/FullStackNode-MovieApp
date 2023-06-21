@@ -230,3 +230,24 @@ if (document.getElementById("favMovies") != null) {
     });
   };
 };
+
+//Evento para mostrar el spinner mientras se carga la pelicula(el scrapping mas bien)
+
+if (document.title == "search") {
+  document.getElementById("search-button").addEventListener("click", (e) => {
+    let section = document.getElementById("card")
+    setTimeout(function () {
+      if (section != null)
+        while (section.firstChild)
+          section.removeChild(section.firstChild);
+      else {
+        section = document.getElementById("spinner");
+        section.setAttribute('class', 'card')
+      }
+      const spinner = document.createElement("img");
+      section.appendChild(spinner);
+      spinner.setAttribute('id', 'gif');
+      spinner.src = "/logos/spinner2.gif";
+    }, 500);
+  })
+}
