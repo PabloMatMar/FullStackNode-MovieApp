@@ -14,5 +14,8 @@ header(id="nickName")
                     button  
                         a(href=  item[0])= item[1]
     div 
-        img(src="/logos/user.jpg" class="imgUser")
+        if avatar
+            img(src=avatar class="imgUser")
+        else
+            img(src="/logos/user.jpg" class="imgUser")
         p User: #{nickName.slice(0, nickName.indexOf('@'))}

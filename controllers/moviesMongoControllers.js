@@ -14,6 +14,7 @@ const Movies = require('../models/moviesMongo')
  * @property {Object} Movies - schema of Movies mongo.
  * @property {Array} movies - All movies mongo conteins.
  * @property {Array} allMovies - Conteins the allMovies to rendering in a templeate.
+ * @property {string} avatar - The user avatar image url for rendering.
  * @property {function} res.render  Rendering of the response in the moviesAdmin.
  * @throws {Error} message with the error.
  */
@@ -21,7 +22,7 @@ const Movies = require('../models/moviesMongo')
 const getMovies = async (req, res) => {
     try {
         const movies = await Movies.find({ Movies }, { _id: 0, __v: 0 });
-        res.status(200).render("moviesAdmin", { allMovies: movies.reverse(), admin: req.decoded.admin, nickName: req.decoded.user });
+        res.status(200).render("moviesAdmin", { allMovies: movies.reverse(), admin: req.decoded.admin, nickName: req.decoded.user, avatar: req.decoded.avatar });
     }
     catch (err) {
         res.status(400).json({ msj: err.message });
@@ -38,13 +39,14 @@ const getMovies = async (req, res) => {
  * @property {null} titleUpdate - This value is null to render the correct fragment of pug.
  * @property {boolean} admin - Informs the renderer if it is a user or an administrator so that it displays the corresponding navigation bar.
  * @property {string} nickName - The username/administrator for rendering.
+ * @property {string} avatar - The user avatar image url for rendering.
  * @property {function} res.render - Rendering of the response in the createMovie view.
  * @throws {Error} message with the error.
  */
 
 const getFormMovie = (req, res) => {
     try {
-        res.render('createMovie', { idValue: "createMovie", titleUpdate: null, admin: req.decoded.admin, nickName: req.decoded.user });
+        res.render('createMovie', { idValue: "createMovie", titleUpdate: null, admin: req.decoded.admin, nickName: req.decoded.user, avatar: req.decoded.avatar });
     } catch (err) {
         res.status(500).json({ msj: err.message });
     };
@@ -108,6 +110,7 @@ const deleteMovie = async (req, res) => {
  * @property {null} titleUpdate - This value prevents the rendering of the input title in the multi-rendered template, because the title is not updateable.
  * @property {boolean} admin - Informs the renderer if it is a user or an administrator so that it displays the corresponding navigation bar.
  * @property {string} nickName - The username/administrator for rendering.
+ * @property {string} avatar - The user avatar image url for rendering.
  * @property {function} res.render  Rendering of the response in the updateMovie view.
  * @throws {Error} message with the error.
  */
@@ -115,7 +118,7 @@ const deleteMovie = async (req, res) => {
 
 const formUpdateMovie = (req, res) => {
     try {
-        res.render('updateMovie', { idValue: "updateMovie", titleUpdate: "Title", admin: req.decoded.admin, nickName: req.decoded.user });
+        res.render('updateMovie', { idValue: "updateMovie", titleUpdate: "Title", admin: req.decoded.admin, nickName: req.decoded.user, avatar: req.decoded.avatar });
     } catch (err) {
         res.status(500).json({ msj: err.message });
     };

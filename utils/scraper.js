@@ -25,8 +25,10 @@ const scrap = async (url) => {
         let i = 0;
         while (scrapedData.length == 0 && i < urls.length && i < 10) {
             const filmaffinity = await extractfilmaffinityData(urls[i], browser);
-            if (filmaffinity.Critics != undefined && filmaffinity.Critics.indexOf("[") == 1)
+            if (filmaffinity.Critics != undefined && filmaffinity.Critics.indexOf("[") == 1) {
                 filmaffinity.Critics = filmaffinity.Critics.slice(filmaffinity.Critics.indexOf("]") + 2, filmaffinity.Critics.length - 1);
+                filmaffinity.Critics = filmaffinity.Critics[0].toUpperCase().concat(filmaffinity.Critics.slice(1))
+            };
             filmaffinity.Critics != undefined && filmaffinity.Punctuation != undefined ? scrapedData.push(filmaffinity) : i++;
         };
         await browser.close();

@@ -19,6 +19,7 @@ let movieToPush = {};
  * @param {Object} res - HTTP response.
  * @property {boolean} admin - Informs the renderer if it is a user or an administrator so that it displays the corresponding navigation bar.
  * @property {string} nickName - The username/administrator for rendering.
+ * @property {string} avatar - The user avatar image url for rendering.
  * @property {function} res.render - Rendering of the response in the search view.
  * @throws {Error} message with the error when render search view.
  * @property {function} res.status.send - Send a json to error message.
@@ -26,7 +27,7 @@ let movieToPush = {};
 
 const getSearch = (req, res) => {
     try {
-        res.render("search", { admin: req.decoded.admin, nickName: req.decoded.user });
+        res.render("search", { admin: req.decoded.admin, nickName: req.decoded.user, avatar: req.decoded.avatar });
     } catch (err) {
         res.status(500).send({ err });
     };
@@ -67,7 +68,12 @@ const startScraping = async (title) => {
  */
 const postFilmForm = async (req, res) => {
     try {
-        res.redirect("/search/local/" + req.body.title.toLowerCase().trim());
+        let title = " "
+        if (req.body.title.length > 0) {
+            title = req.body.title.toLowerCase().trim();
+            title = title[0].toUpperCase().concat(title.slice(1));
+        }
+        res.redirect("/search/local/" + title);
     } catch (err) {
         res.status(500).send({ err: err.message });
     };
@@ -87,6 +93,7 @@ const postFilmForm = async (req, res) => {
  * @property {boolean} admin - Informs the renderer if it is a user or an administrator so that it displays the corresponding navigation bar.
  * @property {Array} categories - The array whit the values to render in the pug template.
  * @property {string} nickName - The username/administrator for rendering.
+ * @property {string} avatar - The user avatar image url for rendering.
  * @property {function} res.render - if the movie is finded the rendering of the response is produced in the search view
  * @property {function} res.redirect if the movie is not finded the response is redirected to path that search in the api.
  * @return {Object} - try find movie in mongo.
@@ -96,14 +103,14 @@ const postFilmForm = async (req, res) => {
 const getSearchForTitleInMongo = async (req, res) => {
     try {
         const movie = await Movies.find({ title: req.params.title }, { _id: 0, __v: 0 });
-        movie[0] != undefined ? res.status(200).render("search", { categories: { ...movie[0] }._doc, excludes: ['poster', 'critics'], admin: req.decoded.admin, nickName: req.decoded.user }) : res.redirect("/search/" + req.params.title);
+        movie[0] != undefined ? res.status(200).render("search", { categories: { ...movie[0] }._doc, excludes: ['poster', 'critics'], admin: req.decoded.admin, nickName: req.decoded.user, avatar: req.decoded.avatar }) : res.redirect("/search/" + req.params.title);
     } catch (err) {
         res.status(500).send({ err: err.message });
     };
 };
 
 /**
- * Description: This function saves in mongo the movie(and scraped) found in the api.
+ * Description: This function saves in mongo the movie(and scraped) found in the external api.
  * @memberof searchControllers
  * @method insertApiMovieInMongo
  * @async 
@@ -126,7 +133,7 @@ const insertApiMovieInMongo = async (movie) => {
 };
 
 /**
- * Description: This function saves in mongo the movie(and scraped) found in the api.
+ * Description: This function saves in mongo the movie (and scraped) found in the external api and render the moviesAdmin view.
  * @memberof searchControllers
  * @method pushApiMovieInMongo
  * @async
@@ -140,6 +147,7 @@ const insertApiMovieInMongo = async (movie) => {
  * @property {boolean} added - Allows rendering of the added movie message.
  * @property {boolean} admin - Informs the renderer if it is a user or an administrator so that it displays the corresponding navigation bar.
  * @property {string} nickName - The username/administrator for rendering.
+ * @property {string} avatar - The user avatar image url for rendering.
  * @property {function} res.render - Rendering of the response with the movie in the moviesAdmin view.
  * @throws {Error} console.log message with the error during the save process.
  */
@@ -152,7 +160,7 @@ const pushApiMovieInMongo = async (req, res) => {
         delete response._doc.__v;
         delete response._doc._id;
         console.log("Push movie ", answer.title, " to MongoDB");
-        res.render("moviesAdmin", {allMovies: [response], admin: req.decoded.admin, nickName: req.decoded.user, added: true })
+        res.render("moviesAdmin", { allMovies: [response], admin: req.decoded.admin, nickName: req.decoded.user, avatar: req.decoded.avatar, added: true })
     } catch (err) {
         console.log(err);
     };
@@ -181,6 +189,7 @@ const pushApiMovieInMongo = async (req, res) => {
  * @property {boolean} addToMongo - Allows rendering of the button to add movie to mongo
  * @property {boolean} noMovie - Tells the renderer of the search view to use the pug template for movie not found.
  * @property {string} nickName - The username/administrator for rendering.
+ * @property {string} avatar - The user avatar image url for rendering.
  * @property {function} res.render - Rendering of the response with the movie in the search view.
  * @throws {Error} message with the error during the search process
  */
@@ -191,21 +200,21 @@ const getSearchForTitle = async (req, res) => {
         const categoriesMovie = await resp.json();
         if (categoriesMovie.Error != 'Movie not found!') {
             console.log("FIND MOVIE IN API");
+            console.log(categoriesMovie);
             const scrapingCritics = { "critics": await startScraping(categoriesMovie.Title) }
             const categories = {};
             Object
                 .keys(categoriesMovie)
                 .map((_, i, arrOfKeys) => {
-                    arrOfKeys[i] == 'Title' ? categories[arrOfKeys[i].toLowerCase()] = categoriesMovie[arrOfKeys[i]].toLowerCase() : categories[arrOfKeys[i].toLowerCase()] = categoriesMovie[arrOfKeys[i]];
-                    if(arrOfKeys[i] == 'totalSeasons') // If is a serie
-                    categories.year = Number(categoriesMovie.totalSeasons)
+                    arrOfKeys[i] == 'Title' ? categories[arrOfKeys[i].toLowerCase()] = categoriesMovie[arrOfKeys[i]][0].concat(categoriesMovie[arrOfKeys[i]].slice(1).toLowerCase()) : categories[arrOfKeys[i].toLowerCase()] = categoriesMovie[arrOfKeys[i]];
+                    if (arrOfKeys[i] == 'totalSeasons') // If is a serie
+                        categories.year = Number(categoriesMovie.totalSeasons)
                 });
             // Mongo Saves movie and scraping
             !req.decoded.admin ? insertApiMovieInMongo({ ...categories, ...scrapingCritics }) : movieToPush = { ...categories, ...scrapingCritics };
-            res.status(200).render("search", { categories: { ...categories, ...scrapingCritics }, excludes: ['rated', 'released', 'writer', 'awards', 'ratings', 'metascore', 'imdbrating', 'imdbvotes', 'imdbid', 'type', 'dvd', 'boxoffice', 'production', 'response', 'website', 'poster', 'critics', 'poster', 'country', 'totalseasons'], admin: req.decoded.admin, nickName: req.decoded.user, addToMongo: req.decoded.admin });
-        } else {
-            res.render("search", { noMovie: true, admin: req.decoded.admin, nickName: req.decoded.user });
-        };
+            res.status(200).render("search", { categories: { ...categories, ...scrapingCritics }, excludes: ['rated', 'released', 'writer', 'awards', 'ratings', 'metascore', 'imdbrating', 'imdbvotes', 'imdbid', 'type', 'dvd', 'boxoffice', 'production', 'response', 'website', 'poster', 'critics', 'poster', 'country', 'totalseasons'], admin: req.decoded.admin, nickName: req.decoded.user, avatar: req.decoded.avatar, addToMongo: req.decoded.admin });
+        } else
+            res.render("search", { noMovie: true, admin: req.decoded.admin, nickName: req.decoded.user, avatar: req.decoded.avatar });
     } catch (err) {
         res.status(500).send({ err: err.message });
     };

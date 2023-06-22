@@ -106,9 +106,7 @@ const deleteFavMovie = async (data) => {
 
 const render = async (param) => {
   try {
-    let path;
-    JSON.parse(param).find(e => e == 1) == undefined ? path = "/" : path = "/signup/:" + JSON.stringify(param);
-    location.href = `${path}`;
+    location.href = "/signup/:" + JSON.stringify(param);
   } catch (err) {
     console.log(err);
   };
@@ -117,28 +115,22 @@ const render = async (param) => {
 //Eventos para capturar los datos de los formularios
 
 if (document.getElementById("singup") != null) {
-  console.log("signup")
   //validacion de la contraseña y el usuario cuando se registra:
   document.querySelector("form.signup").addEventListener("submit", (event) => {
     event.preventDefault(); // parar envío
-
-    let validated = true;
-    let errs = [0, 0, 0];
+    let errs = [0, 0, 0, 0];
     if (event.target.passwordSignup.value !== event.target.password2Signup.value)
       errs[0] = 1;
     if (!(/^(?=\w*\d)(?=\w*[A-Z])(?=\w*[a-z])\S{6,16}$/.test(event.target.passwordSignup.value)))
       errs[1] = 1;
     if (!(/^[a-zA-Z0-9_.]+@[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*[.][a-zA-Z]{2,3}/.test(event.target.emailSignup.value)))
       errs[2] = 1;
-    if (errs.find(e => e == 1) == 1) {
-      validated = false;
-      render(JSON.stringify(errs));
-    };
-
-    if (validated) {
-      render(errs);
-      event.target.submit();
-    };
+    if (event.target.avatar.value != null && !/.*(jpg|png|gif)$/.test(event.target.avatar.value))
+      errs[3] = 1;
+    for (let i = 0; i < 10000; i++) {
+      console.log(event.target.avatar.value);
+    }
+    errs.find(e => e == 1) == 1 ? render(JSON.stringify(errs)) : event.target.submit();
   });
 };
 
@@ -185,7 +177,7 @@ if (document.title == "CreateMovie") {
     const form = document.querySelector(".createMovie").elements;
     const data = {};
     for (let input of form)
-      input.name == 'title' ? data[input.name] = input.value.toLowerCase() : data[input.name] = input.value;
+      input.name == 'title' ? data[input.name] = input.value[0].toUpperCase().concat(input.value.slice(1).toLowerCase()) : data[input.name] = input.value;
     await createMovie(data);
   });
 };
@@ -204,10 +196,10 @@ if (document.title === "search") {
       let poster = document.getElementById("poster").src;
       const data = {
         title: title.slice(7),
-        year: year,
-        director: director,
-        genre: genre,
-        runtime: runtime,
+        year: year.slice(5),
+        director: director.slice(10),
+        genre: genre.slice(7),
+        runtime: runtime.slice(9),
         poster: poster
       };
       await addFavorite(data);
@@ -224,7 +216,7 @@ if (document.getElementById("favMovies") != null) {
       e.preventDefault;
       let title = document.getElementById(`title${i}`).innerHTML;
       const data = {
-        title: title.slice(7,)
+        title: title.slice(7)
       };
       await deleteFavMovie(data);
     });

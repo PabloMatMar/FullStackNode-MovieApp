@@ -9,6 +9,8 @@ if errSignup
             h4 The password must conteins between 6 and 16 characters, at least one upper case letter, at least one lower case letter and at least one digit.
         if errSignup[5] == 1
             h4 Invalid email format.
+        if errSignup[7] == 1
+            h4 The image url must ends with .jpg or .png or .gif
 section 
     fieldset
         form(class="signup" action="/signup" method="post")
@@ -26,6 +28,10 @@ section
             |
             legend Enter the code to register as an admin
             input(type="text" name="admin" placeholder="EL CODIGO ES a1A") 
+            |
+            |
+            legend Url image of your avatar
+            input(type="url" name="avatar")
             br
             input(type="submit" id="signup" value="Sign Up")
     p(id="singup" hidden=true)

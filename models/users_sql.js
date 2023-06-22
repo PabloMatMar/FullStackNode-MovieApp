@@ -109,7 +109,8 @@ const deleteFavorite = async (emailFK, title) => {
  * @param {Object} user - User name and password to create a user.
  * @property {string} user.emailSignup - User name to create a user.
  * @property {string} user.passwordSignup - password to create a user.
- * @property {string} user.admin - The code that allows the registration as admin
+ * @property {string} user.admin - The code that allows the registration as admin.
+ * @property {string} user.avatar - user avatar image url.
  * @const {Object} pool - Host, username, database and password of ElephantSQL.
  * @property {function} connect - Method to connect to sql server.
  * @property {function} release - Method to disconnect to sql server.
@@ -124,9 +125,9 @@ const deleteFavorite = async (emailFK, title) => {
 const createUser = async (user) => {
     let client, result;
     try {
-        const { emailSignup, passwordSignup, admin } = user;
+        const { emailSignup, passwordSignup, admin, avatar } = user;
         client = await pool.connect();
-        const data = await client.query(queries.createUser, [emailSignup, passwordSignup, admin]);
+        const data = await client.query(queries.createUser, [emailSignup, passwordSignup, admin, avatar]);
         result = data.rowCount;
     } catch (err) {
         if (err.detail != undefined && err.detail.endsWith('already exists.'))
@@ -144,7 +145,8 @@ const createUser = async (user) => {
  * @memberof users_sql 
  * @method validatedUser
  * @async 
- * @param {Object} user - Credentials to validate.
+ * @param {string} email - Email to validate.
+ * @param {string} password - Password to validate.
  * @property {string} user.emailSignup - User name to validate.
  * @property {string} user.passwordSignup - password to validate.
  * @property {string} user.admin - The code to validate the admin.
@@ -154,27 +156,28 @@ const createUser = async (user) => {
  * @const {Object} client - Conection to DB.
  * @property {function} query - Sql method that passes a query in the first argument and the query values ​​in the second.
  * @property {Object} queries.validated - The query that validated a credentials of user in the process of login.
- * @return {number} One if the create user was okey, else, 0.
+ * @return {number} One if the validate user was okey, else, 0.
  * @throws {Error} message with the err during save process.
  */
 
-const validatedUser = async (user) => {
+const validatedUser = async (email, password) => {
     let client;
-    let result = {
-        credential: 0,
-        admin: false
-    }
+    let result = {};
     try {
-        const { email, password } = user;
         client = await pool.connect();
         const data = await client.query(queries.validatedUser, [email, password]);
         const checkAdmin = await client.query(queries.isAdmin, [email]);
         let admin = false;
-        if (checkAdmin.rows[0].admin == ADMIN_KEY)
+        let avatar = null;
+        console.log(data.rows, "data.rows");
+        if (data.rowCount == 1)
+            avatar = data.rows[0].avatar;
+        if (checkAdmin.rowCount != 0 && checkAdmin.rows[0].admin == ADMIN_KEY)
             admin = true;
         result = {
             credential: data.rowCount,
-            admin
+            admin,
+            avatar,
         };
     } catch (err) {
         console.log(err);

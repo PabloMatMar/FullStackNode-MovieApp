@@ -1,7 +1,7 @@
 const queries = {
     createUser:`
-    INSERT INTO users(email, password, admin)
-    VALUES ($1,$2,$3);
+    INSERT INTO users(email, password, admin, avatar)
+    VALUES ($1,$2,$3,$4);
     `,
     validatedUser:`
     SELECT *

@@ -43,6 +43,7 @@ const addFavorite = async (req, res) => {
  * @property {string} req.decoded.user - The username that acts as the forenkey in the SQL favorites table.
  * @property {Array} userFavMovies - SQL return with all the user's favorite movies.
  * @property {string} nickName - The username/administrator for rendering.
+ * @property {string} avatar - The user avatar image url for rendering.
  * @property {function}  res.render - Rendering of the response with the user's favorite movies in the search view.
  * @throws {Error} message with the error during the fetch process.
  */
@@ -50,7 +51,7 @@ const addFavorite = async (req, res) => {
 const getFavorites = async (req, res) => {
     try {
         const userFavMovies = await users.getFavorites(req.decoded.user);
-        res.status(200).render("search", { userFavMovies: userFavMovies.reverse(), nickName: req.decoded.user });
+        res.status(200).render("search", { userFavMovies: userFavMovies.reverse(), nickName: req.decoded.user, avatar: req.decoded.avatar });
     } catch (err) {
         res.status(500).json({ msj: err.message });
     };
@@ -88,7 +89,7 @@ const deleteFavoriteMovie = async (req, res) => {
  * @param {Object} res - HTTP response.
  * @property {function} createUser - Call to the function in charge of using the queries to create a new user row in the users table.
  * @property {number} response - The value is one if the user wascreated, else, 0.
- * @property {Object} req.body - The username, the password, and the boolean admin-user.
+ * @property {Object} req.body - The username, the password, the boolean admin-user and the avatar of user.
  * @property {Object} payload - The user information that will be on the server side.
  * @property {string} SECRET - The key to sing the token.
  * @property {string} req.body.emailSignup - The unique username. 
@@ -105,7 +106,8 @@ const createUser = async (req, res) => {
         if (response == 1) {
             const payload = {
                 check: true,
-                user: req.body.emailSignup,
+                user: req.body.emailSignup.toLowerCase(),
+                avatar: req.body.avatar,
                 admin: req.body.admin
             };
             const token = jwt.sign(payload, SECRET, {
@@ -127,12 +129,12 @@ const createUser = async (req, res) => {
  * @async 
  * @param {Object} req - HTTP request.
  * @param {Object} res - HTTP response.
- * @property {function} validatedUser - Call to the function in charge of using the queries to validate the login credentials.
+ * @property {string} req.body.email - The unique username.
+ * @property {string} req.body.password - The password of user.
+ * @property {function} validatedUser - Call to the function (two arguments, email and password) in charge of using the queries to validate the login credentials.
  * @property {number} response - The value is one if the validation of the credential was okey, else, 0.
- * @property {Object} req.body - The username, the password, and the boolean admin-user.
  * @property {Object} payload - The user information that will be on the server side.
  * @property {string} SECRET - The key to sing the token.
- * @property {string} req.body.emailSignup - The unique username. 
  * @property {function} res.cookie - HTTP response to save the token in the cookie and redirect to the home view.
  * @property {boolean} login - Boolean that informs the pug template to allow the form to be rendered.
  * @property {boolean} incorrectUser - Boolean that informs the pug template to allow the message "User does not exist" to be rendered.
@@ -142,11 +144,12 @@ const createUser = async (req, res) => {
 
 const validatedUser = async (req, res) => {
     try {
-        const { credential, admin } = await users.validatedUser(req.body);
+        const { credential, admin, avatar } = await users.validatedUser(req.body.email.toLowerCase(), req.body.password);
         if (credential == 1) {
             const payload = {
                 check: true,
-                user: req.body.email,
+                user: req.body.email.toLowerCase(),
+                avatar: avatar,
                 admin: admin
             };
             const token = jwt.sign(payload, SECRET, {
