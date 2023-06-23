@@ -153,11 +153,11 @@ const validatedUser = async (req, res) => {
                 admin: admin
             };
             const token = jwt.sign(payload, SECRET, {
-                expiresIn: "12000000ms" // 1200 segundos para que expire
+                expiresIn: "12000000ms"
             });
-            res.cookie('token', token).status(200).redirect("/");
+            req.body.avatarChanged ? res.cookie('token', token).render("user", { nickName: req.decoded.user, avatar: req.decoded.avatar }) : res.cookie('token', token).status(200).redirect("/");
         } else
-            res.render("home", { login: true, incorrectUser: true })
+            res.render("home", { login: true, incorrectUser: true });
     } catch (err) {
         res.status(401).json({ msj: err.message })
     };
@@ -204,6 +204,56 @@ const getSingup = (req, res) => {
 };
 
 
+const renderUserView = (req, res) => {
+    try {
+        res.render("user", { nickName: req.decoded.user, avatar: req.decoded.avatar })
+    } catch (err) {
+        res.status(500).json({ msj: err.message });
+    };
+};
+
+const renderFormUpdtAvatar = (req, res) => {
+    try {
+        req.params.errForm == ':' ? res.render("user", { updtAvatar: true, nickName: req.decoded.user, avatar: req.decoded.avatar }) : res.render("user", { updtAvatar: true, errsForm: JSON.parse(req.params.errForm.slice(1)), nickName: req.decoded.user, avatar: req.decoded.avatar })
+    } catch (err) {
+        res.status(500).json({ msj: err.message });
+    };
+};
+
+const renderFormUpdtPassword = (req, res) => {
+    try {
+        req.params.errForm == ':' ? res.render("user", { updtPassword: true, nickName: req.decoded.user, avatar: req.decoded.avatar }) : res.render("user", { updtPassword: true, errsForm: JSON.parse(req.params.errForm.slice(1)), nickName: req.decoded.user, avatar: req.decoded.avatar })
+    } catch (err) {
+        res.status(500).json({ msj: err.message });
+    };
+};
+
+const changesAvatar = async (req, res) => {
+    try {
+        const response = await users.changesAvatar(req.body.password, req.body.avatar, req.decoded.user);
+        if (response.rowCount == 1) {
+            req.body.email = req.decoded.user;
+            req.body.credential = response.avatar;
+            req.body.avatarChanged = true;
+            await validatedUser(req, res);
+        } else {
+            res.render("user", { updtAvatar: true, passwordError: true, nickName: req.decoded.user, avatar: req.decoded.avatar });
+        }
+    } catch (err) {
+        res.status(500).json({ msj: err.message });
+    }
+};
+
+const changesPassword = async (req, res) => {
+    try {
+        const response = await users.changesPassword(req.body.oldPassword, req.body.password, req.decoded.user);
+        response == 1 ? res.render("user", { updtPasswordWasOk: true, nickName: req.decoded.user, avatar: req.decoded.avatar }) : res.render("user", { updtPassword: true, passwordError: true, nickName: req.decoded.user, avatar: req.decoded.avatar });
+    } catch (err) {
+        res.status(500).json({ msj: err.message });
+    }
+};
+
+
 module.exports = {
     addFavorite,
     getFavorites,
@@ -211,5 +261,10 @@ module.exports = {
     getLogin,
     getSingup,
     createUser,
-    validatedUser
+    validatedUser,
+    changesAvatar,
+    changesPassword,
+    renderUserView,
+    renderFormUpdtAvatar,
+    renderFormUpdtPassword
 }

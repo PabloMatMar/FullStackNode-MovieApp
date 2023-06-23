@@ -8,7 +8,7 @@ const token = protectedPaths.use((req, res, next) => {
     const token = req.cookies.token;
     token ? jwt.verify(token, SECRET, (err, decoded) => {
         if (err)
-            console.log(err, "TOKEN INVALIDO");
+            res.clearCookie("token").redirect("/");
         else {
             req.decoded = decoded;
             next();

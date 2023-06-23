@@ -13,6 +13,7 @@ require('./utils/pg_pool');
 const userSingupRoutes = require('./routes/userSingUpRoutes');
 const userLoginRoutes = require('./routes/userLoginRoutes');
 const logoutRoutes = require('./routes/logoutRoutes');
+const userRoutes = require('./routes/userRoutes');
 const adminRoutes = require('./routes/moviesAdminRoutes');
 const homeRoutes = require('./routes/homeRoutes');
 const searchRoutes = require('./routes/searchRoutes');
@@ -49,6 +50,8 @@ app.use('/signup', userSingupRoutes);
 app.use('/login', userLoginRoutes);
 //Ruta para deslogearse
 app.use('/logout', logoutRoutes);
+//Rutas para actualizar contraseña o imagen de usuario
+app.use('/user', token, userRoutes);
 //Rutas para usuario:
 app.use('/search', token, searchRoutes);
 //Rutas para administrador:

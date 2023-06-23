@@ -6,11 +6,11 @@ header(id="nickName")
     
         div(id="links_menu")
             if admin
-                each item in [['../../search', 'Search'], ['../../movies','Movies'], ['../../logout' , 'Logout']]
+                each item in [['../../search', 'Search'], ['../../movies','Movies'], ['../../user','User'], ['../../logout' , 'Logout']]
                     button  
                         a(href=  item[0])= item[1]
             else
-                each item in [['../../search', 'Search'], ['../../favmovies','Favorites'], ['../../logout' , 'Logout']]
+                each item in [['../../search', 'Search'], ['../../favmovies','Favorites'], ['../../user','User'], ['../../logout' , 'Logout']]
                     button  
                         a(href=  item[0])= item[1]
     div 

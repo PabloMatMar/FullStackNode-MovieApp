@@ -27,6 +27,19 @@ const queries = {
     SELECT admin
     FROM users
     WHERE email = $1;
-    `
+    `,
+    updtAvatar:`
+    UPDATE users
+    SET avatar = $2
+    WHERE password = $1 AND email = $3;
+    `,
+    updtPassword:`
+    UPDATE users
+    SET password = $2
+    WHERE password = $1 AND email = $3`,
+    getAvatar:`
+    SELECT avatar
+    FROM users
+    WHERE email = $3`
 }
 module.exports = queries;

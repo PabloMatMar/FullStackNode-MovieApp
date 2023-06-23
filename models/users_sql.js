@@ -127,7 +127,7 @@ const createUser = async (user) => {
     try {
         const { emailSignup, passwordSignup, admin, avatar } = user;
         client = await pool.connect();
-        const data = await client.query(queries.createUser, [emailSignup, passwordSignup, admin, avatar]);
+        const data = await client.query(queries.createUser, [emailSignup.toLowerCase(), passwordSignup, admin, avatar]);
         result = data.rowCount;
     } catch (err) {
         if (err.detail != undefined && err.detail.endsWith('already exists.'))
@@ -169,7 +169,6 @@ const validatedUser = async (email, password) => {
         const checkAdmin = await client.query(queries.isAdmin, [email]);
         let admin = false;
         let avatar = null;
-        console.log(data.rows, "data.rows");
         if (data.rowCount == 1)
             avatar = data.rows[0].avatar;
         if (checkAdmin.rowCount != 0 && checkAdmin.rows[0].admin == ADMIN_KEY)
@@ -188,12 +187,47 @@ const validatedUser = async (email, password) => {
     return result;
 };
 
+const changesAvatar = async (password, avatar, email) => {
+    let client, data;
+    try {
+        client = await pool.connect();
+        data = await client.query(queries.updtAvatar, [password, avatar, email]);
+        if (data.rowCount == 1)
+            data = {
+                rowCount: 1,
+                avatar: await client.query(queries.updtAvatar, [password, avatar, email])
+            };
+    } catch (err) {
+        console.log(err);
+        throw err;
+    } finally {
+        client.release();
+    };
+    return data;
+};
+
+const changesPassword = async (oldPassword, newPassword, email) => {
+    let client, data;
+    try {
+        client = await pool.connect();
+        data = await client.query(queries.updtPassword, [oldPassword, newPassword, email]);
+    } catch (err) {
+        console.log(err);
+        throw err;
+    } finally {
+        client.release();
+    };
+    return data.rowCount;
+};
+
 const users = {
     addFavorite,
     getFavorites,
     deleteFavorite,
     createUser,
-    validatedUser
+    validatedUser,
+    changesAvatar,
+    changesPassword
 }
 
 module.exports = users;

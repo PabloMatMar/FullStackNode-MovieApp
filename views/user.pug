@@ -1,0 +1,16 @@
+include ./basicStructures/head.pug
+    title user
+body
+    include ./basicStructures/header.pug
+    main
+        if updtAvatar
+            include ./userFragments/updtAvatar.pug
+        else if updtPassword
+            include ./userFragments/updtPassword.pug
+        else
+            include ./userFragments/updtButtons.pug
+        if updtPasswordWasOk
+            section 
+                h3 The password was updated!
+    include ./basicStructures/footer.pug
+    script(type="module" src="/scripts.js")

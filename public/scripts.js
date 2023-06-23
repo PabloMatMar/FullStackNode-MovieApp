@@ -103,10 +103,9 @@ const deleteFavMovie = async (data) => {
 };
 
 //Ruta para renderizar mensajes en los intentos de registro:
-
-const render = async (param) => {
+const renderFails = async (param, path) => {
   try {
-    location.href = "/signup/:" + JSON.stringify(param);
+    location.href = path + JSON.stringify(param);
   } catch (err) {
     console.log(err);
   };
@@ -119,18 +118,15 @@ if (document.getElementById("singup") != null) {
   document.querySelector("form.signup").addEventListener("submit", (event) => {
     event.preventDefault(); // parar envío
     let errs = [0, 0, 0, 0];
-    if (event.target.passwordSignup.value !== event.target.password2Signup.value)
+    if (event.target.passwordSignup.value != event.target.password2Signup.value)
       errs[0] = 1;
     if (!(/^(?=\w*\d)(?=\w*[A-Z])(?=\w*[a-z])\S{6,16}$/.test(event.target.passwordSignup.value)))
       errs[1] = 1;
     if (!(/^[a-zA-Z0-9_.]+@[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*[.][a-zA-Z]{2,3}/.test(event.target.emailSignup.value)))
       errs[2] = 1;
-    if (event.target.avatar.value != null && !/.*(jpg|png|gif)$/.test(event.target.avatar.value))
+    if (event.target.avatar.value != null && !/.*(jpg|png|jpeg|gif)$/.test(event.target.avatar.value))
       errs[3] = 1;
-    for (let i = 0; i < 10000; i++) {
-      console.log(event.target.avatar.value);
-    }
-    errs.find(e => e == 1) == 1 ? render(JSON.stringify(errs)) : event.target.submit();
+    errs.find(e => e == 1) == 1 ? renderFails(JSON.stringify(errs), "/signup/:") : event.target.submit();
   });
 };
 
@@ -242,4 +238,33 @@ if (document.title == "search") {
       spinner.src = "/logos/spinner2.gif";
     }, 500);
   })
-}
+};
+
+//Evento para capturar los datos y llamar a la funcion para cambiar el avatar de un usuario:
+if (document.getElementById("updtAvatar") != null) {
+  document.querySelector("form.updtAvatar").addEventListener("submit", e => {
+    e.preventDefault();
+    let errs = [0, 0, 0, 0];
+    if (!(/^(?=\w*\d)(?=\w*[A-Z])(?=\w*[a-z])\S{6,16}$/.test(e.target.password.value)))
+    errs[1] = 1;
+    if (e.target.avatar.value.length != 0 && !/.*(jpg|png|jpeg|gif)$/.test(e.target.avatar.value))
+      errs[3] = 1;
+    errs.find(e => e == 1) == 1 ? renderFails(JSON.stringify(errs), "/user/updtAvatar/:") : e.target.submit();
+  });
+};
+
+//Evento para capturar los datos y llamar a la funcion para cambiar la contraseña de un usuario:
+
+if (document.getElementById("updtPassword") != null) {
+  document.querySelector("form.updtPassword").addEventListener("submit", e => {
+    e.preventDefault();
+    let errs = [0, 0, 0, 0];
+    if (e.target.password.value != e.target.rPassword.value)
+      errs[0] = 1;
+    if (!(/^(?=\w*\d)(?=\w*[A-Z])(?=\w*[a-z])\S{6,16}$/.test(e.target.password.value)))
+      errs[1] = 1;
+    if (!(/^(?=\w*\d)(?=\w*[A-Z])(?=\w*[a-z])\S{6,16}$/.test(e.target.oldPassword.value)))
+      errs[1] = 1;
+    errs.find(e => e == 1) == 1 ? renderFails(JSON.stringify(errs), "/user/updtPassword/:") : e.target.submit();
+  });
+};
