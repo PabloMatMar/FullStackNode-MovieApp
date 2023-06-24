@@ -3,12 +3,11 @@
  * @version 2.0
  * @namespace userControllers
  */
-
-const process = require('process');
-const users = require('../models/users_sql')
-jwt = require('jsonwebtoken');
 require('dotenv').config();
 const { SECRET } = process.env;
+const bcrypt = require('bcrypt');
+const users = require('../models/users_sql')
+const jwt = require('jsonwebtoken');
 
 
 /**
@@ -102,6 +101,8 @@ const deleteFavoriteMovie = async (req, res) => {
 
 const createUser = async (req, res) => {
     try {
+        const saltRounds = 10;
+        req.body.passwordSignup = await bcrypt.hash(req.body.passwordSignup, saltRounds);
         const response = await users.createUser(req.body);
         if (response == 1) {
             const payload = {
@@ -155,7 +156,9 @@ const validatedUser = async (req, res) => {
             const token = jwt.sign(payload, SECRET, {
                 expiresIn: "12000000ms"
             });
-            req.body.avatarChanged ? res.cookie('token', token).render("user", { nickName: req.decoded.user, avatar: req.decoded.avatar }) : res.cookie('token', token).status(200).redirect("/");
+            let path, status;
+            req.body.avatarChanged ? (status = 307, path = "/user") : (status = 200, path = "/");
+            res.cookie('token', token).status(status).redirect(path);
         } else
             res.render("home", { login: true, incorrectUser: true });
     } catch (err) {
@@ -230,27 +233,27 @@ const renderFormUpdtPassword = (req, res) => {
 
 const changesAvatar = async (req, res) => {
     try {
-        const response = await users.changesAvatar(req.body.password, req.body.avatar, req.decoded.user);
+        const response = await users.changesAvatar(req.decoded.user, req.body.avatar, req.body.password);
         if (response.rowCount == 1) {
             req.body.email = req.decoded.user;
-            req.body.credential = response.avatar;
             req.body.avatarChanged = true;
             await validatedUser(req, res);
-        } else {
+        } else
             res.render("user", { updtAvatar: true, passwordError: true, nickName: req.decoded.user, avatar: req.decoded.avatar });
-        }
     } catch (err) {
         res.status(500).json({ msj: err.message });
-    }
+    };
 };
 
 const changesPassword = async (req, res) => {
     try {
-        const response = await users.changesPassword(req.body.oldPassword, req.body.password, req.decoded.user);
+        const saltRounds = 12;
+        req.body.password = await bcrypt.hash(req.body.password, saltRounds);
+        const response = await users.changesPassword(req.decoded.user, req.body.password, req.body.oldPassword);
         response == 1 ? res.render("user", { updtPasswordWasOk: true, nickName: req.decoded.user, avatar: req.decoded.avatar }) : res.render("user", { updtPassword: true, passwordError: true, nickName: req.decoded.user, avatar: req.decoded.avatar });
     } catch (err) {
         res.status(500).json({ msj: err.message });
-    }
+    };
 };
 
 

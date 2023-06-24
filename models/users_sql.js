@@ -4,7 +4,8 @@
  * @namespace users_sql 
  */
 require('dotenv').config();
-const { ADMIN_KEY } = process.env
+const { ADMIN_KEY } = process.env;
+const bcrypt = require('bcrypt');
 const pool = require('../utils/pg_pool');
 const queries = require('../queries/queriesUser');
 
@@ -155,29 +156,29 @@ const createUser = async (user) => {
  * @property {function} release - Method to disconnect to sql server.
  * @const {Object} client - Conection to DB.
  * @property {function} query - Sql method that passes a query in the first argument and the query values ​​in the second.
- * @property {Object} queries.validated - The query that validated a credentials of user in the process of login.
+ * @property {Object} queries.getUserData - The query that validated the credentials of email user and returns all data of that user.
  * @return {number} One if the validate user was okey, else, 0.
  * @throws {Error} message with the err during save process.
  */
 
 const validatedUser = async (email, password) => {
     let client;
-    let result = {};
+    let result = {
+        credential: 0,
+        admin: false,
+        avatar: null
+    };
     try {
         client = await pool.connect();
-        const data = await client.query(queries.validatedUser, [email, password]);
+        const data = await client.query(queries.getUserData, [email]);
+        const isPasswordCorrect = await bcrypt.compare(password, data.rows[0].password);
         const checkAdmin = await client.query(queries.isAdmin, [email]);
-        let admin = false;
-        let avatar = null;
-        if (data.rowCount == 1)
-            avatar = data.rows[0].avatar;
-        if (checkAdmin.rowCount != 0 && checkAdmin.rows[0].admin == ADMIN_KEY)
-            admin = true;
-        result = {
-            credential: data.rowCount,
-            admin,
-            avatar,
+        if (data.rowCount == 1 && isPasswordCorrect) {
+            result.credential = 1;
+            result.avatar = data.rows[0].avatar;
         };
+        if (checkAdmin.rowCount != 0 && checkAdmin.rows[0].admin == ADMIN_KEY)
+            result.admin = true;
     } catch (err) {
         console.log(err);
         throw err;
@@ -187,15 +188,22 @@ const validatedUser = async (email, password) => {
     return result;
 };
 
-const changesAvatar = async (password, avatar, email) => {
-    let client, data;
+const changesAvatar = async (email, avatar, password) => {
+    let client;
+    let data = {
+        rowCount: 0,
+        avatar: null
+    }
     try {
         client = await pool.connect();
-        data = await client.query(queries.updtAvatar, [password, avatar, email]);
+        const userDatas = await client.query(queries.getUserData, [email]);
+        const isPasswordCorrect = await bcrypt.compare(password, userDatas.rows[0].password);
+        if (isPasswordCorrect)
+            data = await client.query(queries.updtAvatar, [email, avatar]);
         if (data.rowCount == 1)
             data = {
                 rowCount: 1,
-                avatar: await client.query(queries.updtAvatar, [password, avatar, email])
+                avatar: await client.query(queries.getAvatar, [email]).rows
             };
     } catch (err) {
         console.log(err);
@@ -206,11 +214,21 @@ const changesAvatar = async (password, avatar, email) => {
     return data;
 };
 
-const changesPassword = async (oldPassword, newPassword, email) => {
-    let client, data;
+const changesPassword = async (email, newPassword, oldPassword) => {
+    let client;
+    let data = {
+        rowCount: 0
+    };
     try {
         client = await pool.connect();
-        data = await client.query(queries.updtPassword, [oldPassword, newPassword, email]);
+        const userDatas = await client.query(queries.getUserData, [email]);
+        const isPasswordCorrect = await bcrypt.compare(oldPassword, userDatas.rows[0].password);
+        if (isPasswordCorrect)
+            data = await client.query(queries.updtPassword, [email, newPassword]);
+        if (data.rowCount == 1)
+            data = {
+                rowCount: 1
+            };
     } catch (err) {
         console.log(err);
         throw err;

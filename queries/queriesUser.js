@@ -3,10 +3,10 @@ const queries = {
     INSERT INTO users(email, password, admin, avatar)
     VALUES ($1,$2,$3,$4);
     `,
-    validatedUser:`
+    getUserData:`
     SELECT *
     FROM users
-    WHERE email = $1 AND password = $2;
+    WHERE email = $1;
     `,
     addFavorite:`
     INSERT INTO favorites
@@ -31,15 +31,20 @@ const queries = {
     updtAvatar:`
     UPDATE users
     SET avatar = $2
-    WHERE password = $1 AND email = $3;
+    WHERE email = $1;
     `,
     updtPassword:`
     UPDATE users
     SET password = $2
-    WHERE password = $1 AND email = $3`,
+    WHERE email = $1`,
     getAvatar:`
     SELECT avatar
     FROM users
-    WHERE email = $3`
+    WHERE email = $1`,
+    // editSQL:`
+    // UPDATE users
+    // SET email = prueba01@gmail.com
+    // WHERE password = Prueba001@gmail.com;
+    // `
 }
 module.exports = queries;
