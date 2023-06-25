@@ -6,8 +6,8 @@ section(class="cardSection")
             h3(id="title" + i)  Title: #{allMovies[i].title}
             img(src=allMovies[i].poster  class="poster")
             each val, key in allMovies[i]._doc
-                if key != 'title' && key != 'poster' && key != 'critics'
-                    if key == 'year' && val.length != 4
+                if key != 'title' && key != 'poster' && key != 'critics' && val != 'N/A'
+                    if key == 'year' && val < 99
                         p(id=key)= 'Total Seasons: ' + val
                     else
                         p(id=key)= key.split('').map((e,i)=> i==0 ? e.toUpperCase(): e).join('') + ': ' + val
@@ -16,4 +16,8 @@ section(class="cardSection")
                         p Filmaffinity Review: #{allMovies[i].critics[j].Critics}
                         p Review Punctuation: #{allMovies[i].critics[j].Punctuation}
             button(class ="css-button-arrow--red" class="delete" id="delete" + i) Delete
+            p(id=`confirmation${i}` style="display: none;") Are you sure ?
+                br
+                button(id=`yes${i}` class ="css-button-arrow--red") Yes
+                button(id=`No${i}` class ="css-button-arrow--red") No 
             a(href="../movies/updateMovie" class="css-button-arrow--red" class="update" id="update" + i) Update

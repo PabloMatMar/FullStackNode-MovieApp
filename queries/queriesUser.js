@@ -10,11 +10,11 @@ const queries = {
     `,
     addFavorite:`
     INSERT INTO favorites
-    (title, year, director, genre, runtime, poster, emailfk)
-    VALUES ($1, $2, $3, $4, $5, $6, $7);
+    (title, year, director, genre, runtime, poster, plot, actors, language, review, punctuation, emailfk)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12);
     `,
     getFavorites:`
-    SELECT title, poster, director, year, genre, runtime
+    SELECT title, year, director, genre, runtime, poster, plot, actors, language, review, punctuation
     FROM favorites
     WHERE emailFK = $1;
     `,

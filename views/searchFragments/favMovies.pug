@@ -2,7 +2,14 @@ each film, i in userFavMovies
     article(class='card')
         img(src=userFavMovies[i].poster class="poster")
         each val, key in userFavMovies[i]
-            if key != 'poster' && val != 'N/A'
-                p(id=key + i)= key.split('').map((e,i)=> i==0 ? e.toUpperCase(): e).join('') +': '+ val
+            if key != 'poster' && val != null
+                if key == 'year' && val < 99
+                    p(id=key)= 'Total Seasons: ' + val
+                else
+                    p(id=key + i)= key.split('').map((e,i)=> i==0 ? e.toUpperCase(): e).join('') +': '+ val
         button(id='delete'+i class="delete" type="button" class ="css-button-arrow--red") Remove
+        p(id=`confirmation${i}` style="display: none;") Are you sure ?
+            br
+            button(id=`yes${i}` class ="css-button-arrow--red") Yes
+            button(id=`No${i}` class ="css-button-arrow--red") No 
         p(id="favMovies" hidden=true)

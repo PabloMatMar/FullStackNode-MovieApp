@@ -79,7 +79,7 @@ const addFavorite = async (movie) => {
     console.log(err);
   };
   if (response.status != 201)
-    alert("The movie " + movie.title + " could not be add to favorites list, you probably have already deleted it, refresh the page to check it.");
+    alert("The movie " + movie.title + " could not be add to favorites list, you probably have already added it, go to favorites to check it.");
 };
 
 //Ruta para eliminar pelicula de favoritos:
@@ -157,13 +157,13 @@ if (document.title === "updateMovie") {
 if (document.title === "Movies") {
   const buttons = document.getElementsByClassName("delete")
   for (let i = 0; i < buttons.length; i++)
-    document.getElementById(`delete${i}`).addEventListener('click', async (e) => {
-      e.preventDefault;
-      let movie = document.getElementById(`title${i}`).innerHTML;
-      const cleanTitle = movie.slice(7);
-      const titleMovie = cleanTitle.trim();
-      if (movie)
-        await deleteMovie(titleMovie);
+    document.getElementById(`delete${i}`).addEventListener('click', async e => {
+      const title = document.getElementById(`title${i}`).innerText;
+      const confirmation = document.getElementById(`confirmation${i}`);
+      confirmation.style.display = "block";
+      const children = confirmation.childNodes;
+      for (let j = 0; j < children.length; j++)
+        children[j].addEventListener('click', async e => j == 2 ? await deleteMovie(title.slice(7).trim()) : confirmation.style.display = "none");
     });
 };
 //Evento para capturar los datos y llamar a la funcion para crear pelicula a lista de mongo a traves de admin:
@@ -180,25 +180,15 @@ if (document.title == "CreateMovie") {
 //Evento para capturar los datos y llamar a la funcion para añadir pelicula favorita de la lista de un usuario:
 
 if (document.title === "search") {
-  let favButton = document.getElementById("fav");
-  if (favButton != undefined)
-    favButton.addEventListener('click', async (e) => {
-      e.preventDefault();
-      let title = document.getElementById("title").innerHTML;
-      let year = document.getElementById("year").innerHTML;
-      let director = document.getElementById("director").innerHTML;
-      let runtime = document.getElementById("runtime").innerHTML;
-      let genre = document.getElementById("genre").innerHTML;
-      let poster = document.getElementById("poster").src;
-      const data = {
-        title: title.slice(7),
-        year: year.slice(5),
-        director: director.slice(10),
-        genre: genre.slice(7),
-        runtime: runtime.slice(9),
-        poster: poster
-      };
-      await addFavorite(data);
+  const favButton = document.getElementById("fav");
+  let movie = {};
+  if (favButton != null)
+    favButton.addEventListener('click', async e => {
+      const section = document.getElementById("card");
+      const children = section.childNodes;
+      for (let j = 0; j < children.length; j++)
+        children[j].id == 'poster' ? movie[children[j].id] = children[j].src : movie[children[j].id] = children[j].innerText.slice(children[j].innerText.indexOf(':') + 1);
+      await addFavorite(movie);
     });
 };
 
@@ -207,14 +197,18 @@ if (document.title === "search") {
 if (document.getElementById("favMovies") != null) {
   const buttons = document.getElementsByClassName("delete")
   for (let i = 0; i < buttons.length; i++) {
-    let deleteButton = document.getElementById(`delete${i}`);
-    deleteButton.addEventListener('click', async (e) => {
+    const deleteButton = document.getElementById(`delete${i}`);
+    deleteButton.addEventListener('click', async e => {
       e.preventDefault;
-      let title = document.getElementById(`title${i}`).innerHTML;
+      const title = document.getElementById(`title${i}`).innerHTML;
       const data = {
         title: title.slice(7)
       };
-      await deleteFavMovie(data);
+      const confirmation = document.getElementById(`confirmation${i}`);
+      confirmation.style.display = "block";
+      const children = confirmation.childNodes;
+      for (let j = 0; j < children.length; j++)
+        children[j].addEventListener('click', async e => j == 2 ? await deleteFavMovie(data) : confirmation.style.display = "none");
     });
   };
 };
@@ -246,7 +240,7 @@ if (document.getElementById("updtAvatar") != null) {
     e.preventDefault();
     let errs = [0, 0, 0, 0];
     if (!(/^(?=\w*\d)(?=\w*[A-Z])(?=\w*[a-z])\S{6,16}$/.test(e.target.password.value)))
-    errs[1] = 1;
+      errs[1] = 1;
     if (e.target.avatar.value.length != 0 && !/.*(jpg|png|jpeg|gif)$/.test(e.target.avatar.value))
       errs[3] = 1;
     errs.find(e => e == 1) == 1 ? renderFails(JSON.stringify(errs), "/user/updtAvatar/:") : e.target.submit();

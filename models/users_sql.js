@@ -27,9 +27,9 @@ const queries = require('../queries/queriesUser');
 const addFavorite = async (fav, emailFK) => {
     let client;
     try {
-        const { title, year, director, genre, runtime, poster } = fav;
+        const { title, year, director, genre, runtime, poster, plot, actors, language, review, punctuation } = fav;
         client = await pool.connect();
-        await client.query(queries.addFavorite, [title, year, director, genre, runtime, poster, emailFK]);
+        await client.query(queries.addFavorite, [title, year, director, genre, runtime, poster,  plot, actors, language, review, punctuation, emailFK]);
     }
     catch (err) {
         console.log(err);

@@ -1,14 +1,14 @@
 section(class="card" id="card")
     img(id="poster" src=categories.poster)
     each val, key in categories
-        if !excludes.includes(key)
-            if key == 'year' && val.length != 4
+        if !excludes.includes(key) && val != 'N/A'
+            if key == 'year' && val < 99
                 p(id=key)= 'Total Seasons: ' + val
             else
                 p(id=key)= key.split('').map((e,i)=> i==0 ? e.toUpperCase(): e).join('') + ': ' + val
-
-    each item , i in categories.critics
-        p Filmaffinity Review: #{categories.critics[i].Critics}
-        p Review Punctuation: #{categories.critics[i].Punctuation}
+    if categories.critics != undefined
+        each item , i in categories.critics
+            p(id="review") Filmaffinity Review: #{categories.critics[i].Critics}
+            p(id="punctuation") Review Punctuation: #{categories.critics[i].Punctuation}
     if !admin
         button(id='fav' type="button" class ="css-button-arrow--red") Add to Favorites
