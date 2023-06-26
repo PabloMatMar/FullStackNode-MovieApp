@@ -63,7 +63,6 @@ const getFavorites = async (emailFK, title) => {
         client = await pool.connect();
         title == undefined ? data = await client.query(queries.getFavorites, [emailFK]) : data = await client.query(queries.getASpecificFavorite, [emailFK, title]);
         result = data.rows;
-        console.log(data);
     }
     catch (err) {
         console.log(err);

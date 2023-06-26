@@ -6,6 +6,7 @@
 
 require('dotenv').config();
 const Movies = require('../models/moviesMongo');
+const Users = require('../models/users_sql');
 const scraper = require('../utils/scraper');
 const { API_KEY } = process.env;
 let movieToPush = {};
@@ -104,8 +105,14 @@ const postFilmForm = async (req, res) => {
 
 const getSearchForTitleInMongo = async (req, res) => {
     try {
+        let isFav = false;
+        if (!req.decoded.admin) {
+            const hasUserMovie = await Users.getFavorites(req.decoded.user, " " + req.params.title);
+            if (hasUserMovie.length > 0)
+                isFav = true;
+        };
         const movie = await Movies.find({ title: req.params.title }, { _id: 0, __v: 0 });
-        movie[0] != undefined ? res.status(200).render("search", { categories: { ...movie[0] }._doc, excludes: ['poster', 'critics'], admin: req.decoded.admin, path: "/search/", nickName: req.decoded.user, avatar: req.decoded.avatar }) : res.redirect("/search/" + req.params.title);
+        movie[0] != undefined ? res.status(200).render("search", { categories: { ...movie[0] }._doc, excludes: ['poster', 'critics'], path: "/search/", isFav, admin: req.decoded.admin, nickName: req.decoded.user, avatar: req.decoded.avatar }) : res.redirect("/search/" + req.params.title);
     } catch (err) {
         res.status(500).send({ err: err.message });
     };
@@ -215,7 +222,7 @@ const getSearchForTitle = async (req, res) => {
             !req.decoded.admin ? insertApiMovieInMongo({ ...categories, ...scrapingCritics }) : movieToPush = { ...categories, ...scrapingCritics };
             res.status(200).render("search", { categories: { ...categories, ...scrapingCritics }, excludes: ['rated', 'released', 'writer', 'awards', 'ratings', 'metascore', 'imdbrating', 'imdbvotes', 'imdbid', 'type', 'dvd', 'boxoffice', 'production', 'response', 'website', 'poster', 'critics', 'poster', 'country', 'totalseasons'], path: "/search/", admin: req.decoded.admin, nickName: req.decoded.user, avatar: req.decoded.avatar, addToMongo: req.decoded.admin });
         } else
-            res.render("search", { noMovie: true,  path: "/search/", admin: req.decoded.admin, nickName: req.decoded.user, avatar: req.decoded.avatar });
+            res.render("search", { noMovie: true, path: "/search/", admin: req.decoded.admin, nickName: req.decoded.user, avatar: req.decoded.avatar });
     } catch (err) {
         res.status(500).send({ err: err.message });
     };

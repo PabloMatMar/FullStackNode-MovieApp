@@ -11,4 +11,7 @@ section(class="card" id="card")
             p(id="review") Filmaffinity Review: #{categories.critics[i].Critics}
             p(id="punctuation") Review Punctuation: #{categories.critics[i].Punctuation}
     if !admin
-        button(id='fav' type="button" class ="css-button-arrow--red") Add to Favorites
+        if !isFav
+            button(id='fav' type="button" class ="css-button-arrow--red") Add to Favorites
+        else
+            button(class ="css-button-arrow--red") This title is in your favorite movies! 

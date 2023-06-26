@@ -6,7 +6,7 @@
 require('dotenv').config();
 const { SECRET } = process.env;
 const bcrypt = require('bcrypt');
-const users = require('../models/users_sql')
+const users = require('../models/users_sql');
 const jwt = require('jsonwebtoken');
 
 
@@ -77,14 +77,12 @@ const getASpecificFavorite = async (req, res) => {
     try {
         const title = req.params.title.slice(1);
         const specificMovie = await users.getFavorites(req.decoded.user, title);
-        console.log(title);
         let notFound;
         specificMovie.length == 0 ? notFound = "That movie is not among your favorites." : notFound = null;
         res.status(302).render("search", { path: "/favmovies/specific/", movieOrFavMovie: "Search among your favorites:", userFavMovies: specificMovie, notFound, title: title.slice(1), nickName: req.decoded.user, avatar: req.decoded.avatar });
-
     } catch (err) {
         res.status(500).json({ msj: err.message });
-    }
+    };
 };
 
 /**
