@@ -29,7 +29,7 @@ const addFavorite = async (fav, emailFK) => {
     try {
         const { title, year, director, genre, runtime, poster, plot, actors, language, review, punctuation } = fav;
         client = await pool.connect();
-        await client.query(queries.addFavorite, [title, year, director, genre, runtime, poster,  plot, actors, language, review, punctuation, emailFK]);
+        await client.query(queries.addFavorite, [title, year, director, genre, runtime, poster, plot, actors, language, review, punctuation, emailFK]);
     }
     catch (err) {
         console.log(err);
@@ -44,8 +44,8 @@ const addFavorite = async (fav, emailFK) => {
  * @memberof users_sql 
  * @method getFavorites
  * @async 
- * @param {Object} fav - The values of the favorite movie.
  * @param {string} emailFK - The name of user that is a forenkey in SQL.
+ * @param {string} title - The name of the movie for a get specific movie. Opcional argument.
  * @const {Object} pool - Host, username, database and password of ElephantSQL.
  * @property {function} connect - Method to connect to sql server.
  * @property {function} release - Method to disconnect to sql server.
@@ -56,12 +56,14 @@ const addFavorite = async (fav, emailFK) => {
  * @throws {Error} message with the err during save process.
  */
 
-const getFavorites = async (emailFK) => {
+const getFavorites = async (emailFK, title) => {
     let client, result;
     try {
+        let data;
         client = await pool.connect();
-        const data = await client.query(queries.getFavorites, [emailFK]);
+        title == undefined ? data = await client.query(queries.getFavorites, [emailFK]) : data = await client.query(queries.getASpecificFavorite, [emailFK, title]);
         result = data.rows;
+        console.log(data);
     }
     catch (err) {
         console.log(err);

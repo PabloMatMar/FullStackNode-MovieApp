@@ -40,6 +40,8 @@ const addFavorite = async (req, res) => {
  * @param {Object} res - HTTP response
  * @property {function} getFavorites - Calls the function in charge of using the queries to obtein all the favorites movies of the user.
  * @property {string} req.decoded.user - The username that acts as the forenkey in the SQL favorites table.
+ * @property {string} path - path in which the form post will be practiced.
+ * @property {string} movieOrFavMovie - Text that informs where the form will search for the movie. It can be in favorites or a search in the apis. 
  * @property {Array} userFavMovies - SQL return with all the user's favorite movies.
  * @property {string} nickName - The username/administrator for rendering.
  * @property {string} avatar - The user avatar image url for rendering.
@@ -50,10 +52,39 @@ const addFavorite = async (req, res) => {
 const getFavorites = async (req, res) => {
     try {
         const userFavMovies = await users.getFavorites(req.decoded.user);
-        res.status(200).render("search", { userFavMovies: userFavMovies.reverse(), nickName: req.decoded.user, avatar: req.decoded.avatar });
+        let path, whatSearch;
+        userFavMovies.length == 0 ? (path = "/search", whatSearch = "Write the full title of the movie/serie:") : (path = "/favmovies/specific/", whatSearch = "Search among your favorites:");
+        res.status(200).render("search", { path: path, movieOrFavMovie: whatSearch, userFavMovies: userFavMovies.reverse(), nickName: req.decoded.user, avatar: req.decoded.avatar });
     } catch (err) {
         res.status(500).json({ msj: err.message });
     };
+};
+
+const capturingFormData = async (req, res) => {
+    try {
+        let title = " "
+        if (req.body.title.length > 0) {
+            title = req.body.title.toLowerCase().trim();
+            title = title[0].toUpperCase().concat(title.slice(1));
+        };
+        res.redirect("/favmovies/: " + title);
+    } catch (err) {
+        res.status(500).send({ err: err.message });
+    };
+};
+
+const getASpecificFavorite = async (req, res) => {
+    try {
+        const title = req.params.title.slice(1);
+        const specificMovie = await users.getFavorites(req.decoded.user, title);
+        console.log(title);
+        let notFound;
+        specificMovie.length == 0 ? notFound = "That movie is not among your favorites." : notFound = null;
+        res.status(302).render("search", { path: "/favmovies/specific/", movieOrFavMovie: "Search among your favorites:", userFavMovies: specificMovie, notFound, title: title.slice(1), nickName: req.decoded.user, avatar: req.decoded.avatar });
+
+    } catch (err) {
+        res.status(500).json({ msj: err.message });
+    }
 };
 
 /**
@@ -260,6 +291,8 @@ const changesPassword = async (req, res) => {
 module.exports = {
     addFavorite,
     getFavorites,
+    capturingFormData,
+    getASpecificFavorite,
     deleteFavoriteMovie,
     getLogin,
     getSingup,

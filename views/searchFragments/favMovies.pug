@@ -1,3 +1,11 @@
+if userFavMovies.length == 0 && !notFound
+    article
+        p You haven't added any movies to favorites section yet
+if notFound
+    article(class="card" id="card")
+        p #{notFound}
+        button(class ="css-button-arrow--red" id="search-Not-Found-FavMovie")
+            a(href="../../search/local/" + title) Click to search the movie in our film archive    
 each film, i in userFavMovies                     
     article(class='card')
         img(src=userFavMovies[i].poster class="poster")

@@ -18,6 +18,11 @@ const queries = {
     FROM favorites
     WHERE emailFK = $1;
     `,
+    getASpecificFavorite: `
+    SELECT title, year, director, genre, runtime, poster, plot, actors, language, review, punctuation
+    FROM favorites
+    WHERE emailFK = $1 AND title = $2;
+    `,
     deleteFavorite:`
     DELETE
     FROM favorites AS e

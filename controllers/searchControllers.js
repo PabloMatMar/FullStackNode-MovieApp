@@ -17,6 +17,8 @@ let movieToPush = {};
  * @async 
  * @param {Object} req - HTTP request.
  * @param {Object} res - HTTP response.
+ * @property {string} movieOrFavMovie - Text that informs where the form will search for the movie. It can be in favorites or a search in the apis. 
+ * @property {string} path - path in which the form post will be practiced.
  * @property {boolean} admin - Informs the renderer if it is a user or an administrator so that it displays the corresponding navigation bar.
  * @property {string} nickName - The username/administrator for rendering.
  * @property {string} avatar - The user avatar image url for rendering.
@@ -27,7 +29,7 @@ let movieToPush = {};
 
 const getSearch = (req, res) => {
     try {
-        res.render("search", { admin: req.decoded.admin, nickName: req.decoded.user, avatar: req.decoded.avatar });
+        res.render("search", { movieOrFavMovie: "Write the full title of the movie/serie:", path: "/search", admin: req.decoded.admin, nickName: req.decoded.user, avatar: req.decoded.avatar });
     } catch (err) {
         res.status(500).send({ err });
     };
@@ -103,7 +105,7 @@ const postFilmForm = async (req, res) => {
 const getSearchForTitleInMongo = async (req, res) => {
     try {
         const movie = await Movies.find({ title: req.params.title }, { _id: 0, __v: 0 });
-        movie[0] != undefined ? res.status(200).render("search", { categories: { ...movie[0] }._doc, excludes: ['poster', 'critics'], admin: req.decoded.admin, nickName: req.decoded.user, avatar: req.decoded.avatar }) : res.redirect("/search/" + req.params.title);
+        movie[0] != undefined ? res.status(200).render("search", { categories: { ...movie[0] }._doc, excludes: ['poster', 'critics'], admin: req.decoded.admin, path: "/search/", nickName: req.decoded.user, avatar: req.decoded.avatar }) : res.redirect("/search/" + req.params.title);
     } catch (err) {
         res.status(500).send({ err: err.message });
     };
@@ -200,7 +202,6 @@ const getSearchForTitle = async (req, res) => {
         const categoriesMovie = await resp.json();
         if (categoriesMovie.Error != 'Movie not found!') {
             console.log("FIND MOVIE IN API");
-            console.log(categoriesMovie);
             const scrapingCritics = { "critics": await startScraping(categoriesMovie.Title) }
             const categories = {};
             Object
@@ -212,9 +213,9 @@ const getSearchForTitle = async (req, res) => {
                 });
             // Mongo Saves movie and scraping
             !req.decoded.admin ? insertApiMovieInMongo({ ...categories, ...scrapingCritics }) : movieToPush = { ...categories, ...scrapingCritics };
-            res.status(200).render("search", { categories: { ...categories, ...scrapingCritics }, excludes: ['rated', 'released', 'writer', 'awards', 'ratings', 'metascore', 'imdbrating', 'imdbvotes', 'imdbid', 'type', 'dvd', 'boxoffice', 'production', 'response', 'website', 'poster', 'critics', 'poster', 'country', 'totalseasons'], admin: req.decoded.admin, nickName: req.decoded.user, avatar: req.decoded.avatar, addToMongo: req.decoded.admin });
+            res.status(200).render("search", { categories: { ...categories, ...scrapingCritics }, excludes: ['rated', 'released', 'writer', 'awards', 'ratings', 'metascore', 'imdbrating', 'imdbvotes', 'imdbid', 'type', 'dvd', 'boxoffice', 'production', 'response', 'website', 'poster', 'critics', 'poster', 'country', 'totalseasons'], path: "/search/", admin: req.decoded.admin, nickName: req.decoded.user, avatar: req.decoded.avatar, addToMongo: req.decoded.admin });
         } else
-            res.render("search", { noMovie: true, admin: req.decoded.admin, nickName: req.decoded.user, avatar: req.decoded.avatar });
+            res.render("search", { noMovie: true,  path: "/search/", admin: req.decoded.admin, nickName: req.decoded.user, avatar: req.decoded.avatar });
     } catch (err) {
         res.status(500).send({ err: err.message });
     };

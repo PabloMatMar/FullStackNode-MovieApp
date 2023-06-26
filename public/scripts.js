@@ -179,7 +179,7 @@ if (document.title == "CreateMovie") {
 };
 //Evento para capturar los datos y llamar a la funcion para añadir pelicula favorita de la lista de un usuario:
 
-if (document.title === "search") {
+if (document.title == "search") {
   const favButton = document.getElementById("fav");
   let movie = {};
   if (favButton != null)
@@ -213,12 +213,12 @@ if (document.getElementById("favMovies") != null) {
   };
 };
 
-//Evento para mostrar el spinner mientras se carga la pelicula(el scrapping mas bien)
+//Evento para mostrar el spinner mientras se carga la pelicula (el scrapping mas bien)
 
 if (document.title == "search") {
-  document.getElementById("search-button").addEventListener("click", (e) => {
+  document.getElementById("search-button").addEventListener("click", e => {
     let section = document.getElementById("card")
-    setTimeout(function () {
+    setTimeout(() => {
       if (section != null)
         while (section.firstChild)
           section.removeChild(section.firstChild);
@@ -231,7 +231,21 @@ if (document.title == "search") {
       spinner.setAttribute('id', 'gif');
       spinner.src = "/logos/spinner2.gif";
     }, 500);
-  })
+  });
+};
+
+if (document.getElementById("search-Not-Found-FavMovie") != null) {
+  document.getElementById("search-Not-Found-FavMovie").addEventListener("click", e => {
+    const article = document.getElementById("card");
+    setTimeout(() => {
+      while (article.firstChild)
+        article.removeChild(article.firstChild);
+      const spinner = document.createElement("img");
+      article.appendChild(spinner);
+      spinner.setAttribute('id', 'gif');
+      spinner.src = "/logos/spinner2.gif";
+    }, 500);
+  });
 };
 
 //Evento para capturar los datos y llamar a la funcion para cambiar el avatar de un usuario:
