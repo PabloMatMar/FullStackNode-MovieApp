@@ -22,12 +22,38 @@ const Movies = require('../models/moviesMongo')
 const getMovies = async (req, res) => {
     try {
         const movies = await Movies.find({ Movies }, { _id: 0, __v: 0 });
-        res.status(200).render("moviesAdmin", { allMovies: movies.reverse(), admin: req.decoded.admin, nickName: req.decoded.user, avatar: req.decoded.avatar });
-    }
-    catch (err) {
+        res.status(200).render("moviesAdmin", { allMovies: movies.reverse(), path: "/movies/", movieOrFavMovie: "Search a Movie in Mongo Api", admin: req.decoded.admin, nickName: req.decoded.user, avatar: req.decoded.avatar });
+    } catch (err) {
         res.status(400).json({ msj: err.message });
     };
 };
+
+
+const capturingFormData = async (req, res) => {
+    try {
+        let title = " ";
+        if (req.body.title.length > 0) {
+            title = req.body.title.toLowerCase().trim();
+            title = title[0].toUpperCase().concat(title.slice(1));
+        };
+        res.redirect("/movies/:" + title);
+    } catch (err) {
+        res.status(500).json({ err: err.message });
+    };
+};
+
+const getSpecificMovieInMongo = async (req, res) => {
+    try {
+        let notFound, status;
+        const title = req.params.title.slice(1);
+        const movie = await Movies.find({ title: req.params.title.slice(1) }, { _id: 0, __v: 0 });
+        movie.length > 0 ? status = 307 : (status = 404, notFound = true);
+        res.status(status).render("moviesAdmin", { allMovies: movie, path: "/movies/", movieOrFavMovie: "Search a Movie in Mongo Api", notFound, title, admin: req.decoded.admin, nickName: req.decoded.user, avatar: req.decoded.avatar });
+    } catch (err) {
+        res.status(500).json({ err: err.message });
+    };
+};
+
 
 /**
  * Description: Render a form on the view createMovie to create a movie.
@@ -151,6 +177,8 @@ const updateMovie = async (req, res) => {
 
 module.exports = {
     getMovies,
+    capturingFormData,
+    getSpecificMovieInMongo,
     createMovie,
     deleteMovie,
     formUpdateMovie,

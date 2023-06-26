@@ -53,7 +53,7 @@ const startScraping = async (title) => {
         const movies = await scraper.scrap("https://www.filmaffinity.com/en/search.php?stype=title&stext=" + title);
         return movies;
     } catch (err) {
-        res.status(500).send({ err: err.message });
+        console.log(err.message);
     };
 };
 
@@ -71,11 +71,11 @@ const startScraping = async (title) => {
  */
 const postFilmForm = async (req, res) => {
     try {
-        let title = " "
+        let title = " ";
         if (req.body.title.length > 0) {
             title = req.body.title.toLowerCase().trim();
             title = title[0].toUpperCase().concat(title.slice(1));
-        }
+        };
         res.redirect("/search/local/" + title);
     } catch (err) {
         res.status(500).send({ err: err.message });
@@ -171,7 +171,7 @@ const pushApiMovieInMongo = async (req, res) => {
         console.log("Push movie ", answer.title, " to MongoDB");
         res.render("moviesAdmin", { allMovies: [response], admin: req.decoded.admin, nickName: req.decoded.user, avatar: req.decoded.avatar, added: true })
     } catch (err) {
-        console.log(err);
+        res.status(500).json({ err: err.message });
     };
 };
 

@@ -77,9 +77,9 @@ const getASpecificFavorite = async (req, res) => {
     try {
         const title = req.params.title.slice(1);
         const specificMovie = await users.getFavorites(req.decoded.user, title);
-        let notFound;
-        specificMovie.length == 0 ? notFound = "That movie is not among your favorites." : notFound = null;
-        res.status(302).render("search", { path: "/favmovies/specific/", movieOrFavMovie: "Search among your favorites:", userFavMovies: specificMovie, notFound, title: title.slice(1), nickName: req.decoded.user, avatar: req.decoded.avatar });
+        let notFound, status;
+        specificMovie.length == 0 ? (status = 302, notFound = "That movie is not among your favorites.") : (status = 404, notFound = null);
+        res.status(status).render("search", { path: "/favmovies/specific/", movieOrFavMovie: "Search among your favorites:", userFavMovies: specificMovie, notFound, title: title.slice(1), nickName: req.decoded.user, avatar: req.decoded.avatar });
     } catch (err) {
         res.status(500).json({ msj: err.message });
     };

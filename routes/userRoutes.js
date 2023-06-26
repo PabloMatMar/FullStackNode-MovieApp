@@ -8,5 +8,4 @@ userRouter.get('/updtPassword/:errForm', userCrontrolers.renderFormUpdtPassword)
 userRouter.post('/updtAvatar', userCrontrolers.changesAvatar);
 userRouter.post('/updtPassword', userCrontrolers.changesPassword);
 
-
 module.exports = userRouter

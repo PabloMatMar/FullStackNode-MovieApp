@@ -4,5 +4,4 @@ const homeRouter = express.Router();
 
 homeRouter.get('/', homeCrontrolers.getHome);
 
-
 module.exports = homeRouter

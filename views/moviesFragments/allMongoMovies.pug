@@ -1,3 +1,8 @@
+if notFound
+    article(class="card" id="card")
+        p This movie is not in the mongo API 
+        button(class ="css-button-arrow--red" id="search-Not-Found-FavMovie")
+            a(href="../../search/:" + title) Click to search the movie in external API    
 section
     a(href="../movies/createMovie" class='css-button-arrow--red') Add New Movie
 section(class="cardSection")
