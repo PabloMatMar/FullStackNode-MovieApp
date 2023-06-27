@@ -4,7 +4,7 @@ if notFound
         button(class ="css-button-arrow--red" id="search-Not-Found-FavMovie")
             a(href="../../search/:" + title) Click to search the movie in external API    
 section
-    a(href="../movies/createMovie" class='css-button-arrow--red') Add New Movie
+    a(href="../movies/createMovie/form" class='css-button-arrow--red') Add New Movie
 section(class="cardSection")
     each item, i in allMovies
         article(class="card")
@@ -25,4 +25,4 @@ section(class="cardSection")
                 br
                 button(id=`yes${i}` class ="css-button-arrow--red") Yes
                 button(id=`No${i}` class ="css-button-arrow--red") No 
-            a(href="../movies/updateMovie" class="css-button-arrow--red" class="update" id="update" + i) Update
+            a(href="../movies/update/Movie" class="css-button-arrow--red" class="update" id="update" + i) Update

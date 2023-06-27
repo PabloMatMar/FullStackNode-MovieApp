@@ -13,7 +13,7 @@ if (document.querySelector(".burger_menu")) {
 const createMovie = async (movie) => {
   let response = { status: 500 };
   try {
-    response = await fetch('/movies/createMovie', {
+    response = await fetch('/movies/create/Movie', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -47,14 +47,15 @@ const deleteMovie = async (title) => {
 const updateMovie = async (movie) => {
   let response = { status: 500 };
   try {
-    response = await fetch('/movies/updateMovie', {
+    response = await fetch('/movies/update/Movie', {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(movie)
     });
-    location.href = `/movies`;
+    const title = localStorage.getItem("title");
+    location.href = `/movies/:${title}`;
   } catch (err) {
     console.log(err);
   };
