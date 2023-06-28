@@ -167,6 +167,7 @@ if (document.title === "Movies") {
         children[j].addEventListener('click', async e => j == 2 ? await deleteMovie(title.slice(7).trim()) : confirmation.style.display = "none");
     });
 };
+
 //Evento para capturar los datos y llamar a la funcion para crear pelicula a lista de mongo a traves de admin:
 if (document.title == "CreateMovie") {
   document.getElementById("createMovie").addEventListener("click", async (e) => {
@@ -218,14 +219,14 @@ if (document.getElementById("favMovies") != null) {
 
 if (document.title == "search") {
   document.getElementById("search-button").addEventListener("click", e => {
-    let section = document.getElementById("card")
+    let section = document.getElementById("card");
     setTimeout(() => {
       if (section != null)
         while (section.firstChild)
           section.removeChild(section.firstChild);
       else {
         section = document.getElementById("spinner");
-        section.setAttribute('class', 'card')
+        section.setAttribute('class', 'card');
       }
       const spinner = document.createElement("img");
       section.appendChild(spinner);

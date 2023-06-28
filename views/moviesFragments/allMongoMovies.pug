@@ -6,6 +6,8 @@ if notFound
 section
     a(href="../movies/createMovie/form" class='css-button-arrow--red') Add New Movie
 section(class="cardSection")
+    if noMovie
+        include ../searchFragments/noMovie.pug
     each item, i in allMovies
         article(class="card")
             h3(id="title" + i)  Title: #{allMovies[i].title}

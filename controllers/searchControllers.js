@@ -8,13 +8,14 @@ require('dotenv').config();
 const Movies = require('../models/moviesMongo');
 const Users = require('../models/users_sql');
 const scraper = require('../utils/scraper');
+const categoriesToExclude = require('./excludes.json');
 const { API_KEY } = process.env;
 let movieToPush = {};
 
 /**
  * Description: This function renders the search view.
  * @memberof  searchControllers
- * @method  getSearch
+ * @method  renderSearchView
  * @async 
  * @param {Object} req - HTTP request.
  * @param {Object} res - HTTP response.
@@ -28,7 +29,7 @@ let movieToPush = {};
  * @property {function} res.status.send - Send a json to error message.
  */
 
-const getSearch = (req, res) => {
+const renderSearchView = (req, res) => {
     try {
         res.render("search", { movieOrFavMovie: "Write the full title of the movie/serie:", path: "/search", admin: req.decoded.admin, nickName: req.decoded.user, avatar: req.decoded.avatar });
     } catch (err) {
@@ -86,7 +87,7 @@ const postFilmForm = async (req, res) => {
 /**
  * Description: Find the movie in mongo. If it finds it, it redirects the search to the api.
  * @memberof searchControllers
- * @method getSearchForTitleInMongo 
+ * @method searchMovieInMongoApi 
  * @async 
  * @param {Object} req - HTTP request.
  * @param {Object} res - HTTP response.
@@ -103,7 +104,7 @@ const postFilmForm = async (req, res) => {
  * @throws {Error} message with the error during the search process.
  */
 
-const getSearchForTitleInMongo = async (req, res) => {
+const searchMovieInMongoApi = async (req, res) => {
     try {
         let isFav = false;
         if (!req.decoded.admin) {
@@ -119,9 +120,9 @@ const getSearchForTitleInMongo = async (req, res) => {
 };
 
 /**
- * Description: This function saves in mongo the movie(and scraped) found in the external api.
+ * Description: This auxiliar function saves in mongo the movie(and scraped) found in the external api.
  * @memberof searchControllers
- * @method insertApiMovieInMongo
+ * @method AutomaticMigration
  * @async 
  * @param {object} movie - Movie and reviews values to send mongo to create a movie.
  * @property {function} Movies - Method that caugth mongo schema to insert a movie in mongo.
@@ -131,11 +132,15 @@ const getSearchForTitleInMongo = async (req, res) => {
  */
 
 
-const insertApiMovieInMongo = async (movie) => {
+const AutomaticMigration = async (movie) => {
     try {
-        const response = await new Movies(movie);
-        const answer = await response.save();
-        console.log("Push movie ", answer, " to MongoDB");
+        const isInMongo = await Movies.find({ title: movie.title });
+        if (isInMongo.length == 0) {
+            const response = await new Movies(movie);
+            const answer = await response.save();
+            console.log("Push movie ", answer, " to MongoDB");
+        } else
+            console.log("The user has not searched for the movie by the original title");
     } catch (err) {
         console.log(err);
     };
@@ -144,7 +149,7 @@ const insertApiMovieInMongo = async (movie) => {
 /**
  * Description: This function saves in mongo the movie (and scraped) found in the external api and render the moviesAdmin view.
  * @memberof searchControllers
- * @method pushApiMovieInMongo
+ * @method pushMigration
  * @async
  * @param {Object} req - HTTP request.
  * @param {Object} res - HTTP response.
@@ -161,15 +166,20 @@ const insertApiMovieInMongo = async (movie) => {
  * @throws {Error} console.log message with the error during the save process.
  */
 
-const pushApiMovieInMongo = async (req, res) => {
+const pushMigration = async (req, res) => {
     try {
-        const response = await new Movies(movieToPush);
-        const answer = await response.save();
-        movieToPush = {};
-        delete response._doc.__v;
-        delete response._doc._id;
-        console.log("Push movie ", answer.title, " to MongoDB");
-        res.render("moviesAdmin", { allMovies: [response], admin: req.decoded.admin, nickName: req.decoded.user, avatar: req.decoded.avatar, added: true })
+        let response = [];
+        const isInMongo = await Movies.find({ title: movieToPush.title });
+        if (isInMongo.length == 0) {
+            response = await new Movies(movieToPush.movie);
+            const answer = await response.save();
+            movieToPush = {};
+            delete response._doc.__v;
+            delete response._doc._id;
+            console.log("Push movie ", answer.title, " to MongoDB");
+            res.render("moviesAdmin", { allMovies: [response], admin: req.decoded.admin, nickName: req.decoded.user, avatar: req.decoded.avatar, added: true })
+        } else
+            res.status().redirect(`../movies/:${movieToPush.title}`)
     } catch (err) {
         res.status(500).json({ err: err.message });
     };
@@ -178,7 +188,7 @@ const pushApiMovieInMongo = async (req, res) => {
 /**
  * Description: This function search de movie in api.
  * @memberof searchControllers
- * @method getSearchForTitle
+ * @method searchMovieInExternalApi
  * @async 
  * @param {Object} req - HTTP request.
  * @param {Object} res - HTTP response.
@@ -190,7 +200,7 @@ const pushApiMovieInMongo = async (req, res) => {
  * @func startScraping - Call to the function that initiates the scrapping. Receives as argument the title of the movie.
  * @property {Object} scrappingCritics - The reviews obtained in the scraped. Value of property is an Array.
  * @property {Object} categories - It contains the properties and values ​​of the movie from the api but correcting the bad practice in the naming of the properties without camel case.
- * @func pushApiMovieInMongo - Call to the function that saves the movie from the api plus the scrapping reviews in mongo
+ * @func pushMigration - Call to the function that saves the movie from the api plus the scrapping reviews in mongo
  * @property {Object} categories - The values send to render.
  * @property {string} Title - The value of the title property is passed to lower case to unify searches once it is saved in mongo
  * @property {Array} exclude - Array with the categories that the pug loop should not render.
@@ -203,24 +213,25 @@ const pushApiMovieInMongo = async (req, res) => {
  * @throws {Error} message with the error during the search process
  */
 
-const getSearchForTitle = async (req, res) => {
+const searchMovieInExternalApi = async (req, res) => {
     try {
+        let categoriesMovie;
         const resp = await fetch(`http://www.omdbapi.com/?t=${req.params.title}&apikey=` + API_KEY);
-        const categoriesMovie = await resp.json();
-        if (categoriesMovie.Error != 'Movie not found!') {
-            console.log("FIND MOVIE IN API");
+        if (resp.status == 200)
+            categoriesMovie = await resp.json();
+        if (resp.status == 200 && categoriesMovie.Error != 'Movie not found!') {
             const scrapingCritics = { "critics": await startScraping(categoriesMovie.Title) }
             const categories = {};
             Object
                 .keys(categoriesMovie)
                 .map((_, i, arrOfKeys) => {
                     arrOfKeys[i] == 'Title' ? categories[arrOfKeys[i].toLowerCase()] = categoriesMovie[arrOfKeys[i]][0].concat(categoriesMovie[arrOfKeys[i]].slice(1).toLowerCase()) : categories[arrOfKeys[i].toLowerCase()] = categoriesMovie[arrOfKeys[i]];
-                    if (arrOfKeys[i] == 'totalSeasons') // If is a serie
-                        categories.year = Number(categoriesMovie.totalSeasons)
+                    if (arrOfKeys[i] == 'totalSeasons')// If is a serie
+                        isNaN(Number(categoriesMovie.totalSeasons)) ? categories.year = 10 : categories.year = Number(categoriesMovie.totalSeasons);
                 });
             // Mongo Saves movie and scraping
-            !req.decoded.admin ? insertApiMovieInMongo({ ...categories, ...scrapingCritics }) : movieToPush = { ...categories, ...scrapingCritics };
-            res.status(200).render("search", { categories: { ...categories, ...scrapingCritics }, excludes: ['rated', 'released', 'writer', 'awards', 'ratings', 'metascore', 'imdbrating', 'imdbvotes', 'imdbid', 'type', 'dvd', 'boxoffice', 'production', 'response', 'website', 'poster', 'critics', 'poster', 'country', 'totalseasons'], path: "/search/", admin: req.decoded.admin, nickName: req.decoded.user, avatar: req.decoded.avatar, addToMongo: req.decoded.admin });
+            !req.decoded.admin ? AutomaticMigration({ ...categories, ...scrapingCritics }) : movieToPush = { movie: { ...categories, ...scrapingCritics }, title: categories.title };
+            res.status(200).render("search", { categories: { ...categories, ...scrapingCritics }, excludes: categoriesToExclude, path: "/search/", admin: req.decoded.admin, nickName: req.decoded.user, avatar: req.decoded.avatar, addToMongo: req.decoded.admin });
         } else
             res.render("search", { noMovie: true, path: "/search/", admin: req.decoded.admin, nickName: req.decoded.user, avatar: req.decoded.avatar });
     } catch (err) {
@@ -229,10 +240,10 @@ const getSearchForTitle = async (req, res) => {
 };
 
 module.exports = {
-    getSearch,
-    getSearchForTitle,
+    renderSearchView,
     postFilmForm,
-    getSearchForTitleInMongo,
+    searchMovieInExternalApi,
+    searchMovieInMongoApi,
     startScraping,
-    pushApiMovieInMongo
+    pushMigration
 }
