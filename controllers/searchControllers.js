@@ -122,7 +122,7 @@ const searchMovieInMongoApi = async (req, res) => {
 /**
  * Description: This auxiliar function saves in mongo the movie(and scraped) found in the external api.
  * @memberof searchControllers
- * @method AutomaticMigration
+ * @method automaticMigration
  * @async 
  * @param {object} movie - Movie and reviews values to send mongo to create a movie.
  * @property {function} Movies - Method that caugth mongo schema to insert a movie in mongo.
@@ -132,15 +132,14 @@ const searchMovieInMongoApi = async (req, res) => {
  */
 
 
-const AutomaticMigration = async (movie) => {
+const automaticMigration = async (movie) => {
     try {
         const isInMongo = await Movies.find({ title: movie.title });
         if (isInMongo.length == 0) {
             const response = await new Movies(movie);
             const answer = await response.save();
             console.log("Push movie ", answer, " to MongoDB");
-        } else
-            console.log("The user has not searched for the movie by the original title");
+        };
     } catch (err) {
         console.log(err);
     };
@@ -177,7 +176,7 @@ const pushMigration = async (req, res) => {
             delete response._doc.__v;
             delete response._doc._id;
             console.log("Push movie ", answer.title, " to MongoDB");
-            res.render("moviesAdmin", { allMovies: [response], admin: req.decoded.admin, nickName: req.decoded.user, avatar: req.decoded.avatar, added: true })
+            res.render("moviesAdmin", { allMovies: [response], added: true, admin: req.decoded.admin, nickName: req.decoded.user, avatar: req.decoded.avatar })
         } else
             res.status().redirect(`../movies/:${movieToPush.title}`)
     } catch (err) {
@@ -220,18 +219,26 @@ const searchMovieInExternalApi = async (req, res) => {
         if (resp.status == 200)
             categoriesMovie = await resp.json();
         if (resp.status == 200 && categoriesMovie.Error != 'Movie not found!') {
-            const scrapingCritics = { "critics": await startScraping(categoriesMovie.Title) }
-            const categories = {};
-            Object
-                .keys(categoriesMovie)
-                .map((_, i, arrOfKeys) => {
-                    arrOfKeys[i] == 'Title' ? categories[arrOfKeys[i].toLowerCase()] = categoriesMovie[arrOfKeys[i]][0].concat(categoriesMovie[arrOfKeys[i]].slice(1).toLowerCase()) : categories[arrOfKeys[i].toLowerCase()] = categoriesMovie[arrOfKeys[i]];
-                    if (arrOfKeys[i] == 'totalSeasons')// If is a serie
-                        isNaN(Number(categoriesMovie.totalSeasons)) ? categories.year = 10 : categories.year = Number(categoriesMovie.totalSeasons);
-                });
-            // Mongo Saves movie and scraping
-            !req.decoded.admin ? AutomaticMigration({ ...categories, ...scrapingCritics }) : movieToPush = { movie: { ...categories, ...scrapingCritics }, title: categories.title };
-            res.status(200).render("search", { categories: { ...categories, ...scrapingCritics }, excludes: categoriesToExclude, path: "/search/", admin: req.decoded.admin, nickName: req.decoded.user, avatar: req.decoded.avatar, addToMongo: req.decoded.admin });
+            categoriesMovie.Title = categoriesMovie.Title[0].toUpperCase()
+                .concat(categoriesMovie.Title.slice(1).toLowerCase());
+            const movie = await Movies.find({ title: categoriesMovie.Title }, { _id: 0, __v: 0 });
+            if (movie.length > 0)
+                res.redirect("/search/local/" + categoriesMovie.Title);
+            else {
+                const scrapingCritics = { "critics": await startScraping(categoriesMovie.Title) };
+                const categories = {};
+                Object
+                    .keys(categoriesMovie)
+                    .map((_, i, arrOfKeys) => {
+                        categories[arrOfKeys[i].toLowerCase()] = categoriesMovie[arrOfKeys[i]];
+                        if (arrOfKeys[i] == 'totalSeasons')// If is a serie
+                            isNaN(Number(categoriesMovie.totalSeasons)) ? categories.year = 10 : categories.year = Number(categoriesMovie.totalSeasons);
+                    });
+                console.log(categories);
+                // Mongo Saves movie and scraping
+                !req.decoded.admin ? automaticMigration({ ...categories, ...scrapingCritics }) : movieToPush = { movie: { ...categories, ...scrapingCritics }, title: categories.title };
+                res.status(200).render("search", { categories: { ...categories, ...scrapingCritics }, excludes: categoriesToExclude, path: "/search/", admin: req.decoded.admin, nickName: req.decoded.user, avatar: req.decoded.avatar, addToMongo: req.decoded.admin });
+            };
         } else
             res.render("search", { noMovie: true, path: "/search/", admin: req.decoded.admin, nickName: req.decoded.user, avatar: req.decoded.avatar });
     } catch (err) {
