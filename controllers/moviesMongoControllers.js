@@ -4,7 +4,8 @@
  * @namespace moviesMongoControllers
  */
 
-const Movies = require('../models/moviesMongo')
+const Movies = require('../models/moviesMongo');
+const auxiliarFunctions = require('../controllers/auxiliarFunctions');
 /**
  * Description: This function gets all the movies in the database.
  * @memberof moviesMongoControllers
@@ -34,7 +35,7 @@ const capturingFormData = async (req, res) => {
         let title = " ";
         if (req.body.title.length > 0) {
             title = req.body.title.toLowerCase().trim();
-            title = title[0].toUpperCase().concat(title.slice(1));
+            title = auxiliarFunctions.titleFormat(title);
         };
         res.redirect("/movies/:" + title);
     } catch (err) {
@@ -96,6 +97,7 @@ const getFormMovie = (req, res) => {
 
 const createMovie = async (req, res) => {
     try {
+        req.body.title = auxiliarFunctions.titleFormat(req.body.title);
         const response = await new Movies(req.body);
         const answer = await response.save();
         res.status(201).json({ "msj": `The movie with title ${answer.title} has been added to mongodb`, movie: answer });

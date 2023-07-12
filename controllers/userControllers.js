@@ -8,6 +8,7 @@ const { SECRET } = process.env;
 const bcrypt = require('bcrypt');
 const users = require('../models/users_sql');
 const jwt = require('jsonwebtoken');
+const auxiliarFunctions = require('../controllers/auxiliarFunctions');
 
 
 /**
@@ -65,7 +66,7 @@ const capturingFormData = async (req, res) => {
         let title = " "
         if (req.body.title.length > 0) {
             title = req.body.title.toLowerCase().trim();
-            title = title[0].toUpperCase().concat(title.slice(1));
+            title = auxiliarFunctions.titleFormat(title);
         };
         res.redirect("/favmovies/: " + title);
     } catch (err) {

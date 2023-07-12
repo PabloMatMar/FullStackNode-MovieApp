@@ -10,9 +10,10 @@ if noMovie
     include ../searchFragments/noMovie.pug  
 each film, i in userFavMovies                     
     article(class='card')
+        h3(id="title" + i) #{userFavMovies[i].title}
         img(src=userFavMovies[i].poster class="poster")
         each val, key in userFavMovies[i]
-            if key != 'poster' && val != null
+            if key != 'poster' && key != 'title' && val != null
                 if key == 'year' && val < 99
                     p(id=key)= 'Total Seasons: ' + val
                 else

@@ -1,4 +1,5 @@
 section(class="card" id="card")
+    h3(id="title") #{categories.title}
     img(id="poster" src=categories.poster)
     each val, key in categories
         if !excludes.includes(key) && val != 'N/A'

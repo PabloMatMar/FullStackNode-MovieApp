@@ -8,6 +8,7 @@ require('dotenv').config();
 const Movies = require('../models/moviesMongo');
 const Users = require('../models/users_sql');
 const scraper = require('../utils/scraper');
+const auxiliarFunctions = require('../controllers/auxiliarFunctions');
 const categoriesToExclude = require('./excludes.json');
 const { API_KEY } = process.env;
 let movieToPush = {};
@@ -75,7 +76,7 @@ const postFilmForm = async (req, res) => {
         let title = " ";
         if (req.body.title.length > 0) {
             title = req.body.title.toLowerCase().trim();
-            title = title[0].toUpperCase().concat(title.slice(1));
+            title = auxiliarFunctions.titleFormat(title);
         };
         res.redirect("/search/local/" + title);
     } catch (err) {
@@ -113,7 +114,7 @@ const searchMovieInMongoApi = async (req, res) => {
                 isFav = true;
         };
         const movie = await Movies.find({ title: req.params.title }, { _id: 0, __v: 0 });
-        movie[0] != undefined ? res.status(200).render("search", { categories: { ...movie[0] }._doc, excludes: ['poster', 'critics'], path: "/search/", isFav, admin: req.decoded.admin, nickName: req.decoded.user, avatar: req.decoded.avatar }) : res.redirect("/search/" + req.params.title);
+        movie[0] != undefined ? res.status(200).render("search", { categories: { ...movie[0] }._doc, excludes: ['title' ,'poster', 'critics'], path: "/search/", isFav, admin: req.decoded.admin, nickName: req.decoded.user, avatar: req.decoded.avatar }) : res.redirect("/search/" + req.params.title);
     } catch (err) {
         res.status(500).send({ err: err.message });
     };
@@ -219,8 +220,7 @@ const searchMovieInExternalApi = async (req, res) => {
         if (resp.status == 200)
             categoriesMovie = await resp.json();
         if (resp.status == 200 && categoriesMovie.Error != 'Movie not found!') {
-            categoriesMovie.Title = categoriesMovie.Title[0].toUpperCase()
-                .concat(categoriesMovie.Title.slice(1).toLowerCase());
+            categoriesMovie.Title = auxiliarFunctions.titleFormat(categoriesMovie.Title);
             const movie = await Movies.find({ title: categoriesMovie.Title }, { _id: 0, __v: 0 });
             if (movie.length > 0)
                 res.redirect("/search/local/" + categoriesMovie.Title);

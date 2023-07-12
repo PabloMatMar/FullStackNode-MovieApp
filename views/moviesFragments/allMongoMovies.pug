@@ -10,14 +10,14 @@ section(class="cardSection")
         include ../searchFragments/noMovie.pug
     each item, i in allMovies
         article(class="card")
-            h3(id="title" + i)  Title: #{allMovies[i].title}
+            h3(id="title" + i) #{allMovies[i].title}
             img(src=allMovies[i].poster  class="poster")
             each val, key in allMovies[i]._doc
                 if key != 'title' && key != 'poster' && key != 'critics' && val != 'N/A'
                     if key == 'year' && val < 99
                         p(id=key)= 'Total Seasons: ' + val
                     else
-                        p(id=key)= key.split('').map((e,i)=> i==0 ? e.toUpperCase(): e).join('') + ': ' + val
+                        p(id=key)= key.split('').map((e,i)=> i==0 ? e.toUpperCase() : e).join('') + ': ' + val
                 if key == 'critics'
                     each item , j in allMovies[i].critics
                         p Filmaffinity Review: #{allMovies[i].critics[j].Critics}

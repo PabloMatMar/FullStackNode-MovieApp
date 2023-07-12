@@ -175,7 +175,7 @@ if (document.title == "CreateMovie") {
     const form = document.querySelector(".createMovie").elements;
     const data = {};
     for (let input of form)
-      input.name == 'title' ? data[input.name] = input.value[0].toUpperCase().concat(input.value.slice(1).toLowerCase()) : data[input.name] = input.value;
+      data[input.name] = input.value;
     await createMovie(data);
   });
 };
