@@ -7,7 +7,8 @@
     "test": "jest",
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "generate-docs": "jsdoc -c ./jsdoc.json"
+    "generate-docs": "jsdoc -c ./jsdoc.json",
+    "changesFieldInDB": "node apiCorrections/apiMongoChanges.js"
   },
   "repository": {
     "type": "git",
