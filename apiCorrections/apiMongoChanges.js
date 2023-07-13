@@ -22,7 +22,6 @@ mongoose
     .then(() => console.log('mongodb connection success'))
     .catch((error) => console.log(error));
 
-changesFieldInMovies().then(() => {
-    mongoose.connection.close();
-    console.log('closed connection');
-});
+changesFieldInMovies()
+    .then(() => mongoose.connection.close())
+    .then(() => console.log('closed connection'));

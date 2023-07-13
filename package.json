@@ -8,7 +8,8 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "generate-docs": "jsdoc -c ./jsdoc.json",
-    "changesFieldInDB": "node apiCorrections/apiMongoChanges.js"
+    "changesFieldInDB": "node apiCorrections/apiMongoChanges.js",
+    "changesRow": "node apiCorrections/apiSQLChanges.js"
   },
   "repository": {
     "type": "git",

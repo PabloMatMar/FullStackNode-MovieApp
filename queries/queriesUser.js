@@ -41,15 +41,10 @@ const queries = {
     updtPassword:`
     UPDATE users
     SET password = $2
-    WHERE email = $1`,
+    WHERE email = $1;`,
     getAvatar:`
     SELECT avatar
     FROM users
-    WHERE email = $1`,
-    // editSQL:`
-    // UPDATE users
-    // SET email = prueba01@gmail.com
-    // WHERE password = Prueba001@gmail.com;
-    // `
+    WHERE email = $1;`,
 }
 module.exports = queries;
