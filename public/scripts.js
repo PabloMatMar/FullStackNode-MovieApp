@@ -103,20 +103,12 @@ const deleteFavMovie = async (data) => {
     alert("The movie " + data.title + " could not be deleted from favorites list, you probably have already deleted it, refresh the page to check it.");
 };
 
-//Ruta para renderizar mensajes en los intentos de registro:
-const renderFails = async (param, path) => {
-  try {
-    location.href = path + JSON.stringify(param);
-  } catch (err) {
-    console.log(err);
-  };
-};
-
 //Eventos para capturar los datos de los formularios
 
-if (document.getElementById("singup") != null) {
+if (document.getElementById("signup") != null) {
+  console.log("Estoy aqui");
   //validacion de la contraseña y el usuario cuando se registra:
-  document.querySelector("form.signup").addEventListener("submit", (event) => {
+  document.querySelector("form.signup").addEventListener("submit", event => {
     event.preventDefault(); // parar envío
     let errs = [0, 0, 0, 0];
     if (event.target.passwordSignup.value != event.target.password2Signup.value)
@@ -127,7 +119,7 @@ if (document.getElementById("singup") != null) {
       errs[2] = 1;
     if (event.target.avatar.value != null && !/.*(jpg|png|jpeg|gif)$/.test(event.target.avatar.value))
       errs[3] = 1;
-    errs.find(e => e == 1) == 1 ? renderFails(JSON.stringify(errs), "/signup/:") : event.target.submit();
+    errs.find(e => e == 1) == 1 ? location.href = `/signup/:${JSON.stringify(errs)}` : event.target.submit();
   });
 };
 
@@ -259,7 +251,7 @@ if (document.getElementById("updtAvatar") != null) {
       errs[1] = 1;
     if (e.target.avatar.value.length != 0 && !/.*(jpg|png|jpeg|gif)$/.test(e.target.avatar.value))
       errs[3] = 1;
-    errs.find(e => e == 1) == 1 ? renderFails(JSON.stringify(errs), "/user/updtAvatar/:") : e.target.submit();
+    errs.find(e => e == 1) == 1 ? location.href = `/user/updtAvatar/:${JSON.stringify(errs)}` : e.target.submit();
   });
 };
 
@@ -275,6 +267,22 @@ if (document.getElementById("updtPassword") != null) {
       errs[1] = 1;
     if (!(/^(?=\w*\d)(?=\w*[A-Z])(?=\w*[a-z])\S{6,16}$/.test(e.target.oldPassword.value)))
       errs[1] = 1;
-    errs.find(e => e == 1) == 1 ? renderFails(JSON.stringify(errs), "/user/updtPassword/:") : e.target.submit();
+    errs.find(e => e == 1) == 1 ? location.href = `/user/updtPassword/:${JSON.stringify(errs)}` : e.target.submit();
   });
 };
+
+//Evento para capturar los datos asi como los errores en el proceso de eliminacion de un usuario
+
+if (document.getElementById("deleteUser") != null) {
+  document.querySelector("form.deleteUser").addEventListener("submit", e => {
+    e.preventDefault();
+    let errs = [0, 0, 0, 0];
+    if (!(/^(?=\w*\d)(?=\w*[A-Z])(?=\w*[a-z])\S{6,16}$/.test(e.target.password.value)))
+      errs[1] = 1;
+    if (!(/^[a-zA-Z0-9_.]+@[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*[.][a-zA-Z]{2,3}/.test(e.target.email.value)))
+      errs[2] = 1;
+    errs.find(e => e == 1) == 1 ? location.href = `/user/deleteUser/:${JSON.stringify(errs)}` : e.target.submit();
+  });
+};
+
+

@@ -1,5 +1,4 @@
 const pool = require('../utils/pg_pool');
-const queries = require('../queries/queriesUser');
 
 const changes = async () => {
     let client;

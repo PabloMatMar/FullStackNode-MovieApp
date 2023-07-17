@@ -1,0 +1,18 @@
+if errsForm
+    include ./errsForm.pug
+if passwordError
+    section
+        h4 The user has not been deleted because the password or email entered is not correct.
+section 
+    fieldset
+        form(action="/user/deleteUser" method="post" class="deleteUser")
+            legend Email
+            input(type="text" name="email" required)
+            |
+            |
+            legend Password
+            input(type="text" name="password" required)
+            |
+            |
+            br
+            input(type="submit" id="deleteUser" value="Delete user")

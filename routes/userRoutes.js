@@ -1,11 +1,13 @@
 const express = require('express');
-const userCrontrolers = require('../controllers/userControllers');
+const userCrontollers = require('../controllers/userControllers');
 const userRouter = express.Router();
 
-userRouter.get('/', userCrontrolers.renderUserView);
-userRouter.get('/updtAvatar/:errForm', userCrontrolers.renderFormUpdtAvatar);
-userRouter.get('/updtPassword/:errForm', userCrontrolers.renderFormUpdtPassword);
-userRouter.post('/updtAvatar', userCrontrolers.changesAvatar);
-userRouter.post('/updtPassword', userCrontrolers.changesPassword);
+userRouter.get('/', userCrontollers.renderUserView);
+userRouter.get('/updtAvatar/:errForm', userCrontollers.renderFormUpdtAvatar);
+userRouter.get('/updtPassword/:errForm', userCrontollers.renderFormUpdtPassword);
+userRouter.get('/deleteUser/:errForm', userCrontollers.renderFormDeleteUser);
+userRouter.post('/updtAvatar', userCrontollers.changesAvatar);
+userRouter.post('/updtPassword', userCrontollers.changesPassword);
+userRouter.post('/deleteUser', userCrontollers.deleteUser);
 
 module.exports = userRouter

@@ -46,5 +46,10 @@ const queries = {
     SELECT avatar
     FROM users
     WHERE email = $1;`,
+    deleteUser: `
+    DELETE
+    FROM users AS u
+    WHERE email = $1;
+    `
 }
 module.exports = queries;

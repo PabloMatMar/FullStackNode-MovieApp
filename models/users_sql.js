@@ -239,6 +239,32 @@ const changesPassword = async (email, newPassword, oldPassword) => {
     return data.rowCount;
 };
 
+const deleteUser = async (email, password) => {
+    let client;
+    let data = {
+        rowCount: 0
+    };
+    try {
+        client = await pool.connect();
+        const userDatas = await client.query(queries.getUserData, [email]);
+        console.log(userDatas);
+        const isPasswordCorrect = await bcrypt.compare(password, userDatas.rows[0].password);
+        if (isPasswordCorrect)
+            data = await client.query(queries.deleteFavorite, [email]);
+        if (data.rowCount == 1)
+            data = {
+                rowCount: 1
+            };
+    } catch (err) {
+        console.log(err);
+        throw err;
+    } finally {
+        client.release();
+    };
+    return data.rowCount;
+
+};
+
 const users = {
     addFavorite,
     getFavorites,
@@ -246,7 +272,8 @@ const users = {
     createUser,
     validatedUser,
     changesAvatar,
-    changesPassword
+    changesPassword,
+    deleteUser
 }
 
 module.exports = users;

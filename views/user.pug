@@ -7,6 +7,8 @@ body
             include ./userFragments/updtAvatar.pug
         else if updtPassword
             include ./userFragments/updtPassword.pug
+        else if deleteUser
+            include ./userFragments/deleteUser.pug
         else
             include ./userFragments/updtButtons.pug
         if updtPasswordWasOk

@@ -247,7 +247,9 @@ const renderUserView = (req, res) => {
 
 const renderFormUpdtAvatar = (req, res) => {
     try {
-        req.params.errForm == ':' ? res.render("user", { updtAvatar: true, nickName: req.decoded.user, avatar: req.decoded.avatar }) : res.render("user", { updtAvatar: true, errsForm: JSON.parse(req.params.errForm.slice(1)), nickName: req.decoded.user, avatar: req.decoded.avatar })
+        let errsForm;
+        req.params.errForm == ':' ? errsForm = false : errsForm = JSON.parse(req.params.errForm.slice(1));
+        res.render("user", { updtAvatar: true, errsForm, nickName: req.decoded.user, avatar: req.decoded.avatar })
     } catch (err) {
         res.status(500).json({ msj: err.message });
     };
@@ -255,7 +257,19 @@ const renderFormUpdtAvatar = (req, res) => {
 
 const renderFormUpdtPassword = (req, res) => {
     try {
-        req.params.errForm == ':' ? res.render("user", { updtPassword: true, nickName: req.decoded.user, avatar: req.decoded.avatar }) : res.render("user", { updtPassword: true, errsForm: JSON.parse(req.params.errForm.slice(1)), nickName: req.decoded.user, avatar: req.decoded.avatar })
+        let errsForm;
+        req.params.errForm == ':' ? errsForm = false : errsForm = JSON.parse(req.params.errForm.slice(1));
+        res.render("user", { updtPassword: true, errsForm, nickName: req.decoded.user, avatar: req.decoded.avatar })
+    } catch (err) {
+        res.status(500).json({ msj: err.message });
+    };
+};
+
+const renderFormDeleteUser = (req, res) => {
+    try {
+        let errsForm;
+        req.params.errForm == ':' ? errsForm = false : errsForm = JSON.parse(req.params.errForm.slice(1));
+        res.render("user", { deleteUser: true, errsForm, nickName: req.decoded.user, avatar: req.decoded.avatar })
     } catch (err) {
         res.status(500).json({ msj: err.message });
     };
@@ -286,6 +300,18 @@ const changesPassword = async (req, res) => {
     };
 };
 
+const deleteUser = async (req, res) => {
+    try {
+        let isNotYourUser, response;
+        req.body.email == req.decoded.user ? isNotYourUser = false : isNotYourUser = true;
+        if (isNotYourUser)
+            response = await users.deleteUser(req.body.email, req.body.password);
+        response == 1 ? res.render("home") :  res.render("user", { deleteUser: true, passwordError: true, nickName: req.decoded.user, avatar: req.decoded.avatar });
+    } catch (err) {
+        res.status(500).json({ msj: err.message });
+    };
+};
+
 
 module.exports = {
     addFavorite,
@@ -299,7 +325,9 @@ module.exports = {
     validatedUser,
     changesAvatar,
     changesPassword,
+    deleteUser,
     renderUserView,
     renderFormUpdtAvatar,
-    renderFormUpdtPassword
+    renderFormUpdtPassword,
+    renderFormDeleteUser
 }
