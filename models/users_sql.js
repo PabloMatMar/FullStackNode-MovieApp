@@ -223,13 +223,10 @@ const changesPassword = async (email, newPassword, oldPassword) => {
     try {
         client = await pool.connect();
         const userDatas = await client.query(queries.getUserData, [email]);
+        console.log(userDatas);
         const isPasswordCorrect = await bcrypt.compare(oldPassword, userDatas.rows[0].password);
         if (isPasswordCorrect)
             data = await client.query(queries.updtPassword, [email, newPassword]);
-        if (data.rowCount == 1)
-            data = {
-                rowCount: 1
-            };
     } catch (err) {
         console.log(err);
         throw err;
@@ -247,14 +244,11 @@ const deleteUser = async (email, password) => {
     try {
         client = await pool.connect();
         const userDatas = await client.query(queries.getUserData, [email]);
-        console.log(userDatas);
         const isPasswordCorrect = await bcrypt.compare(password, userDatas.rows[0].password);
-        if (isPasswordCorrect)
-            data = await client.query(queries.deleteFavorite, [email]);
-        if (data.rowCount == 1)
-            data = {
-                rowCount: 1
-            };
+        if (isPasswordCorrect) {
+            await client.query(queries.deleteFavMovies, [email]);
+            data = await client.query(queries.deleteUser, [email]);
+        };
     } catch (err) {
         console.log(err);
         throw err;

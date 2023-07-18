@@ -234,7 +234,6 @@ const searchMovieInExternalApi = async (req, res) => {
                         if (arrOfKeys[i] == 'totalSeasons')// If is a serie
                             isNaN(Number(categoriesMovie.totalSeasons)) ? categories.year = 10 : categories.year = Number(categoriesMovie.totalSeasons);
                     });
-                console.log(categories);
                 // Mongo Saves movie and scraping
                 !req.decoded.admin ? automaticMigration({ ...categories, ...scrapingCritics }) : movieToPush = { movie: { ...categories, ...scrapingCritics }, title: categories.title };
                 res.status(200).render("search", { categories: { ...categories, ...scrapingCritics }, excludes: categoriesToExclude, path: "/search/", admin: req.decoded.admin, nickName: req.decoded.user, avatar: req.decoded.avatar, addToMongo: req.decoded.admin });

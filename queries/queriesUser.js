@@ -41,14 +41,21 @@ const queries = {
     updtPassword:`
     UPDATE users
     SET password = $2
-    WHERE email = $1;`,
+    WHERE email = $1;
+    `,
     getAvatar:`
     SELECT avatar
     FROM users
-    WHERE email = $1;`,
+    WHERE email = $1;
+    `,
+    deleteFavMovies: `
+    DELETE
+    FROM favorites
+    WHERE emailFK = $1;
+    `,
     deleteUser: `
     DELETE
-    FROM users AS u
+    FROM users
     WHERE email = $1;
     `
 }

@@ -106,7 +106,6 @@ const deleteFavMovie = async (data) => {
 //Eventos para capturar los datos de los formularios
 
 if (document.getElementById("signup") != null) {
-  console.log("Estoy aqui");
   //validacion de la contraseña y el usuario cuando se registra:
   document.querySelector("form.signup").addEventListener("submit", event => {
     event.preventDefault(); // parar envío
@@ -117,7 +116,7 @@ if (document.getElementById("signup") != null) {
       errs[1] = 1;
     if (!(/^[a-zA-Z0-9_.]+@[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*[.][a-zA-Z]{2,3}/.test(event.target.emailSignup.value)))
       errs[2] = 1;
-    if (event.target.avatar.value != null && !/.*(jpg|png|jpeg|gif)$/.test(event.target.avatar.value))
+    if (event.target.avatar.value.length != 0 && !/.*(jpg|png|jpeg|gif)$/.test(event.target.avatar.value))
       errs[3] = 1;
     errs.find(e => e == 1) == 1 ? location.href = `/signup/:${JSON.stringify(errs)}` : event.target.submit();
   });
@@ -131,7 +130,6 @@ if (document.title == "Movies") {
     document.getElementById(`update${i}`).addEventListener('click', async (e) => {
       e.preventDefault;
       let title = document.getElementById(`title${i}`).innerHTML;
-      title = title.slice(7).trim();
       localStorage.setItem("title", title);
     });
 };
@@ -156,7 +154,7 @@ if (document.title === "Movies") {
       confirmation.style.display = "block";
       const children = confirmation.childNodes;
       for (let j = 0; j < children.length; j++)
-        children[j].addEventListener('click', async e => j == 2 ? await deleteMovie(title.slice(7).trim()) : confirmation.style.display = "none");
+        children[j].addEventListener('click', async e => j == 2 ? await deleteMovie(title) : confirmation.style.display = "none");
     });
 };
 
@@ -196,7 +194,7 @@ if (document.getElementById("favMovies") != null) {
       e.preventDefault;
       const title = document.getElementById(`title${i}`).innerHTML;
       const data = {
-        title: title.slice(7)
+        title: title
       };
       const confirmation = document.getElementById(`confirmation${i}`);
       confirmation.style.display = "block";
@@ -281,7 +279,15 @@ if (document.getElementById("deleteUser") != null) {
       errs[1] = 1;
     if (!(/^[a-zA-Z0-9_.]+@[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*[.][a-zA-Z]{2,3}/.test(e.target.email.value)))
       errs[2] = 1;
-    errs.find(e => e == 1) == 1 ? location.href = `/user/deleteUser/:${JSON.stringify(errs)}` : e.target.submit();
+    if (errs.find(e => e == 1) == 1)
+      location.href = `/user/deleteUser/:${JSON.stringify(errs)}`
+    else {
+      const confirmation = document.getElementById('confirmation');
+      confirmation.style.display = "block";
+      const children = confirmation.childNodes;
+      for (let j = 0; j < children.length; j++)
+        children[j].addEventListener('click', async _ => j == 2 ? e.target.submit() : (confirmation.style.display = "none", location.href = '/user'));
+    }
   });
 };
 
