@@ -2,6 +2,6 @@ const express = require('express');
 const homeCrontrolers = require('../controllers/homeControllers');
 const homeRouter = express.Router();
 
-homeRouter.get('/', homeCrontrolers.getHome);
+homeRouter.get('/home/:messageToUsers', homeCrontrolers.getHome);
 
 module.exports = homeRouter

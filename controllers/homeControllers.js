@@ -21,12 +21,14 @@
 
 const getHome = (req, res) => {
     try {
-        let payload;
-        if (req.cookie.token) {
+        let payload, messageToUsers;
+        req.params.messageToUsers == ':' ? messageToUsers = false : messageToUsers = req.params.messageToUsers.slice(1);
+        console.log(messageToUsers.length);
+        if (req.cookies.token) {
             payload = JSON.parse(Buffer.from(req.cookies.token.split('.')[1], 'base64').toString());
-        }
-        req.cookies.token ?
-            res.render("home", { logged: true, admin: payload.admin, nickName: payload.user, avatar: payload.avatar }) : res.render("home");
+            res.render("home", { logged: true, message: messageToUsers, admin: payload.admin, nickName: payload.user, avatar: payload.avatar })
+        } else
+            res.render("home");
     } catch (err) {
         res.status(500).send({ err: err.message });
     };

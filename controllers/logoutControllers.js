@@ -19,7 +19,7 @@
 
 const logout = (_, res) => {
     try {
-        res.clearCookie("token").redirect("/");
+        res.clearCookie("token").redirect("/home/:");
     } catch (err) {
         res.status(500).send({ err: err.message });
     };

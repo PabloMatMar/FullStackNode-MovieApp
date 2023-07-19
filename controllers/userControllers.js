@@ -144,7 +144,7 @@ const createUser = async (req, res) => {
             const token = jwt.sign(payload, SECRET, {
                 expiresIn: "3000000ms" // 30 minutos hasta que expira
             });
-            res.cookie('token', token).status(200).redirect("/");
+            res.cookie('token', token).status(200).redirect("/home/:");
         } else {
             res.render("home", { singup: true, alreadyExist: true });
         }
@@ -188,7 +188,7 @@ const validatedUser = async (req, res) => {
                 expiresIn: "12000000ms"
             });
             req.body.avatarChanged ?
-                res.cookie('token', token).status(200).render("home") : res.cookie('token', token).status(200).redirect("/");
+                res.cookie('token', token).status(200).render("home") : res.cookie('token', token).status(200).redirect("/home/:");
         } else
             res.render("home", { login: true, incorrectUser: true });
     } catch (err) {

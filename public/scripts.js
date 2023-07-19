@@ -115,7 +115,7 @@ const deleteUser = async data => {
       },
       body: JSON.stringify(data)
     });
-    response.status == 200 ? path = '/' : path = '/user/deleteUser/:["passwordError"]';
+    response.status == 200 ? path = '/home/:userDeletion' : path = '/user/deleteUser/:["passwordError"]';
     if (response.status != 500)
       location.href = path;
   } catch (err) {
@@ -138,7 +138,7 @@ const updtPassword = async data => {
       },
       body: JSON.stringify(data)
     });
-    response.status == 200 ? path = '/' : path = '/user/updtPassword/:["passwordError"]';
+    response.status == 200 ? path = '/home/:passwordUpdt' : path = '/user/updtPassword/:["passwordError"]';
     if (response.status != 500)
       location.href = path;
   } catch (err) {
@@ -161,7 +161,7 @@ const updtAvatar = async data => {
       },
       body: JSON.stringify(data)
     });
-    response.status == 200 ? path = '/' : path = '/user/updtAvatar/:["passwordError"]';
+    response.status == 200 ? path = '/home/:avatarUpdt' : path = '/user/updtAvatar/:["passwordError"]';
     if (response.status != 500)
       location.href = path;
   } catch (err) {

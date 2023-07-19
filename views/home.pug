@@ -19,5 +19,7 @@ body
         if noAdmin
             section
                 h4 This section is only for Admins.
+        if message
+            include ./homeFragments/messageToUsers.pug
     include ./basicStructures/footer.pug
     script(type="module" src="/scripts.js")
