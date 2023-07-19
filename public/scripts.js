@@ -1,6 +1,6 @@
 //despliegue del menu 'hamburguesa'
 if (document.querySelector(".burger_menu")) {
-  document.querySelector(".burger_menu").addEventListener("click", () => {
+  document.querySelector(".burger_menu").addEventListener("click", _ => {
     let links = document.getElementById("links_menu");
     links.style.display == "block" ? links.style.display = "none" : links.style.display = "block";
   });
@@ -9,7 +9,7 @@ if (document.querySelector(".burger_menu")) {
 
 //LLAMADAS A RUTAS DE ADMIN
 
-//Ruta para crear pelicula en mongo:
+// LLamada a la ruta para crear pelicula en mongo:
 const createMovie = async (movie) => {
   let response = { status: 500 };
   try {
@@ -28,7 +28,7 @@ const createMovie = async (movie) => {
     alert("The movie " + movie.title + " could not be created check that the title is not repeated");
 };
 
-//Ruta para eliminar pelicula de mongo:
+// LLamada a la ruta para eliminar pelicula de mongo:
 const deleteMovie = async (title) => {
   let response = { status: 500 };
   try {
@@ -43,7 +43,7 @@ const deleteMovie = async (title) => {
     alert("The movie " + title + " could not be deleted, you probably have already deleted it, refresh the page to check it.");
 };
 
-//Ruta para actualizar pelicula de mongo:
+// LLamada a la ruta para actualizar pelicula de mongo:
 const updateMovie = async (movie) => {
   let response = { status: 500 };
   try {
@@ -64,7 +64,7 @@ const updateMovie = async (movie) => {
 };
 
 //LLAMADAS A RUTAS DE USUARIO
-//Ruta para añadir pelicula a favoritos: 
+// LLamada a la ruta para añadir pelicula a favoritos: 
 const addFavorite = async (movie) => {
   let response = { status: 500 };
   try {
@@ -83,7 +83,7 @@ const addFavorite = async (movie) => {
     alert("The movie " + movie.title + " could not be add to favorites list, you probably have already added it, go to favorites to check it.");
 };
 
-//Ruta para eliminar pelicula de favoritos:
+// LLamada a la ruta para eliminar pelicula de favoritos:
 const deleteFavMovie = async (data) => {
   let response = { status: 500 };
   try {
@@ -103,6 +103,74 @@ const deleteFavMovie = async (data) => {
     alert("The movie " + data.title + " could not be deleted from favorites list, you probably have already deleted it, refresh the page to check it.");
 };
 
+// LLamada a la ruta para eliminar usuario:
+const deleteUser = async data => {
+  let response = { status: 500 };
+  let path;
+  try {
+    response = await fetch('/user/deleteUser', {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+    response.status == 200 ? path = '/' : path = '/user/deleteUser/:["passwordError"]';
+    if (response.status != 500)
+      location.href = path;
+  } catch (err) {
+    alert(err);
+    console.log(err);
+  };
+  if (response.status == 500)
+    alert("The user " + data.email + " could not be deleted, you probably have already deleted it, refresh the page to check it.");
+};
+
+// LLamada a la ruta para actualizar el password
+const updtPassword = async data => {
+  let response = { status: 500 };
+  let path;
+  try {
+    response = await fetch('/user/updtPassword', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+    response.status == 200 ? path = '/' : path = '/user/updtPassword/:["passwordError"]';
+    if (response.status != 500)
+      location.href = path;
+  } catch (err) {
+    alert(err);
+    console.log(err);
+  };
+  if (response.status == 500)
+    alert("The password could not be updt, you probably have already deleted it, refresh the page to check it.");
+};
+
+// LLamada a la ruta para actualizar el avatar
+const updtAvatar = async data => {
+  let response = { status: 500 };
+  let path;
+  try {
+    response = await fetch('/user/updtAvatar', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+    response.status == 200 ? path = '/' : path = '/user/updtAvatar/:["passwordError"]';
+    if (response.status != 500)
+      location.href = path;
+  } catch (err) {
+    alert(err);
+    console.log(err);
+  };
+  if (response.status == 500)
+    alert("The avatar could not be updt, you probably have already deleted it, refresh the page to check it.");
+}
 //Eventos para capturar los datos de los formularios
 
 if (document.getElementById("signup") != null) {
@@ -127,7 +195,7 @@ if (document.getElementById("signup") != null) {
 if (document.title == "Movies") {
   const anchors = document.getElementsByClassName("update");
   for (let i = 0; i < anchors.length; i++)
-    document.getElementById(`update${i}`).addEventListener('click', async (e) => {
+    document.getElementById(`update${i}`).addEventListener('click', async e => {
       e.preventDefault;
       let title = document.getElementById(`title${i}`).innerHTML;
       localStorage.setItem("title", title);
@@ -135,7 +203,7 @@ if (document.title == "Movies") {
 };
 
 if (document.title === "updateMovie") {
-  document.getElementById("updateMovie").addEventListener("click", async (e) => {
+  document.getElementById("updateMovie").addEventListener("click", async e => {
     e.preventDefault();
     const form = document.querySelector(".updateMovie").elements;
     const data = {};
@@ -160,7 +228,7 @@ if (document.title === "Movies") {
 
 //Evento para capturar los datos y llamar a la funcion para crear pelicula a lista de mongo a traves de admin:
 if (document.title == "CreateMovie") {
-  document.getElementById("createMovie").addEventListener("click", async (e) => {
+  document.getElementById("createMovie").addEventListener("click", async e => {
     e.preventDefault();
     const form = document.querySelector(".createMovie").elements;
     const data = {};
@@ -245,11 +313,13 @@ if (document.getElementById("updtAvatar") != null) {
   document.querySelector("form.updtAvatar").addEventListener("submit", e => {
     e.preventDefault();
     let errs = [0, 0, 0, 0];
-    if (!(/^(?=\w*\d)(?=\w*[A-Z])(?=\w*[a-z])\S{6,16}$/.test(e.target.password.value)))
+    const password = e.target.password.value;
+    const avatar = e.target.avatar.value;
+    if (!(/^(?=\w*\d)(?=\w*[A-Z])(?=\w*[a-z])\S{6,16}$/.test(password)))
       errs[1] = 1;
-    if (e.target.avatar.value.length != 0 && !/.*(jpg|png|jpeg|gif)$/.test(e.target.avatar.value))
+    if (e.target.avatar.value.length != 0 && !/.*(jpg|png|jpeg|gif)$/.test(avatar))
       errs[3] = 1;
-    errs.find(e => e == 1) == 1 ? location.href = `/user/updtAvatar/:${JSON.stringify(errs)}` : e.target.submit();
+    errs.find(e => e == 1) == 1 ? location.href = `/user/updtAvatar/:${JSON.stringify(errs)}` : updtAvatar({ password, avatar });
   });
 };
 
@@ -259,13 +329,15 @@ if (document.getElementById("updtPassword") != null) {
   document.querySelector("form.updtPassword").addEventListener("submit", e => {
     e.preventDefault();
     let errs = [0, 0, 0, 0];
-    if (e.target.password.value != e.target.rPassword.value)
+    const newPassword = e.target.password.value
+    const oldPassword = e.target.oldPassword.value;
+    if (newPassword != e.target.rPassword.value)
       errs[0] = 1;
-    if (!(/^(?=\w*\d)(?=\w*[A-Z])(?=\w*[a-z])\S{6,16}$/.test(e.target.password.value)))
+    if (!(/^(?=\w*\d)(?=\w*[A-Z])(?=\w*[a-z])\S{6,16}$/.test(newPassword)))
       errs[1] = 1;
-    if (!(/^(?=\w*\d)(?=\w*[A-Z])(?=\w*[a-z])\S{6,16}$/.test(e.target.oldPassword.value)))
+    if (!(/^(?=\w*\d)(?=\w*[A-Z])(?=\w*[a-z])\S{6,16}$/.test(oldPassword)))
       errs[1] = 1;
-    errs.find(e => e == 1) == 1 ? location.href = `/user/updtPassword/:${JSON.stringify(errs)}` : e.target.submit();
+    errs.find(e => e == 1) == 1 ? location.href = `/user/updtPassword/:${JSON.stringify(errs)}` : updtPassword({ newPassword, oldPassword });
   });
 };
 
@@ -275,18 +347,22 @@ if (document.getElementById("deleteUser") != null) {
   document.querySelector("form.deleteUser").addEventListener("submit", e => {
     e.preventDefault();
     let errs = [0, 0, 0, 0];
-    if (!(/^(?=\w*\d)(?=\w*[A-Z])(?=\w*[a-z])\S{6,16}$/.test(e.target.password.value)))
+    const password = e.target.password.value;
+    const email = e.target.email.value.toLowerCase();
+    if (!(/^(?=\w*\d)(?=\w*[A-Z])(?=\w*[a-z])\S{6,16}$/.test(password)))
       errs[1] = 1;
-    if (!(/^[a-zA-Z0-9_.]+@[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*[.][a-zA-Z]{2,3}/.test(e.target.email.value)))
+    if (!(/^[a-zA-Z0-9_.]+@[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*[.][a-zA-Z]{2,3}/.test(email)))
       errs[2] = 1;
     if (errs.find(e => e == 1) == 1)
       location.href = `/user/deleteUser/:${JSON.stringify(errs)}`
     else {
       const confirmation = document.getElementById('confirmation');
       confirmation.style.display = "block";
+      const form = document.getElementById('formToDeleteUser');
+      form.style.display = "none";
       const children = confirmation.childNodes;
       for (let j = 0; j < children.length; j++)
-        children[j].addEventListener('click', async _ => j == 2 ? e.target.submit() : (confirmation.style.display = "none", location.href = '/user'));
+        children[j].addEventListener('click', async _ => j == 2 ? deleteUser({ email, password }) : (confirmation.style.display = "none", location.href = '/user'));
     }
   });
 };

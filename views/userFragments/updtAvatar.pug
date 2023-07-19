@@ -1,11 +1,8 @@
 if errsForm
     include ./errsForm.pug
-if passwordError
-    section
-        h4 The avatar has not been updated because the password is not correct.
 section 
     fieldset
-        form(action="/user/updtAvatar" method="post" class="updtAvatar")
+        form(class="updtAvatar")
             legend Password
             input(type="text" name="password" required)
             |
@@ -13,4 +10,4 @@ section
             legend New Url image of your avatar
             input(type="url" name="avatar" placeholder="It leave empty if you want to delete your avatar")
             br
-            input(type="submit" id="updtAvatar" value="Changes Avatar")
+            input(type="submit" id="updtAvatar" value="Changes Avatar" class="css-button-arrow--red")

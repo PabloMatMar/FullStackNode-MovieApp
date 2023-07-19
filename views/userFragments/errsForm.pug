@@ -1,4 +1,6 @@
 section
+    if errsForm[0] == "passwordError"
+        h4 The action could not be carried out because the password or user entered are incorrect
     if errsForm[0] == 1
         h4 Passwords did not match.
     if errsForm[1] == 1

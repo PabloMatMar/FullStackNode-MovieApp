@@ -21,10 +21,12 @@
 
 const getHome = (req, res) => {
     try {
-        let admin;
+        let payload;
+        if (req.cookie.token) {
+            payload = JSON.parse(Buffer.from(req.cookies.token.split('.')[1], 'base64').toString());
+        }
         req.cookies.token ?
-            (admin = JSON.parse(Buffer.from(req.cookies.token.split('.')[1], 'base64').toString()).admin, res.render("home", { logged: true, admin: admin, nickName: JSON.parse(Buffer.from(req.cookies.token.split('.')[1], 'base64').toString()).user, avatar: JSON.parse(Buffer.from(req.cookies.token.split('.')[1], 'base64').toString()).avatar }))
-            : res.render("home");
+            res.render("home", { logged: true, admin: payload.admin, nickName: payload.user, avatar: payload.avatar }) : res.render("home");
     } catch (err) {
         res.status(500).send({ err: err.message });
     };

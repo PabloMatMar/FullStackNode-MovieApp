@@ -6,8 +6,8 @@ userRouter.get('/', userCrontollers.renderUserView);
 userRouter.get('/updtAvatar/:errForm', userCrontollers.renderFormUpdtAvatar);
 userRouter.get('/updtPassword/:errForm', userCrontollers.renderFormUpdtPassword);
 userRouter.get('/deleteUser/:errForm', userCrontollers.renderFormDeleteUser);
-userRouter.post('/updtAvatar', userCrontollers.changesAvatar);
-userRouter.post('/updtPassword', userCrontollers.changesPassword);
-userRouter.post('/deleteUser', userCrontollers.deleteUser);
+userRouter.put('/updtAvatar', userCrontollers.changesAvatar);
+userRouter.put('/updtPassword', userCrontollers.changesPassword);
+userRouter.delete('/deleteUser', userCrontollers.deleteUser);
 
 module.exports = userRouter

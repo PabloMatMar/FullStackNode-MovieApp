@@ -1,11 +1,8 @@
 if errsForm
     include ./errsForm.pug
-if passwordError
-    section
-        h4 The user has not been deleted because the password or email entered is not correct.
 section 
-    fieldset
-        form(action="/user/deleteUser" method="post" class="deleteUser")
+    fieldset(id="formToDeleteUser" style="display: block;")
+        form(class="deleteUser")
             legend Email
             input(type="text" name="email" required)
             |
@@ -15,7 +12,7 @@ section
             |
             |
             br
-            input(type="submit" id="deleteUser" value="Delete user")
+            input(type="submit" id="deleteUser" value="Delete User" class ="css-button-arrow--red")
     p(id="confirmation" style="display: none;") If you delete your user, the entire list of your favorite movies will be permanently deleted.
         br
         button(id="Yes" class ="css-button-arrow--red") Delete

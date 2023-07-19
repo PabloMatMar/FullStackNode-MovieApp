@@ -175,6 +175,7 @@ const createUser = async (req, res) => {
 
 const validatedUser = async (req, res) => {
     try {
+        let path;
         const { credential, admin, avatar } = await users.validatedUser(req.body.email.toLowerCase(), req.body.password);
         if (credential == 1) {
             const payload = {
@@ -186,9 +187,8 @@ const validatedUser = async (req, res) => {
             const token = jwt.sign(payload, SECRET, {
                 expiresIn: "12000000ms"
             });
-            let path, status;
-            req.body.avatarChanged ? (status = 307, path = "/user") : (status = 200, path = "/");
-            res.cookie('token', token).status(status).redirect(path);
+            req.body.avatarChanged ?
+                res.cookie('token', token).status(200).render("home") : res.cookie('token', token).status(200).redirect("/");
         } else
             res.render("home", { login: true, incorrectUser: true });
     } catch (err) {
@@ -283,7 +283,7 @@ const changesAvatar = async (req, res) => {
             req.body.avatarChanged = true;
             await validatedUser(req, res);
         } else
-            res.render("user", { updtAvatar: true, passwordError: true, nickName: req.decoded.user, avatar: req.decoded.avatar });
+            res.status(401).render("user");
     } catch (err) {
         res.status(500).json({ msj: err.message });
     };
@@ -292,9 +292,9 @@ const changesAvatar = async (req, res) => {
 const changesPassword = async (req, res) => {
     try {
         const saltRounds = 12;
-        req.body.password = await bcrypt.hash(req.body.password, saltRounds);
-        const response = await users.changesPassword(req.decoded.user, req.body.password, req.body.oldPassword);
-        response == 1 ? res.render("user", { updtPasswordWasOk: true, nickName: req.decoded.user, avatar: req.decoded.avatar }) : res.render("user", { updtPassword: true, passwordError: true, nickName: req.decoded.user, avatar: req.decoded.avatar });
+        req.body.newPassword = await bcrypt.hash(req.body.newPassword, saltRounds);
+        const response = await users.changesPassword(req.decoded.user, req.body.newPassword, req.body.oldPassword);
+        response == 1 ? res.status(200).render("home") : res.status(401).render("user");
     } catch (err) {
         res.status(500).json({ msj: err.message });
     };
@@ -303,11 +303,10 @@ const changesPassword = async (req, res) => {
 const deleteUser = async (req, res) => {
     try {
         let isNotYourUser, response;
-        req.body.email = req.body.email.toLowerCase();
         req.body.email == req.decoded.user ? isNotYourUser = true : isNotYourUser = false;
         if (isNotYourUser)
             response = await users.deleteUser(req.body.email, req.body.password);
-        response == 1 ? res.redirect("/logout") :  res.render("user", { deleteUser: true, passwordError: true, nickName: req.decoded.user, avatar: req.decoded.avatar });
+        response == 1 ? res.clearCookie("token").status(200).render("home") : res.status(401).render("user");
     } catch (err) {
         res.status(500).json({ msj: err.message });
     };

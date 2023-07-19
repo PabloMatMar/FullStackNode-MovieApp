@@ -163,7 +163,7 @@ const createUser = async (user) => {
  */
 
 const validatedUser = async (email, password) => {
-    let client;
+    let client, isPasswordCorrect;
     let result = {
         credential: 0,
         admin: false,
@@ -172,7 +172,8 @@ const validatedUser = async (email, password) => {
     try {
         client = await pool.connect();
         const data = await client.query(queries.getUserData, [email]);
-        const isPasswordCorrect = await bcrypt.compare(password, data.rows[0].password);
+        if (data.rowCount == 1)
+            isPasswordCorrect = await bcrypt.compare(password, data.rows[0].password);
         const checkAdmin = await client.query(queries.isAdmin, [email]);
         if (data.rowCount == 1 && isPasswordCorrect) {
             result.credential = 1;
@@ -223,7 +224,6 @@ const changesPassword = async (email, newPassword, oldPassword) => {
     try {
         client = await pool.connect();
         const userDatas = await client.query(queries.getUserData, [email]);
-        console.log(userDatas);
         const isPasswordCorrect = await bcrypt.compare(oldPassword, userDatas.rows[0].password);
         if (isPasswordCorrect)
             data = await client.query(queries.updtPassword, [email, newPassword]);
@@ -237,14 +237,15 @@ const changesPassword = async (email, newPassword, oldPassword) => {
 };
 
 const deleteUser = async (email, password) => {
-    let client;
+    let client, isPasswordCorrect;
     let data = {
         rowCount: 0
     };
     try {
         client = await pool.connect();
         const userDatas = await client.query(queries.getUserData, [email]);
-        const isPasswordCorrect = await bcrypt.compare(password, userDatas.rows[0].password);
+        if (userDatas.rowCount == 1)
+            isPasswordCorrect = await bcrypt.compare(password, userDatas.rows[0].password);
         if (isPasswordCorrect) {
             await client.query(queries.deleteFavMovies, [email]);
             data = await client.query(queries.deleteUser, [email]);
