@@ -6,15 +6,22 @@
 
 const Movies = require('../models/moviesMongo');
 const auxiliarFunctions = require('../controllers/auxiliarFunctions');
+
 /**
  * Description: This function gets all the movies in the database.
  * @memberof moviesMongoControllers
  * @method getMovies
  * @async 
+ * @param {Object} req - HTTP request.
  * @param {Object} res - HTTP response.
  * @property {Object} Movies - schema of Movies mongo.
  * @property {Array} movies - All movies mongo conteins.
  * @property {Array} allMovies - Conteins the allMovies to rendering in a templeate.
+ * @property {string} path - path in which the form post will be practiced.
+ * @property {string} movieOrFavMovie - Text of the label of the movie search form.
+ * @property {Object} req.decoded - User information extracted from the token for the rendering.
+ * @property {boolean} admin - Informs the renderer if it is a user or an administrator so that it displays the corresponding navigation bar.
+ * @property {string} nickName - The username/administrator for rendering.
  * @property {string} avatar - The user avatar image url for rendering.
  * @property {function} res.render  Rendering of the response in the moviesAdmin.
  * @throws {Error} message with the error.
@@ -29,32 +36,63 @@ const getMovies = async (req, res) => {
     };
 };
 
+/**
+ * Description: This function collects the name of the movie that the admin wants to search in the local apis.
+ * @memberof moviesMongoControllers
+ * @method capturingFormData
+ * @async 
+ * @param {Object} req - HTTP request.
+ * @param {Object} res - HTTP response.
+ * @property {string} req.body.title - title of the searched movie.
+ * @property {Object} auxiliarFunctions - Script to axuliar functions.
+ * @property {function} titleFormat - This function formats the title of the movies for the movement between apis.  
+ * @property {function} res.redirect - Redirection of the response to the path that search the movie in the mongo database.
+ * @throws {Error} message with the error.
+ */
 
 const capturingFormData = async (req, res) => {
     try {
         let title = " ";
-        if (req.body.title.length > 0) {
-            title = req.body.title.toLowerCase().trim();
-            title = auxiliarFunctions.titleFormat(title);
-        };
+        if (req.body.title.length > 0)
+            title = auxiliarFunctions.titleFormat(req.body.title);
         res.redirect("/movies/:" + title);
     } catch (err) {
         res.status(500).json({ err: err.message });
     };
 };
 
+/**
+ * Description: Find the movie in mongo. If it finds it, it redirects the search to the api.
+ * @memberof moviesMongoControllers
+ * @method getSpecificMovieInMongo
+ * @async 
+ * @param {Object} req - HTTP request.
+ * @param {Object} res - HTTP response.
+ * @property {string} req.params.title - title of the searched movie.
+ * @property {Array} movie - The array whit the movies finded in mongo.
+ * @property {number} status - Code http 404 or 307
+ * @property {boolean} notFound - Allows the rendering of the link to search for the movie in the external api.
+ * @property {string} title - The title of the movie to be inserted in the path of the link that looks for it in the external api.
+ * @property {string} path - path in which the form post will be practiced.
+ * @property {string} movieOrFavMovie - Text of the label of the movie search form.
+ * @property {boolean} admin - Informs the renderer if it is a user or an administrator so that it displays the corresponding navigation bar.
+ * @property {string} nickName - The username/administrator for rendering.
+ * @property {string} avatar - The user avatar image url for rendering.
+ * @property {function} res.render - Rendering of the response in the moviesAdmin view.
+ * @throws {Error} message with the error.
+ */
+
 const getSpecificMovieInMongo = async (req, res) => {
     try {
         let notFound, status;
         const title = req.params.title.slice(1);
-        const movie = await Movies.find({ title: req.params.title.slice(1) }, { _id: 0, __v: 0 });
+        const movie = await Movies.find({ title }, { _id: 0, __v: 0 });
         movie.length > 0 ? status = 307 : (status = 404, notFound = true);
         res.status(status).render("moviesAdmin", { allMovies: movie, path: "/movies/", movieOrFavMovie: "Search a Movie in Mongo Api", notFound, title, admin: req.decoded.admin, nickName: req.decoded.user, avatar: req.decoded.avatar });
     } catch (err) {
         res.status(500).json({ err: err.message });
     };
 };
-
 
 /**
  * Description: Render a form on the view createMovie to create a movie.

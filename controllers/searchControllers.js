@@ -17,7 +17,6 @@ let movieToPush = {};
  * Description: This function renders the search view.
  * @memberof  searchControllers
  * @method  renderSearchView
- * @async 
  * @param {Object} req - HTTP request.
  * @param {Object} res - HTTP response.
  * @property {string} movieOrFavMovie - Text that informs where the form will search for the movie. It can be in favorites or a search in the apis. 
@@ -67,17 +66,17 @@ const startScraping = async (title) => {
  * @param {Object} req - HTTP request.
  * @param {Object} res - HTTP response.
  * @property {string} req.body.title - title of the searched movie.
+ * @property {Object} auxiliarFunctions - Script to axuliar functions.
+ * @property {function} titleFormat - This function formats the title of the movies for the movement between apis.
  * @property {function} res.redirect - Redirection of the response to the path that search the movie in the mongo database.
  * @throws {Error} message with the error during the redirection process.
- * @property {function} res.send - Send a json to error message.
+ * @property {function} res.status.send - Send a json to error message.
  */
 const postFilmForm = async (req, res) => {
     try {
         let title = " ";
-        if (req.body.title.length > 0) {
-            title = req.body.title.toLowerCase().trim();
-            title = auxiliarFunctions.titleFormat(title);
-        };
+        if (req.body.title.length > 0)
+            title = auxiliarFunctions.titleFormat(req.body.title);
         res.redirect("/search/local/" + title);
     } catch (err) {
         res.status(500).send({ err: err.message });
@@ -107,9 +106,9 @@ const postFilmForm = async (req, res) => {
 
 const searchMovieInMongoApi = async (req, res) => {
     try {
-        let isFav = false;
+        let isFav;
         if (!req.decoded.admin) {
-            const hasUserMovie = await Users.getFavorites(req.decoded.user, " " + req.params.title);
+            const hasUserMovie = await Users.getFavorites(req.decoded.user, req.params.title);
             if (hasUserMovie.length > 0)
                 isFav = true;
         };

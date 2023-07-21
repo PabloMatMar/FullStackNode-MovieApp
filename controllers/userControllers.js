@@ -64,10 +64,8 @@ const getFavorites = async (req, res) => {
 const capturingFormData = async (req, res) => {
     try {
         let title = " "
-        if (req.body.title.length > 0) {
-            title = req.body.title.toLowerCase().trim();
-            title = auxiliarFunctions.titleFormat(title);
-        };
+        if (req.body.title.length > 0)
+            title = auxiliarFunctions.titleFormat(req.body.title);
         res.redirect("/favmovies/: " + title);
     } catch (err) {
         res.status(500).send({ err: err.message });

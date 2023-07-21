@@ -5,7 +5,8 @@ const changes = async () => {
     try {
         client = await pool.connect();
         //Introduzco la query para cambiar el dato, fila, columna o tabla que desee
-        await client.query(``);
+        await client.query(`DELETE
+        FROM favorites`);
     }
     catch (err) {
         console.log(err);

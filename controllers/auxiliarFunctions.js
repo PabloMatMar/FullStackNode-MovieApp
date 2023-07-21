@@ -9,6 +9,7 @@ const isNotRoman = (word, romanLetters) =>
 
 const titleFormat = title =>
     title
+        .trim()
         .toLowerCase()
         .split(' ')
         .map((word, indInText) =>
