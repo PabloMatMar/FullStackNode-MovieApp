@@ -62,7 +62,6 @@ const startScraping = async (title) => {
  * Description: This function collects the name of the movie that the user wants to search.
  * @memberof searchControllers
  * @method postFilmForm
- * @async 
  * @param {Object} req - HTTP request.
  * @param {Object} res - HTTP response.
  * @property {string} req.body.title - title of the searched movie.
@@ -72,7 +71,7 @@ const startScraping = async (title) => {
  * @throws {Error} message with the error during the redirection process.
  * @property {function} res.status.send - Send a json to error message.
  */
-const postFilmForm = async (req, res) => {
+const postFilmForm = (req, res) => {
     try {
         let title = " ";
         if (req.body.title.length > 0)
@@ -91,7 +90,13 @@ const postFilmForm = async (req, res) => {
  * @async 
  * @param {Object} req - HTTP request.
  * @param {Object} res - HTTP response.
- * @property {string} req.params.title - The title of the movie that has been redirected from postfilm
+ * @property {boolean} isFav - Informs the rendering if the searched movie is in the user's favorites list.
+ * @property {Array} hasUserMovie - Contains the searched movie in case it is already in the user's favorites list.
+ * @property {Object} Users - Container script of the functions to make requests to sql.
+ * @property {function} getFavorites - This function return the movie if this is in the favorites list. 
+ * @property {string} req.params.title - The title of the movie that has been redirected from postfilm.
+ * @property {string} req.decoded.user - The name of user that is forenkey in SQL
+ * @property {Object} Movies - schema of Movies mongo.
  * @property {function} find - Method to find in mongo a movie for title.
  * @property {Array} movie - The array whit the movies finded in mongo. Only takes the first element.
  * @property {boolean} admin - Informs the renderer if it is a user or an administrator so that it displays the corresponding navigation bar.
@@ -113,7 +118,8 @@ const searchMovieInMongoApi = async (req, res) => {
                 isFav = true;
         };
         const movie = await Movies.find({ title: req.params.title }, { _id: 0, __v: 0 });
-        movie[0] != undefined ? res.status(200).render("search", { categories: { ...movie[0] }._doc, excludes: ['title' ,'poster', 'critics'], path: "/search/", isFav, admin: req.decoded.admin, nickName: req.decoded.user, avatar: req.decoded.avatar }) : res.redirect("/search/" + req.params.title);
+        movie[0] != undefined ?
+            res.status(200).render("search", { categories: { ...movie[0] }._doc, excludes: ['title', 'poster', 'critics'], path: "/search/", isFav, admin: req.decoded.admin, nickName: req.decoded.user, avatar: req.decoded.avatar }) : res.redirect("/search/" + req.params.title);
     } catch (err) {
         res.status(500).send({ err: err.message });
     };
@@ -125,6 +131,8 @@ const searchMovieInMongoApi = async (req, res) => {
  * @method automaticMigration
  * @async 
  * @param {object} movie - Movie and reviews values to send mongo to create a movie.
+ * @property {Object} Movies - schema of Movies mongo.
+ * @property {function} find - Method to find in mongo a movie for title.
  * @property {function} Movies - Method that caugth mongo schema to insert a movie in mongo.
  * @property {function} save - The method to save the movie in mongo.
  * @property {Object} answer - Response of the attempt to save the movie in mongo.
@@ -152,6 +160,8 @@ const automaticMigration = async (movie) => {
  * @async
  * @param {Object} req - HTTP request.
  * @param {Object} res - HTTP response.
+ * @property {Object} Movies - schema of Movies mongo.
+ * @property {function} find - Method to find in mongo a movie for title.
  * @property {function} Movies - Method that caugth mongo schema to insert a movie in mongo.
  * @property {Object} movieToPush - Global variable that conteins the movie searched in api imd to transfer to mongo.
  * @property {function} save - The method to save the movie in mongo.
@@ -178,7 +188,7 @@ const pushMigration = async (req, res) => {
             console.log("Push movie ", answer.title, " to MongoDB");
             res.render("moviesAdmin", { allMovies: [response], added: true, admin: req.decoded.admin, nickName: req.decoded.user, avatar: req.decoded.avatar })
         } else
-            res.status().redirect(`../movies/:${movieToPush.title}`)
+            res.status(302).redirect(`../movies/:${movieToPush.title}`)
     } catch (err) {
         res.status(500).json({ err: err.message });
     };
@@ -194,6 +204,11 @@ const pushMigration = async (req, res) => {
  * @property {function} fetch - Make a get request to url `http://www.omdbapi.com/?t=${req.params.title}&apikey=` + API_KEY
  * @property {string} req.params.title - The title of the movie to search in API.
  * @property {string} API_KEY - The key of the API movies.
+ * @property {Object} auxiliarFunctions - Script to axuliar functions.
+ * @property {function} titleFormat - This function formats the title of the movies for the movement between apis.
+ * @property {Object} Movies - schema of Movies mongo.
+ * @property {function} find - Method to find in mongo a movie for title.
+ * @property {Array} movie - Conteins the movie if it is in mongo, in this case the user is redirected to the mongo route with the title FORMATTED so that a new scrapping does not start.
  * @property {string} categoriesMovie.Error  - If this is not equal to "Movie not found" then movie rendering is started, else, the search view is rendered with the noMovie property set to true.
  * @property {boolean} req.decoded.admin - Allows executing the block of code that calls the function to add the movie to the mongo API if the searcher is a user and not an admin
  * @func startScraping - Call to the function that initiates the scrapping. Receives as argument the title of the movie.

@@ -6,7 +6,7 @@
 require('dotenv').config();
 const { SECRET } = process.env;
 const bcrypt = require('bcrypt');
-const users = require('../models/users_sql');
+const Users = require('../models/users_sql');
 const jwt = require('jsonwebtoken');
 const auxiliarFunctions = require('../controllers/auxiliarFunctions');
 
@@ -18,14 +18,14 @@ const auxiliarFunctions = require('../controllers/auxiliarFunctions');
  * @async  
  * @param {Object} req - HTTP request
  * @param {Object} res - HTTP response
- * @property {Object} req.body - The values ​​to enter in SQL
- * @property {string} req.decoded.user - The name of user that is forenkey in SQL
- * @property {function} res.json - Formatting the response to JSON whit the message "The movie was adds"
+ * @property {Object} req.body - The values ​​to enter in SQL.
+ * @property {string} req.decoded.user - The name of user that is forenkey in SQL.
+ * @property {function} res.json - Formatting the response to JSON whit the message "The movie was adds".
  * @throws {Error} message with the err during save process.
  */
 const addFavorite = async (req, res) => {
     try {
-        await users.addFavorite(req.body, req.decoded.user);
+        await Users.addFavorite(req.body, req.decoded.user);
         res.status(201).json({ msj: "The movie was adds" });
     } catch (err) {
         res.status(500).json({ msj: err.message });
@@ -39,6 +39,7 @@ const addFavorite = async (req, res) => {
  * @async  
  * @param {Object} req - HTTP request
  * @param {Object} res - HTTP response
+ * @property {Object} Users - Container script of the functions to make requests to sql.
  * @property {function} getFavorites - Calls the function in charge of using the queries to obtein all the favorites movies of the user.
  * @property {string} req.decoded.user - The username that acts as the forenkey in the SQL favorites table.
  * @property {string} path - path in which the form post will be practiced.
@@ -52,10 +53,10 @@ const addFavorite = async (req, res) => {
 
 const getFavorites = async (req, res) => {
     try {
-        const userFavMovies = await users.getFavorites(req.decoded.user);
-        let path, whatSearch;
-        userFavMovies.length == 0 ? (path = "/search", whatSearch = "Write the full title of the movie/serie:") : (path = "/favmovies/specific/", whatSearch = "Search among your favorites:");
-        res.status(200).render("search", { path: path, movieOrFavMovie: whatSearch, userFavMovies: userFavMovies.reverse(), nickName: req.decoded.user, avatar: req.decoded.avatar });
+        const userFavMovies = await Users.getFavorites(req.decoded.user);
+        let path, movieOrFavMovie;
+        userFavMovies.length == 0 ? (path = "/search", movieOrFavMovie = "Write the full title of the movie/serie:") : (path = "/favmovies/specific/", movieOrFavMovie = "Search among your favorites:");
+        res.status(200).render("search", { path, movieOrFavMovie, userFavMovies: userFavMovies.reverse(), nickName: req.decoded.user, avatar: req.decoded.avatar });
     } catch (err) {
         res.status(500).json({ msj: err.message });
     };
@@ -75,7 +76,7 @@ const capturingFormData = async (req, res) => {
 const getASpecificFavorite = async (req, res) => {
     try {
         const title = req.params.title.slice(1);
-        const specificMovie = await users.getFavorites(req.decoded.user, title);
+        const specificMovie = await Users.getFavorites(req.decoded.user, title);
         let notFound, status;
         specificMovie.length == 0 ? (status = 302, notFound = "That movie is not among your favorites.") : (status = 404, notFound = null);
         res.status(status).render("search", { path: "/favmovies/specific/", movieOrFavMovie: "Search among your favorites:", userFavMovies: specificMovie, notFound, title: title.slice(1), nickName: req.decoded.user, avatar: req.decoded.avatar });
@@ -91,6 +92,7 @@ const getASpecificFavorite = async (req, res) => {
  * @async  
  * @param {Object} req - HTTP request.
  * @param {Object} res - HTTP response.
+ * @property {Object} Users - Container script of the functions to make requests to sql.
  * @property {function} deleteFavorite - Calls the function in charge of using the queries to eliminate the movie.
  * @property {string} req.decoded.user - The username that acts as the forenkey in the SQL favorites table.
  * @property {string} req.body.title - The username that will be used in the where clause of the query.
@@ -100,7 +102,7 @@ const getASpecificFavorite = async (req, res) => {
 
 const deleteFavoriteMovie = async (req, res) => {
     try {
-        await users.deleteFavorite(req.decoded.user, req.body.title);
+        await Users.deleteFavorite(req.decoded.user, req.body.title);
         res.status(200).json({ msj: "The movie was delete" });
     } catch (err) {
         res.status(500).json({ msj: err.message });
@@ -114,13 +116,18 @@ const deleteFavoriteMovie = async (req, res) => {
  * @async 
  * @param {Object} req - HTTP request.
  * @param {Object} res - HTTP response.
+ * @property {number} saltRounds - This number indicates how many cycles the encryption will perform.
+ * @property {fucntion} bcrypt - Password encryption library.
+ * @property {function} hash - This method allows encryption.
+ * @property {Object} req.body.passwordSignup  - The encrypted password.
+ * @property {Object} Users - Container script of the functions to make requests to sql.
  * @property {function} createUser - Call to the function in charge of using the queries to create a new user row in the users table.
  * @property {number} response - The value is one if the user wascreated, else, 0.
  * @property {Object} req.body - The username, the password, the boolean admin-user and the avatar of user.
  * @property {Object} payload - The user information that will be on the server side.
  * @property {string} SECRET - The key to sing the token.
  * @property {string} req.body.emailSignup - The unique username. 
- * @property {function} res.cookie - HTTP response to save the token in the cookie and redirect to the home view.
+ * @property {function} res.cookie.redirect - HTTP response to save the token in the cookie and redirect to the home view.
  * @property {boolean} login - Boolean that informs the pug template to allow the login form to be rendered.
  * @property {boolean} alreadyExist - Boolean that informs the pug template to allow the message "User already Exisst" to be rendered.
  * @property {function} res.render - Rendering of the response in the home view with the login form and the message "User does not exist".
@@ -131,7 +138,7 @@ const createUser = async (req, res) => {
     try {
         const saltRounds = 10;
         req.body.passwordSignup = await bcrypt.hash(req.body.passwordSignup, saltRounds);
-        const response = await users.createUser(req.body);
+        const response = await Users.createUser(req.body);
         if (response == 1) {
             const payload = {
                 check: true,
@@ -160,6 +167,7 @@ const createUser = async (req, res) => {
  * @param {Object} res - HTTP response.
  * @property {string} req.body.email - The unique username.
  * @property {string} req.body.password - The password of user.
+ * @property {Object} Users - Container script of the functions to make requests to sql.
  * @property {function} validatedUser - Call to the function (two arguments, email and password) in charge of using the queries to validate the login credentials.
  * @property {number} response - The value is one if the validation of the credential was okey, else, 0.
  * @property {Object} payload - The user information that will be on the server side.
@@ -173,8 +181,7 @@ const createUser = async (req, res) => {
 
 const validatedUser = async (req, res) => {
     try {
-        let path;
-        const { credential, admin, avatar } = await users.validatedUser(req.body.email.toLowerCase(), req.body.password);
+        const { credential, admin, avatar } = await Users.validatedUser(req.body.email.toLowerCase(), req.body.password);
         if (credential == 1) {
             const payload = {
                 check: true,
@@ -198,7 +205,6 @@ const validatedUser = async (req, res) => {
  * Description: This function renders the home view whit the form to login.
  * @memberof userControllers
  * @method  getLogin
- * @async 
  * @param {Object} res - HTTP response.
  * @property {boolean} login - Boolean that informs the pug template to allow the form to be rendered.
  * @property {function} res.render - Rendering of the response in the home view whit the form of login.
@@ -217,7 +223,6 @@ const getLogin = (_, res) => {
  * Description: This function renders the home view whit the form to singup.
  * @memberof userControllers
  * @method  getSingup
- * @async 
  * @param {Object} res - HTTP response.
  * @property {string} req.params.errSignup - A stringified array containing error information on the character constraint singup attempt. If params is empty, the log view is rendered without error reporting.
  * @property {boolean} singup - Boolean that informs the pug template to allow the form to be rendered.
@@ -275,7 +280,7 @@ const renderFormDeleteUser = (req, res) => {
 
 const changesAvatar = async (req, res) => {
     try {
-        const response = await users.changesAvatar(req.decoded.user, req.body.avatar, req.body.password);
+        const response = await Users.changesAvatar(req.decoded.user, req.body.avatar, req.body.password);
         if (response.rowCount == 1) {
             req.body.email = req.decoded.user;
             req.body.avatarChanged = true;
@@ -291,7 +296,7 @@ const changesPassword = async (req, res) => {
     try {
         const saltRounds = 12;
         req.body.newPassword = await bcrypt.hash(req.body.newPassword, saltRounds);
-        const response = await users.changesPassword(req.decoded.user, req.body.newPassword, req.body.oldPassword);
+        const response = await Users.changesPassword(req.decoded.user, req.body.newPassword, req.body.oldPassword);
         response == 1 ? res.status(200).render("home") : res.status(401).render("user");
     } catch (err) {
         res.status(500).json({ msj: err.message });
@@ -303,7 +308,7 @@ const deleteUser = async (req, res) => {
         let isNotYourUser, response;
         req.body.email == req.decoded.user ? isNotYourUser = true : isNotYourUser = false;
         if (isNotYourUser)
-            response = await users.deleteUser(req.body.email, req.body.password);
+            response = await Users.deleteUser(req.body.email, req.body.password);
         response == 1 ? res.clearCookie("token").status(200).render("home") : res.status(401).render("user");
     } catch (err) {
         res.status(500).json({ msj: err.message });
