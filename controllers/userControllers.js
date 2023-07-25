@@ -62,6 +62,20 @@ const getFavorites = async (req, res) => {
     };
 };
 
+/**
+* Description: This function collects the name of the movie that the user wants to search in favorites movies section.
+* @memberof searchControllers
+* @method capturingFormData
+* @param {Object} req - HTTP request.
+* @param {Object} res - HTTP response.
+* @property {string} req.body.title - title of the searched movie.
+* @property {Object} auxiliarFunctions - Script to axuliar functions.
+* @property {function} titleFormat - This function formats the title of the movies for the movement between apis.
+* @property {function} res.redirect - Redirection of the response to the path that search the movie on favorites table in SQL.
+* @throws {Error} message with the error during the redirection process.
+* @property {function} res.status.json - Send a json to error message.
+*/
+
 const capturingFormData = async (req, res) => {
     try {
         let title = " "
@@ -69,9 +83,32 @@ const capturingFormData = async (req, res) => {
             title = auxiliarFunctions.titleFormat(req.body.title);
         res.redirect("/favmovies/: " + title);
     } catch (err) {
-        res.status(500).send({ err: err.message });
+        res.status(500).json({ err: err.message });
     };
 };
+
+/**
+ * Description: Find the movie on favorites table in SQL.
+ * @memberof moviesMongoControllers
+ * @method getASpecificFavorite
+ * @async 
+ * @param {Object} req - HTTP request.
+ * @param {Object} res - HTTP response.
+ * @property {string} req.params.title - title of the searched movie.
+ * @property {Array} specificMovie - The array whit the favorite movie finded in SQL.
+ * @property {Object} Users - Container script of the functions to make requests to sql.
+ * @property {function} getFavorites - Calls the function in charge of using the queries to obtein all the favorites movies of the user.
+ * @property {number} status - Code http 404 or 302
+ * @property {boolean} notFound - Allows the rendering of the link to search for the movie in the external api.
+ * @property {string} title - The title of the movie to be inserted in the path of the link that looks for it in the external api.
+ * @property {string} path - path in which the form post will be practiced.
+ * @property {string} movieOrFavMovie - Text of the label of the movie search form.
+ * @property {boolean} admin - Informs the renderer if it is a user or an administrator so that it displays the corresponding navigation bar.
+ * @property {string} nickName - The username/administrator for rendering.
+ * @property {string} avatar - The user avatar image url for rendering.
+ * @property {function} res.render - Rendering of the response in the favorites section on search view.
+ * @throws {Error} message with the error.
+ */
 
 const getASpecificFavorite = async (req, res) => {
     try {
@@ -146,6 +183,7 @@ const createUser = async (req, res) => {
                 avatar: req.body.avatar,
                 admin: req.body.admin
             };
+            req.body.passwordSignup = "";
             const token = jwt.sign(payload, SECRET, {
                 expiresIn: "3000000ms" // 30 minutos hasta que expira
             });
@@ -172,9 +210,9 @@ const createUser = async (req, res) => {
  * @property {number} response - The value is one if the validation of the credential was okey, else, 0.
  * @property {Object} payload - The user information that will be on the server side.
  * @property {string} SECRET - The key to sing the token.
- * @property {function} res.cookie - HTTP response to save the token in the cookie and redirect to the home view.
- * @property {boolean} login - Boolean that informs the pug template to allow the form to be rendered.
- * @property {boolean} incorrectUser - Boolean that informs the pug template to allow the message "User does not exist" to be rendered.
+ * @property {Object} req.body.avatarChanged - If it is true, it renders the home view with the success message (This is rendered through the frontend) in the avatar update. If it does not redirect to the path /home/: with the user already logged in.
+ * @property {function} res.cookie.status.render - HTTP response to save the token in the cookie and render the home view.
+ * @property {function} res.cookie.status.redirect - HTTP response to save the token in the cookie and redirect to the /home/: path.
  * @property {function} res.render - Rendering of the response in the home view with the login form and the message "User does not exist"
  * @throws {Error} message with the error during the delete process.
  */
@@ -182,6 +220,7 @@ const createUser = async (req, res) => {
 const validatedUser = async (req, res) => {
     try {
         const { credential, admin, avatar } = await Users.validatedUser(req.body.email.toLowerCase(), req.body.password);
+        req.body.password = "";
         if (credential == 1) {
             const payload = {
                 check: true,
@@ -239,6 +278,18 @@ const getSingup = (req, res) => {
     };
 };
 
+/**
+ * Description: This function renders the user view.
+ * @memberof  searchControllers
+ * @method  renderUserView
+ * @param {Object} req - HTTP request.
+ * @param {Object} res - HTTP response.
+ * @property {string} nickName - The username/administrator for rendering.
+ * @property {string} avatar - The user avatar image url for rendering.
+ * @property {function} res.render - Rendering the user view.
+ * @throws {Error} message with the error when render search view.
+ * @property {function} res.status.json - Send a json to error message.
+ */
 
 const renderUserView = (req, res) => {
     try {
@@ -247,6 +298,22 @@ const renderUserView = (req, res) => {
         res.status(500).json({ msj: err.message });
     };
 };
+
+/**
+ * Description: This function renders the avatar update form.
+ * @memberof  searchControllers
+ * @method  renderFormUpdtAvatar
+ * @param {Object} req - HTTP request.
+ * @param {Object} res - HTTP response.
+ * @property {string} req.params.errForm - Stringed array containing character errors in credentials.
+ * @property {Array} errsForm - Array whit the character errors in credentials.
+ * @property {boolean} updtAvatar - Boolean that informs the pug render template to render the avatar update form. 
+ * @property {string} nickName - The username/administrator for rendering.
+ * @property {string} avatar - The user avatar image url for rendering.
+ * @property {function} res.render - Rendering the user the update form on user view.
+ * @throws {Error} message with the error when render search view.
+ * @property {function} res.status.json - Send a json to error message.
+ */
 
 const renderFormUpdtAvatar = (req, res) => {
     try {
@@ -258,6 +325,22 @@ const renderFormUpdtAvatar = (req, res) => {
     };
 };
 
+/**
+ * Description: This function renders the password update form.
+ * @memberof  searchControllers
+ * @method  renderFormUpdtPassword
+ * @param {Object} req - HTTP request.
+ * @param {Object} res - HTTP response.
+ * @property {string} req.params.errForm - Stringed array containing character errors in credentials.
+ * @property {Array} errsForm - Array whit the character errors in credentials.
+ * @property {boolean} updtPassword - Boolean that informs the pug render template to render the password update form. 
+ * @property {string} nickName - The username/administrator for rendering.
+ * @property {string} avatar - The user avatar image url for rendering.
+ * @property {function} res.render - Rendering the user the password form on user view.
+ * @throws {Error} message with the error when render search view.
+ * @property {function} res.status.json - Send a json to error message.
+ */
+
 const renderFormUpdtPassword = (req, res) => {
     try {
         let errsForm;
@@ -267,6 +350,22 @@ const renderFormUpdtPassword = (req, res) => {
         res.status(500).json({ msj: err.message });
     };
 };
+
+/**
+ * Description: This function renders the delete user form.
+ * @memberof  searchControllers
+ * @method  renderFormDeleteUser
+ * @param {Object} req - HTTP request.
+ * @param {Object} res - HTTP response.
+ * @property {string} req.params.errForm - Stringed array containing character errors in credentials.
+ * @property {Array} errsForm - Array whit the character errors in credentials.
+ * @property {boolean} deleteUser - Boolean that informs the pug render template to render the delete user form. 
+ * @property {string} nickName - The username/administrator for rendering.
+ * @property {string} avatar - The user avatar image url for rendering.
+ * @property {function} res.render - Rendering the user the delete user form on user view.
+ * @throws {Error} message with the error when render search view.
+ * @property {function} res.status.json - Send a json to error message.
+ */
 
 const renderFormDeleteUser = (req, res) => {
     try {
@@ -278,30 +377,94 @@ const renderFormDeleteUser = (req, res) => {
     };
 };
 
+/**
+ * Description: This function updates the avatar of the user.
+ * @memberof  searchControllers
+ * @method  changesAvatar
+ * @param {Object} req - HTTP request.
+ * @param {Object} res - HTTP response.
+ * @property {Object} Users - Container script of the functions to make requests to sql.
+ * @property {function} changesAvatar - Calls the function in charge of using the queries to update the avatar of the user.
+ * @property {string} req.decoded.user - Argument of the function changesAvatar: The username of the user in users table of SQL.
+ * @property {string} req.body.avatar - Argument of the function changesAvatar: The avatar to update in the users table of SQL.
+ * @property {string} req.body.password - Argument of the function changesAvatar: The password of the user in users table of SQL.
+ * @property {number} response - If is 1 the avatar was updated.
+ * @property {function} validatedUser - Call the functions to refresh token whit the new avatar.
+ * @property {string} req.body.email - The user email of user is setting in this field to allows enter in payload of the token when execute the validatedUser function.
+ * @property {boolean} req.body.avatarChanged - Informs the validatedUser function of the avatar update.
+ * @property {boolean} deleteUser - Boolean that informs the pug render template to render the delete user form. 
+ * @property {string} nickName - The username/administrator for rendering.
+ * @property {string} avatar - The user avatar image url for rendering.
+ * @property {function} res.render - If the avatar dont updtaded, rendering the user view. Bad password error is rendered from frontend.
+ * @throws {Error} message with the error when render search view.
+ */
+
 const changesAvatar = async (req, res) => {
     try {
         const response = await Users.changesAvatar(req.decoded.user, req.body.avatar, req.body.password);
-        if (response.rowCount == 1) {
+        if (response == 1) {
             req.body.email = req.decoded.user;
             req.body.avatarChanged = true;
             await validatedUser(req, res);
-        } else
+        } else {
+            req.body.password = "";
             res.status(401).render("user");
+        };
     } catch (err) {
         res.status(500).json({ msj: err.message });
     };
 };
+
+/**
+ * Description: This function updates the avatar of the user.
+ * @memberof  searchControllers
+ * @method  changesPassword
+ * @param {Object} req - HTTP request.
+ * @param {Object} res - HTTP response.
+ * @property {number} saltRounds - This number indicates how many cycles the encryption will perform.
+ * @property {fucntion} bcrypt - Password encryption library.
+ * @property {function} hash - This method allows encryption.
+ * @property {Object} Users - Container script of the functions to make requests to sql.
+ * @property {function} changesPassword - Calls the function in charge of using the queries to update the avatar of the user.
+ * @property {string} req.decoded.user - Argument of the function changesPassword: The username of the user in users table of SQL.
+ * @property {string} req.body.newPassword - Argument of the function changesPassword: The new password to updated in the user in users table of SQL.
+ * @property {string} req.body.oldPassword - Argument of the function changesPassword: The password of the user in users table of SQL.
+ * @property {number} response - If is 1 the password was updated.
+ * @property {function} res.render - If the password dont updtaded, rendering the user view. Bad password error is rendered from frontend. Else, render the home view. Success message is rendered from the frontend.
+ * @throws {Error} message with the error when render search view.
+ */
 
 const changesPassword = async (req, res) => {
     try {
         const saltRounds = 12;
         req.body.newPassword = await bcrypt.hash(req.body.newPassword, saltRounds);
         const response = await Users.changesPassword(req.decoded.user, req.body.newPassword, req.body.oldPassword);
+        req.body.newPassword = "";
+        req.body.oldPassword = "";
         response == 1 ? res.status(200).render("home") : res.status(401).render("user");
     } catch (err) {
         res.status(500).json({ msj: err.message });
     };
 };
+
+/**
+ * Description: This function updates the avatar of the user.
+ * @memberof  searchControllers
+ * @method  deleteUser
+ * @param {Object} req - HTTP request.
+ * @param {Object} res - HTTP response.
+ * @property {boolean} isNotYourUser - Check that the credentials entered are those of the user who is logged in before proceeding to delete them from the database.
+ * @property {string} req.body.email - Contains the email credential entered by the user.
+ * @property {string} req.decoded.user - Argument of the function deleteUser: The user name extracted to payload of the token.
+ * @property {fucntion} bcrypt - Password encryption library.
+ * @property {function} hash - This method allows encryption.
+ * @property {Object} Users - Container script of the functions to make requests to sql.
+ * @property {function} deleteUser - Calls the function in charge of using the queries to delete user.
+ * @property {string} req.body.password - Argument of the function deleteUser: The password of the user in users table of SQL.
+ * @property {number} response - If is 1 the user was deleted and render home view. Else render user view whit the message to incorrects credentials(Render message send of the frontend).
+ * @property {function} res.render - If the password dont updtaded, rendering the user view. Bad password error is rendered from frontend. Else, render the home view. Success message is rendered from the frontend.
+ * @throws {Error} message with the error when render search view.
+ */
 
 const deleteUser = async (req, res) => {
     try {
@@ -309,6 +472,7 @@ const deleteUser = async (req, res) => {
         req.body.email == req.decoded.user ? isNotYourUser = true : isNotYourUser = false;
         if (isNotYourUser)
             response = await Users.deleteUser(req.body.email, req.body.password);
+        req.body.password = "";
         response == 1 ? res.clearCookie("token").status(200).render("home") : res.status(401).render("user");
     } catch (err) {
         res.status(500).json({ msj: err.message });

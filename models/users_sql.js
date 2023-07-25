@@ -193,8 +193,7 @@ const validatedUser = async (email, password) => {
 const changesAvatar = async (email, avatar, password) => {
     let client;
     let data = {
-        rowCount: 0,
-        avatar: null
+        rowCount: 0
     }
     try {
         client = await pool.connect();
@@ -202,18 +201,13 @@ const changesAvatar = async (email, avatar, password) => {
         const isPasswordCorrect = await bcrypt.compare(password, userDatas.rows[0].password);
         if (isPasswordCorrect)
             data = await client.query(queries.updtAvatar, [email, avatar]);
-        if (data.rowCount == 1)
-            data = {
-                rowCount: 1,
-                avatar: await client.query(queries.getAvatar, [email]).rows
-            };
     } catch (err) {
         console.log(err);
         throw err;
     } finally {
         client.release();
     };
-    return data;
+    return data.rowCount;
 };
 
 const changesPassword = async (email, newPassword, oldPassword) => {

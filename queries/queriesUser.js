@@ -43,11 +43,6 @@ const queries = {
     SET password = $2
     WHERE email = $1;
     `,
-    getAvatar:`
-    SELECT avatar
-    FROM users
-    WHERE email = $1;
-    `,
     deleteFavMovies: `
     DELETE
     FROM favorites
